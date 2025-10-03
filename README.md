@@ -1,5 +1,5 @@
 <img src="https://github.com/ry-ops/proxmox-mcp-server/blob/main/proxmox-mcp-server.png" width="100%">
-# Proxmox MCP Server
+## Proxmox MCP Server
 
 A Model Context Protocol (MCP) server for interacting with Proxmox Virtual Environment API. This server provides comprehensive tools for managing VMs, containers, storage, and cluster resources through the MCP interface.
 
