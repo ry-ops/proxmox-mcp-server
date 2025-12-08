@@ -14,6 +14,23 @@ A Model Context Protocol (MCP) server for interacting with Proxmox Virtual Envir
 
 ## Features
 
+### Agent-to-Agent (A2A) Protocol Support
+
+This server implements the **A2A protocol** for seamless agent-to-agent communication. The included `agent-card.json` file provides:
+
+- **Structured agent capabilities** - Detailed skill definitions for AI-to-AI discovery
+- **Authentication specifications** - Clear auth requirements for automated integration
+- **Tool catalog** - Complete inventory of available operations organized by category
+- **MCP protocol support** - Native Model Context Protocol implementation
+
+**Use Cases:**
+- Multi-agent orchestration systems
+- Automated infrastructure workflows
+- Agent discovery and composition
+- Cross-system AI collaboration
+
+See the [A2A Protocol Documentation](#a2a-protocol) section below for integration details.
+
 ### Virtual Machine Management
 - List all VMs (node-specific or cluster-wide)
 - Get VM configuration and status
@@ -354,6 +371,253 @@ The script will verify:
 3. Authentication
 4. Permission to list nodes
 5. Access to cluster resources
+
+## A2A Protocol
+
+### Overview
+
+This Proxmox MCP server implements the **Agent-to-Agent (A2A) protocol**, enabling AI agents to discover, communicate with, and orchestrate infrastructure management tasks autonomously.
+
+### Agent Card
+
+The `agent-card.json` file serves as the agent's identity and capability manifest. It provides:
+
+**Location:** `/agent-card.json` (repository root)
+
+**Contents:**
+- Agent name, version, and description
+- MCP protocol version and capabilities
+- Authentication methods and requirements
+- Skill catalog organized by functional category
+- Required permissions and dependencies
+- Endpoint configuration
+
+### Available Skills
+
+The agent provides **20 tools** organized into **6 skill categories**:
+
+#### 1. Node Management
+- `list_nodes` - List all cluster nodes
+- `get_node_status` - Get node resource usage and status
+
+#### 2. Virtual Machine Management
+- `list_vms` - List VMs (node-specific or cluster-wide)
+- `get_vm_config` - Get VM configuration
+- `get_vm_status` - Get VM status and metrics
+- `start_vm` - Start a VM
+- `stop_vm` - Force stop a VM
+- `shutdown_vm` - Gracefully shutdown a VM
+- `reboot_vm` - Reboot a VM
+- `create_vm_snapshot` - Create VM snapshot
+- `list_vm_snapshots` - List VM snapshots
+- `delete_vm_snapshot` - Delete VM snapshot
+
+#### 3. Container Management
+- `list_containers` - List LXC containers
+- `get_container_status` - Get container status
+- `start_container` - Start container
+- `stop_container` - Stop container
+
+#### 4. Storage Management
+- `list_storage` - List storage devices
+- `get_storage_status` - Get storage usage and capacity
+
+#### 5. Task Management
+- `list_tasks` - List running and recent tasks
+- `get_task_status` - Get task progress and status
+
+#### 6. Cluster Management
+- `get_cluster_status` - Get overall cluster status and resources
+
+### Agent-to-Agent Integration
+
+#### Discovery
+
+Other agents can discover this agent's capabilities by reading the agent card:
+
+```python
+import json
+
+# Load agent card
+with open('agent-card.json') as f:
+    agent_card = json.load(f)
+
+# Discover capabilities
+print(f"Agent: {agent_card['name']}")
+print(f"Version: {agent_card['version']}")
+print(f"Skills: {len(agent_card['skills'])} categories")
+
+# List available skills
+for skill in agent_card['skills']:
+    print(f"\n{skill['category']}:")
+    for capability in skill['capabilities']:
+        print(f"  - {capability['name']}: {capability['description']}")
+```
+
+#### Authentication Setup
+
+Agents can programmatically configure authentication:
+
+```python
+# API Token (recommended)
+env_config = {
+    "PROXMOX_HOST": "192.168.1.100",
+    "PROXMOX_USER": "root@pam",
+    "PROXMOX_TOKEN_NAME": "automation",
+    "PROXMOX_TOKEN_VALUE": "your-token-value"
+}
+
+# Or Password-based
+env_config = {
+    "PROXMOX_HOST": "192.168.1.100",
+    "PROXMOX_USER": "root@pam",
+    "PROXMOX_PASSWORD": "your-password"
+}
+```
+
+#### Tool Invocation
+
+Agents communicate via MCP protocol:
+
+```python
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+# Connect to the agent
+server_params = StdioServerParameters(
+    command="uv",
+    args=["--directory", "/path/to/proxmox-mcp-server", "run", "proxmox-mcp-server"],
+    env=env_config
+)
+
+async with stdio_client(server_params) as (read, write):
+    async with ClientSession(read, write) as session:
+        # Initialize session
+        await session.initialize()
+
+        # List available tools
+        tools = await session.list_tools()
+
+        # Call a tool
+        result = await session.call_tool("list_vms", arguments={})
+        print(result.content)
+```
+
+#### Multi-Agent Orchestration Example
+
+Example workflow with multiple agents:
+
+```python
+# Agent orchestration: VM backup workflow
+async def backup_workflow():
+    # 1. Proxmox agent: List VMs
+    vms = await proxmox_agent.call_tool("list_vms", {})
+
+    # 2. Proxmox agent: Create snapshots for each VM
+    for vm in vms['data']:
+        snapshot_name = f"backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        await proxmox_agent.call_tool("create_vm_snapshot", {
+            "node": vm['node'],
+            "vmid": vm['vmid'],
+            "snapname": snapshot_name
+        })
+
+    # 3. Storage agent: Verify backup storage capacity
+    storage_status = await storage_agent.call_tool("check_capacity", {})
+
+    # 4. Notification agent: Send completion report
+    await notification_agent.call_tool("send_alert", {
+        "message": f"Backup completed: {len(vms['data'])} VMs"
+    })
+```
+
+### A2A Protocol Benefits
+
+**For AI Agents:**
+- **Self-documenting** - Agent card provides complete capability discovery
+- **Type-safe** - Structured skill definitions with input/output schemas
+- **Composable** - Skills can be combined for complex workflows
+- **Secure** - Clear authentication requirements and permissions
+
+**For Orchestration Systems:**
+- **Dynamic discovery** - Find and integrate agents at runtime
+- **Capability matching** - Match tasks to agent skills automatically
+- **Parallel execution** - Coordinate multiple agents simultaneously
+- **Error handling** - Standardized error responses and retry logic
+
+### Integration Examples
+
+#### Example 1: Infrastructure Monitoring Agent
+
+```python
+# Monitoring agent that uses Proxmox agent skills
+async def monitor_infrastructure():
+    # Get cluster status
+    cluster = await proxmox_agent.call_tool("get_cluster_status", {})
+
+    # Get all nodes
+    nodes = await proxmox_agent.call_tool("list_nodes", {})
+
+    # Check each node's status
+    for node in nodes['data']:
+        status = await proxmox_agent.call_tool("get_node_status", {
+            "node": node['node']
+        })
+
+        # Alert if resource usage is high
+        if status['data']['cpu'] > 0.9:
+            await alert_agent.send_alert(f"High CPU on {node['node']}")
+```
+
+#### Example 2: Auto-scaling Agent
+
+```python
+# Auto-scaling agent that manages VM capacity
+async def autoscale_vms():
+    # Get current VM statuses
+    vms = await proxmox_agent.call_tool("list_vms", {})
+
+    # Analyze load across VMs
+    for vm in vms['data']:
+        status = await proxmox_agent.call_tool("get_vm_status", {
+            "node": vm['node'],
+            "vmid": vm['vmid']
+        })
+
+        # Scale based on metrics
+        if needs_scaling(status):
+            await proxmox_agent.call_tool("start_vm", {
+                "node": "pve2",
+                "vmid": get_next_vm_id()
+            })
+```
+
+#### Example 3: Disaster Recovery Agent
+
+```python
+# DR agent that coordinates backup and recovery
+async def disaster_recovery():
+    # Take snapshots of all critical VMs
+    critical_vms = [100, 101, 102]
+
+    for vmid in critical_vms:
+        # Find which node hosts the VM
+        vms = await proxmox_agent.call_tool("list_vms", {})
+        vm = next(v for v in vms['data'] if v['vmid'] == vmid)
+
+        # Create snapshot
+        await proxmox_agent.call_tool("create_vm_snapshot", {
+            "node": vm['node'],
+            "vmid": vmid,
+            "snapname": f"dr-{datetime.now().isoformat()}"
+        })
+
+        # Verify snapshot
+        snapshots = await proxmox_agent.call_tool("list_vm_snapshots", {
+            "node": vm['node'],
+            "vmid": vmid
+        })
+```
 
 ## API Documentation
 

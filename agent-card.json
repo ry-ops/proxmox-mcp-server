@@ -1,0 +1,257 @@
+{
+  "name": "proxmox-mcp-server",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides comprehensive control over VMs, containers, storage, nodes, and cluster resources through the Proxmox VE API.",
+  "version": "1.0.0",
+  "url": "https://github.com/ry-ops/proxmox-mcp-server",
+  "protocol": {
+    "type": "MCP",
+    "version": "1.0"
+  },
+  "capabilities": {
+    "streaming": false,
+    "tasks": true,
+    "tools": true,
+    "prompts": false,
+    "resources": false
+  },
+  "authentication": {
+    "required": true,
+    "methods": [
+      {
+        "type": "api_token",
+        "description": "Proxmox API token authentication (recommended)",
+        "parameters": {
+          "PROXMOX_HOST": "Proxmox server hostname or IP address",
+          "PROXMOX_USER": "Username (e.g., root@pam)",
+          "PROXMOX_TOKEN_NAME": "API token name",
+          "PROXMOX_TOKEN_VALUE": "API token secret value"
+        }
+      },
+      {
+        "type": "password",
+        "description": "Password-based authentication",
+        "parameters": {
+          "PROXMOX_HOST": "Proxmox server hostname or IP address",
+          "PROXMOX_USER": "Username (e.g., root@pam)",
+          "PROXMOX_PASSWORD": "User password"
+        }
+      }
+    ],
+    "optional_parameters": {
+      "PROXMOX_PORT": "API port (default: 8006)",
+      "PROXMOX_VERIFY_SSL": "Verify SSL certificates (default: false)"
+    }
+  },
+  "skills": [
+    {
+      "category": "node_management",
+      "description": "Cluster node monitoring and management",
+      "capabilities": [
+        {
+          "name": "list_nodes",
+          "description": "List all nodes in the Proxmox cluster",
+          "inputs": [],
+          "outputs": ["node_list"]
+        },
+        {
+          "name": "get_node_status",
+          "description": "Get status and resource usage for a specific node",
+          "inputs": ["node"],
+          "outputs": ["node_status", "cpu_usage", "memory_usage", "uptime"]
+        }
+      ]
+    },
+    {
+      "category": "virtual_machine_management",
+      "description": "Complete VM lifecycle and snapshot management",
+      "capabilities": [
+        {
+          "name": "list_vms",
+          "description": "List all virtual machines (node-specific or cluster-wide)",
+          "inputs": ["node (optional)"],
+          "outputs": ["vm_list"]
+        },
+        {
+          "name": "get_vm_config",
+          "description": "Get configuration for a specific VM",
+          "inputs": ["node", "vmid"],
+          "outputs": ["vm_configuration"]
+        },
+        {
+          "name": "get_vm_status",
+          "description": "Get current status of a VM",
+          "inputs": ["node", "vmid"],
+          "outputs": ["vm_status", "cpu_usage", "memory_usage", "uptime"]
+        },
+        {
+          "name": "start_vm",
+          "description": "Start a virtual machine",
+          "inputs": ["node", "vmid"],
+          "outputs": ["task_id"]
+        },
+        {
+          "name": "stop_vm",
+          "description": "Force stop a virtual machine",
+          "inputs": ["node", "vmid", "timeout (optional)"],
+          "outputs": ["task_id"]
+        },
+        {
+          "name": "shutdown_vm",
+          "description": "Gracefully shutdown a virtual machine (ACPI shutdown)",
+          "inputs": ["node", "vmid", "timeout (optional)"],
+          "outputs": ["task_id"]
+        },
+        {
+          "name": "reboot_vm",
+          "description": "Reboot a virtual machine",
+          "inputs": ["node", "vmid"],
+          "outputs": ["task_id"]
+        },
+        {
+          "name": "create_vm_snapshot",
+          "description": "Create a snapshot of a VM",
+          "inputs": ["node", "vmid", "snapname", "description (optional)"],
+          "outputs": ["task_id"]
+        },
+        {
+          "name": "list_vm_snapshots",
+          "description": "List all snapshots of a VM",
+          "inputs": ["node", "vmid"],
+          "outputs": ["snapshot_list"]
+        },
+        {
+          "name": "delete_vm_snapshot",
+          "description": "Delete a VM snapshot",
+          "inputs": ["node", "vmid", "snapname"],
+          "outputs": ["task_id"]
+        }
+      ]
+    },
+    {
+      "category": "container_management",
+      "description": "LXC container lifecycle management",
+      "capabilities": [
+        {
+          "name": "list_containers",
+          "description": "List all LXC containers on a node",
+          "inputs": ["node"],
+          "outputs": ["container_list"]
+        },
+        {
+          "name": "get_container_status",
+          "description": "Get status of an LXC container",
+          "inputs": ["node", "vmid"],
+          "outputs": ["container_status", "cpu_usage", "memory_usage", "uptime"]
+        },
+        {
+          "name": "start_container",
+          "description": "Start an LXC container",
+          "inputs": ["node", "vmid"],
+          "outputs": ["task_id"]
+        },
+        {
+          "name": "stop_container",
+          "description": "Stop an LXC container",
+          "inputs": ["node", "vmid"],
+          "outputs": ["task_id"]
+        }
+      ]
+    },
+    {
+      "category": "storage_management",
+      "description": "Storage device monitoring and management",
+      "capabilities": [
+        {
+          "name": "list_storage",
+          "description": "List all storage devices",
+          "inputs": ["node (optional)"],
+          "outputs": ["storage_list"]
+        },
+        {
+          "name": "get_storage_status",
+          "description": "Get status of a specific storage device",
+          "inputs": ["node", "storage"],
+          "outputs": ["storage_status", "capacity", "usage", "available"]
+        }
+      ]
+    },
+    {
+      "category": "task_management",
+      "description": "Task tracking and monitoring",
+      "capabilities": [
+        {
+          "name": "list_tasks",
+          "description": "List running and recent tasks",
+          "inputs": ["node (optional)", "limit (optional)"],
+          "outputs": ["task_list"]
+        },
+        {
+          "name": "get_task_status",
+          "description": "Get status of a specific task",
+          "inputs": ["node", "upid"],
+          "outputs": ["task_status", "progress", "exitstatus"]
+        }
+      ]
+    },
+    {
+      "category": "cluster_management",
+      "description": "Cluster-wide status and resource monitoring",
+      "capabilities": [
+        {
+          "name": "get_cluster_status",
+          "description": "Get overall cluster status and resources",
+          "inputs": [],
+          "outputs": ["cluster_status", "total_resources", "node_status"]
+        }
+      ]
+    }
+  ],
+  "requirements": {
+    "python": ">=3.10",
+    "dependencies": [
+      "mcp>=1.0.0",
+      "httpx>=0.27.0"
+    ],
+    "proxmox": "Proxmox VE 6.0 or later"
+  },
+  "permissions": {
+    "recommended": [
+      "VM.Monitor",
+      "VM.Audit",
+      "VM.PowerMgmt",
+      "VM.Snapshot",
+      "Datastore.Audit",
+      "Sys.Audit"
+    ],
+    "description": "Minimum permissions required for full functionality. Adjust based on use case."
+  },
+  "endpoints": {
+    "mcp": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/path/to/proxmox-mcp-server",
+        "run",
+        "proxmox-mcp-server"
+      ]
+    }
+  },
+  "metadata": {
+    "license": "MIT",
+    "repository": "https://github.com/ry-ops/proxmox-mcp-server",
+    "documentation": "https://github.com/ry-ops/proxmox-mcp-server#readme",
+    "issues": "https://github.com/ry-ops/proxmox-mcp-server/issues",
+    "author": "ry-ops",
+    "tags": [
+      "proxmox",
+      "virtualization",
+      "infrastructure",
+      "automation",
+      "devops",
+      "ai-agent",
+      "a2a",
+      "mcp"
+    ]
+  }
+}
