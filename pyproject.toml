@@ -67,7 +67,7 @@ dev-dependencies = [
 [tool.black]
 line-length = 100
 target-version = ["py310", "py311", "py312"]
-include = '\.pyi?
+include = '\.pyi?$'
 
 
 [tool.ruff]
