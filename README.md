@@ -127,6 +127,7 @@ The server is configured via environment variables:
 
 - `PROXMOX_PORT`: API port (default: `8006`)
 - `PROXMOX_VERIFY_SSL`: Verify SSL certificates (default: `false`)
+- `PROXMOX_READ_ONLY`: Block all writes — only GET requests are allowed; any create/update/delete/action tool is refused (default: `false`)
 
 ## Setting Up Proxmox Authentication
 
