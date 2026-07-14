@@ -10,6 +10,7 @@ Configuration (environment variables):
     PROXMOX_TOKEN_VALUE API token value (required if no password)
     PROXMOX_PASSWORD    Password (alternative to token auth)
     PROXMOX_VERIFY_SSL  Verify SSL certs (default: false)
+    PROXMOX_READ_ONLY   Block all writes (POST/PUT/DELETE); GET only (default: false)
 """
 
 from __future__ import annotations
