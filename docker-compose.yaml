@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   proxmox-mcp-server:
     build:
@@ -11,9 +9,11 @@ services:
     env_file:
       - .env
     environment:
-      - PROXMOX_HOST=${PROXMOX_HOST:-https://10.88.140.151:8006}
-      - PROXMOX_TOKEN_ID=${PROXMOX_TOKEN_ID}
-      - PROXMOX_TOKEN_SECRET=${PROXMOX_TOKEN_SECRET}
+      - PROXMOX_HOST=${PROXMOX_HOST:-10.88.140.151}
+      - PROXMOX_PORT=${PROXMOX_PORT:-8006}
+      - PROXMOX_USER=${PROXMOX_USER}
+      - PROXMOX_TOKEN_NAME=${PROXMOX_TOKEN_NAME}
+      - PROXMOX_TOKEN_VALUE=${PROXMOX_TOKEN_VALUE}
       - PROXMOX_VERIFY_SSL=${PROXMOX_VERIFY_SSL:-false}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     # MCP servers communicate via stdio, not network ports
