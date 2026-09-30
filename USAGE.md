@@ -247,6 +247,26 @@ Shutdown all VMs on pve1 gracefully
 Show me the status of all VMs and indicate which need attention
 ```
 
+### Running Commands with the QEMU Guest Agent
+
+`vm_agent_exec` runs a program inside a VM and returns its process ID. Pass the
+program in `command` and each argument separately in `args`. Use
+`vm_agent_exec_status` with the returned PID to check whether the process has
+exited and read its stdout and stderr.
+
+For example, to list the highest-CPU processes in a Windows VM, run
+`powershell.exe` with the following `args`:
+
+```text
+-NoProfile
+-Command
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 ProcessName,Id,CPU | ConvertTo-Json -Compress
+```
+
+Poll `vm_agent_exec_status` with the returned PID until `exited` is true. The
+result includes the process exit code as well as captured stdout and stderr.
+The QEMU Guest Agent must be enabled and running inside the VM.
+
 ---
 
 ## Container Management

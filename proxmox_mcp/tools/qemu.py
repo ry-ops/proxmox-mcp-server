@@ -541,16 +541,40 @@ TOOLS = [
     # --- Agent ---
     {
         "name": "vm_agent_exec",
-        "description": "Execute a command inside a VM via QEMU guest agent.",
+        "description": (
+            "Execute a program inside a VM via QEMU guest agent. Returns a PID; use "
+            "vm_agent_exec_status to retrieve completion status and captured output."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "node": NODE,
                 "vmid": VMID,
-                "command": OPT_STR("Command to execute"),
+                "command": OPT_STR("Program to execute inside the VM"),
+                "args": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Program arguments, passed as separate arguments",
+                },
                 "input-data": OPT_STR("Stdin data for the command"),
             },
             "required": ["node", "vmid", "command"],
+        },
+    },
+    {
+        "name": "vm_agent_exec_status",
+        "description": (
+            "Get the completion status and captured stdout/stderr of a QEMU guest agent "
+            "process started with vm_agent_exec."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "vmid": VMID,
+                "pid": OPT_INT("Process ID returned by vm_agent_exec"),
+            },
+            "required": ["node", "vmid", "pid"],
         },
     },
     {
@@ -841,10 +865,14 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{vm}/rrddata", params)
 
     elif name == "vm_agent_exec":
-        data = {"command": args["command"]}
+        command = [args["command"], *args.get("args", [])]
+        exec_data: dict[str, Any] = {"command": command}
         if "input-data" in args:
-            data["input-data"] = args["input-data"]
-        return await client.post(f"{vm}/agent/exec", data)
+            exec_data["input-data"] = args["input-data"]
+        return await client.post(f"{vm}/agent/exec", exec_data)
+
+    elif name == "vm_agent_exec_status":
+        return await client.get(f"{vm}/agent/exec-status", {"pid": args["pid"]})
 
     elif name == "vm_agent_get_fsinfo":
         return await client.get(f"{vm}/agent/get-fsinfo")
