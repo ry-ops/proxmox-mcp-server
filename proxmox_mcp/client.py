@@ -73,6 +73,9 @@ class ProxmoxClient:
     ) -> Any:
         url = f"{self.base_url}{path}"
         headers = self._headers(method)
+        if data is not None:
+            # Proxmox API rejects true/false; it requires 1/0.
+            data = {k: int(v) if isinstance(v, bool) else v for k, v in data.items()}
         if method == "GET":
             response = await self.client.get(url, headers=headers, params=data)
         elif method == "POST":
