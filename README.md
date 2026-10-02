@@ -96,12 +96,10 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Clone or download this repository
 cd proxmox-mcp-server
 
-# Run setup script (creates structure and installs dependencies)
+# Run setup script (installs dependencies)
 ./setup.sh
 
 # Or manually:
-mkdir -p src/proxmox_mcp_server
-# Place server.py and __init__.py in src/proxmox_mcp_server/
 uv sync
 ```
 
@@ -293,10 +291,10 @@ uv run pytest
 
 ```
 proxmox-mcp-server/
-├── src/
-│   └── proxmox_mcp_server/
-│       ├── __init__.py       # Package initialization
-│       └── server.py         # Main server implementation
+├── proxmox_mcp/
+│   ├── server.py             # MCP server entrypoint and tool registry
+│   ├── client.py             # Proxmox API client (token/password auth)
+│   └── tools/                # Tool definitions and handlers, one module per API area
 ├── pyproject.toml            # Project configuration
 ├── uv.lock                   # Locked dependencies (generated)
 ├── .env.example              # Environment variable template

@@ -12,16 +12,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync
 ```
 
-## 2. Create Project Structure
-
-```bash
-# Create the Python package structure
-mkdir -p src/proxmox_mcp_server
-touch src/proxmox_mcp_server/__init__.py
-# Move server.py to src/proxmox_mcp_server/server.py
-```
-
-## 3. Create API Token in Proxmox
+## 2. Create API Token in Proxmox
 
 1. Open Proxmox web interface
 2. Go to **Datacenter** → **Permissions** → **API Tokens**
@@ -32,7 +23,7 @@ touch src/proxmox_mcp_server/__init__.py
 7. Click **Add**
 8. **Copy the token secret** (you won't see it again!)
 
-## 4. Configure Claude Desktop
+## 3. Configure Claude Desktop
 
 Edit config file:
 - **MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -64,11 +55,11 @@ Add this configuration (replace values with yours):
 
 **Important**: Use the absolute path to your project!
 
-## 5. Restart Claude Desktop
+## 4. Restart Claude Desktop
 
 Completely quit and restart Claude Desktop.
 
-## 6. Test It!
+## 5. Test It!
 
 Open a new conversation in Claude and try:
 

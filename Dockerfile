@@ -12,13 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
+COPY proxmox_mcp ./proxmox_mcp
 
-RUN pip install --no-cache-dir "mcp>=1.0.0" "httpx>=0.27.0" hatchling
-
-COPY . .
-
-RUN pip install --no-cache-dir --no-deps .
+# Install with dependencies resolved from pyproject.toml so version caps apply.
+RUN pip install --no-cache-dir .
 
 RUN groupadd -g 1001 proxmox && \
     useradd -u 1001 -g proxmox -s /bin/sh proxmox && \
@@ -28,4 +26,4 @@ USER proxmox
 
 ENV MCP_SERVER_TYPE=proxmox
 
-CMD ["python", "-m", "proxmox_mcp_server.server"]
+CMD ["proxmox-mcp-server"]
