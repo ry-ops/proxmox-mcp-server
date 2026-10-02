@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides comprehensive control over VMs, containers, storage, nodes, and cluster resources through the Proxmox VE API.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 338 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications and resource pools.",
   "version": "2.1.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -45,163 +45,3288 @@
   "skills": [
     {
       "category": "node_management",
-      "description": "Cluster node monitoring and management",
+      "description": "Node status, configuration, networking, services, updates and power",
       "capabilities": [
         {
           "name": "list_nodes",
-          "description": "List all nodes in the Proxmox cluster",
-          "inputs": [],
-          "outputs": ["node_list"]
+          "description": "List all nodes in the Proxmox cluster with status and resource usage.",
+          "inputs": []
         },
         {
           "name": "get_node_status",
-          "description": "Get status and resource usage for a specific node",
-          "inputs": ["node"],
-          "outputs": ["node_status", "cpu_usage", "memory_usage", "uptime"]
+          "description": "Get detailed status and resource usage for a specific node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_config",
+          "description": "Get node configuration (wake-on-LAN MAC, etc.).",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_version",
+          "description": "Get Proxmox VE version information for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_time",
+          "description": "Get current time and timezone for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "set_node_time",
+          "description": "Set timezone for a node.",
+          "inputs": [
+            "node",
+            "timezone"
+          ]
+        },
+        {
+          "name": "get_node_dns",
+          "description": "Get DNS configuration for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "set_node_dns",
+          "description": "Set DNS configuration for a node.",
+          "inputs": [
+            "node",
+            "search (optional)",
+            "dns1 (optional)",
+            "dns2 (optional)",
+            "dns3 (optional)"
+          ]
+        },
+        {
+          "name": "get_node_hosts",
+          "description": "Get /etc/hosts content for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "set_node_hosts",
+          "description": "Write /etc/hosts content for a node.",
+          "inputs": [
+            "node",
+            "data",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_node_network",
+          "description": "List network interfaces configured on a node.",
+          "inputs": [
+            "node",
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_node_network_interface",
+          "description": "Get configuration for a specific network interface on a node.",
+          "inputs": [
+            "node",
+            "iface"
+          ]
+        },
+        {
+          "name": "apply_node_network",
+          "description": "Apply pending network configuration changes on a node (reload interfaces).",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "revert_node_network",
+          "description": "Revert pending network configuration changes on a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_netstat",
+          "description": "Get network statistics for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "list_node_services",
+          "description": "List all systemd services on a node with their state.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_service_state",
+          "description": "Get the state of a specific service on a node.",
+          "inputs": [
+            "node",
+            "service"
+          ]
+        },
+        {
+          "name": "start_node_service",
+          "description": "Start a systemd service on a node.",
+          "inputs": [
+            "node",
+            "service"
+          ]
+        },
+        {
+          "name": "stop_node_service",
+          "description": "Stop a systemd service on a node.",
+          "inputs": [
+            "node",
+            "service"
+          ]
+        },
+        {
+          "name": "restart_node_service",
+          "description": "Restart a systemd service on a node.",
+          "inputs": [
+            "node",
+            "service"
+          ]
+        },
+        {
+          "name": "reload_node_service",
+          "description": "Reload a systemd service on a node.",
+          "inputs": [
+            "node",
+            "service"
+          ]
+        },
+        {
+          "name": "get_node_syslog",
+          "description": "Get syslog entries from a node.",
+          "inputs": [
+            "node",
+            "limit (optional)",
+            "start (optional)",
+            "since (optional)",
+            "until (optional)",
+            "service (optional)"
+          ]
+        },
+        {
+          "name": "get_node_journal",
+          "description": "Get systemd journal entries from a node.",
+          "inputs": [
+            "node",
+            "limit (optional)",
+            "startcursor (optional)",
+            "endcursor (optional)",
+            "since (optional)",
+            "until (optional)",
+            "lastentries (optional)"
+          ]
+        },
+        {
+          "name": "get_node_report",
+          "description": "Get a full diagnostic report for a node (OS, hardware, config).",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_subscription",
+          "description": "Get Proxmox subscription info for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_apt_update",
+          "description": "List available APT package updates on a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_apt_changelog",
+          "description": "Get changelog for an APT package on a node.",
+          "inputs": [
+            "node",
+            "name",
+            "version (optional)"
+          ]
+        },
+        {
+          "name": "get_node_hardware",
+          "description": "List PCI devices and hardware info for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_rrd",
+          "description": "Get RRD statistics graph data for a node (returns base64 PNG).",
+          "inputs": [
+            "node",
+            "ds",
+            "timeframe",
+            "cf (optional)"
+          ]
+        },
+        {
+          "name": "get_node_rrddata",
+          "description": "Get RRD statistics data points for a node.",
+          "inputs": [
+            "node",
+            "timeframe",
+            "cf (optional)"
+          ]
+        },
+        {
+          "name": "node_shutdown",
+          "description": "Shutdown or reboot a Proxmox node.",
+          "inputs": [
+            "node",
+            "command"
+          ]
+        },
+        {
+          "name": "node_startall",
+          "description": "Start all VMs and containers on a node.",
+          "inputs": [
+            "node",
+            "vms (optional)",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "node_stopall",
+          "description": "Stop all VMs and containers on a node.",
+          "inputs": [
+            "node",
+            "vms (optional)",
+            "force_stop (optional)"
+          ]
+        },
+        {
+          "name": "node_migrateall",
+          "description": "Migrate all VMs and containers from a node to a target node.",
+          "inputs": [
+            "node",
+            "target",
+            "maxworkers (optional)",
+            "vms (optional)",
+            "with_local_disks (optional)"
+          ]
+        },
+        {
+          "name": "get_node_aplinfo",
+          "description": "Get available LXC appliance/template info for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_capabilities_qemu",
+          "description": "Get QEMU capabilities for a node (CPU types, machine types, migration options).",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_node_scan",
+          "description": "Scan for available storage, iSCSI targets, or other resources on a node.",
+          "inputs": [
+            "node",
+            "type"
+          ]
+        },
+        {
+          "name": "wakeonlan",
+          "description": "Wake a node via Wake-on-LAN.",
+          "inputs": [
+            "node"
+          ]
         }
       ]
     },
     {
       "category": "virtual_machine_management",
-      "description": "Complete VM lifecycle and snapshot management",
+      "description": "QEMU/KVM VM lifecycle, configuration, snapshots, migration, disks, metrics, firewall and guest agent",
       "capabilities": [
         {
           "name": "list_vms",
-          "description": "List all virtual machines (node-specific or cluster-wide)",
-          "inputs": ["node (optional)"],
-          "outputs": ["vm_list"]
-        },
-        {
-          "name": "get_vm_config",
-          "description": "Get configuration for a specific VM",
-          "inputs": ["node", "vmid"],
-          "outputs": ["vm_configuration"]
+          "description": "List all QEMU VMs on a node or cluster-wide.",
+          "inputs": [
+            "node (optional)"
+          ]
         },
         {
           "name": "get_vm_status",
-          "description": "Get current status of a VM",
-          "inputs": ["node", "vmid"],
-          "outputs": ["vm_status", "cpu_usage", "memory_usage", "uptime"]
+          "description": "Get current running status of a VM (CPU, memory, uptime, etc.).",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "get_vm_config",
+          "description": "Get the configuration of a VM (hardware, boot, network, disks).",
+          "inputs": [
+            "node",
+            "vmid",
+            "current (optional)",
+            "snapshot (optional)"
+          ]
+        },
+        {
+          "name": "set_vm_config",
+          "description": "Update VM configuration. Accepts any Proxmox VM config key as a parameter.",
+          "inputs": [
+            "node",
+            "vmid",
+            "name (optional)",
+            "description (optional)",
+            "memory (optional)",
+            "cores (optional)",
+            "sockets (optional)",
+            "cpu (optional)",
+            "onboot (optional)",
+            "startup (optional)",
+            "hotplug (optional)",
+            "agent (optional)",
+            "net0 (optional)",
+            "net1 (optional)",
+            "scsi0 (optional)",
+            "ide2 (optional)",
+            "boot (optional)",
+            "tags (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_pending",
+          "description": "Get pending config changes for a VM (applied on next start).",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
         },
         {
           "name": "start_vm",
-          "description": "Start a virtual machine",
-          "inputs": ["node", "vmid"],
-          "outputs": ["task_id"]
+          "description": "Start a virtual machine.",
+          "inputs": [
+            "node",
+            "vmid",
+            "skiplock (optional)",
+            "timeout (optional)"
+          ]
         },
         {
           "name": "stop_vm",
-          "description": "Force stop a virtual machine",
-          "inputs": ["node", "vmid", "timeout (optional)"],
-          "outputs": ["task_id"]
+          "description": "Force-stop a virtual machine (hard power off).",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeout (optional)",
+            "skiplock (optional)",
+            "keepActive (optional)"
+          ]
         },
         {
           "name": "shutdown_vm",
-          "description": "Gracefully shutdown a virtual machine (ACPI shutdown)",
-          "inputs": ["node", "vmid", "timeout (optional)"],
-          "outputs": ["task_id"]
+          "description": "Gracefully shut down a VM via ACPI signal.",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeout (optional)",
+            "forceStop (optional)",
+            "skiplock (optional)"
+          ]
         },
         {
           "name": "reboot_vm",
-          "description": "Reboot a virtual machine",
-          "inputs": ["node", "vmid"],
-          "outputs": ["task_id"]
+          "description": "Reboot a virtual machine (ACPI reboot).",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeout (optional)"
+          ]
         },
         {
-          "name": "create_vm_snapshot",
-          "description": "Create a snapshot of a VM",
-          "inputs": ["node", "vmid", "snapname", "description (optional)"],
-          "outputs": ["task_id"]
+          "name": "reset_vm",
+          "description": "Hard-reset a virtual machine (like pressing the reset button).",
+          "inputs": [
+            "node",
+            "vmid",
+            "skiplock (optional)"
+          ]
+        },
+        {
+          "name": "suspend_vm",
+          "description": "Suspend a virtual machine to RAM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "skiplock (optional)",
+            "todisk (optional)",
+            "statestorage (optional)"
+          ]
+        },
+        {
+          "name": "resume_vm",
+          "description": "Resume a suspended virtual machine.",
+          "inputs": [
+            "node",
+            "vmid",
+            "skiplock (optional)",
+            "nocheck (optional)"
+          ]
+        },
+        {
+          "name": "create_vm",
+          "description": "Create a new QEMU VM.",
+          "inputs": [
+            "node",
+            "vmid (optional)",
+            "name (optional)",
+            "memory (optional)",
+            "cores (optional)",
+            "sockets (optional)",
+            "cpu (optional)",
+            "ostype (optional)",
+            "scsihw (optional)",
+            "scsi0 (optional)",
+            "ide2 (optional)",
+            "net0 (optional)",
+            "boot (optional)",
+            "onboot (optional)",
+            "agent (optional)",
+            "description (optional)",
+            "tags (optional)",
+            "pool (optional)",
+            "start (optional)",
+            "template (optional)"
+          ]
+        },
+        {
+          "name": "clone_vm",
+          "description": "Clone a VM to a new VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "newid (optional)",
+            "name (optional)",
+            "description (optional)",
+            "full (optional)",
+            "storage (optional)",
+            "pool (optional)",
+            "target (optional)",
+            "snapname (optional)",
+            "format (optional)"
+          ]
+        },
+        {
+          "name": "delete_vm",
+          "description": "Delete a VM and optionally its disks.",
+          "inputs": [
+            "node",
+            "vmid",
+            "destroy-unreferenced-disks (optional)",
+            "purge (optional)",
+            "skiplock (optional)"
+          ]
+        },
+        {
+          "name": "convert_vm_to_template",
+          "description": "Convert a VM to a template.",
+          "inputs": [
+            "node",
+            "vmid",
+            "disk (optional)"
+          ]
         },
         {
           "name": "list_vm_snapshots",
-          "description": "List all snapshots of a VM",
-          "inputs": ["node", "vmid"],
-          "outputs": ["snapshot_list"]
+          "description": "List all snapshots of a VM.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "create_vm_snapshot",
+          "description": "Create a snapshot of a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname",
+            "description (optional)",
+            "vmstate (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_snapshot_config",
+          "description": "Get the VM config at a specific snapshot.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname"
+          ]
+        },
+        {
+          "name": "rollback_vm_snapshot",
+          "description": "Rollback a VM to a snapshot.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname",
+            "start (optional)"
+          ]
         },
         {
           "name": "delete_vm_snapshot",
-          "description": "Delete a VM snapshot",
-          "inputs": ["node", "vmid", "snapname"],
-          "outputs": ["task_id"]
+          "description": "Delete a VM snapshot.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "migrate_vm",
+          "description": "Migrate a VM to another node.",
+          "inputs": [
+            "node",
+            "vmid",
+            "target",
+            "online (optional)",
+            "with-local-disks (optional)",
+            "targetstorage (optional)",
+            "bwlimit (optional)",
+            "force (optional)",
+            "migration_type (optional)",
+            "migration_network (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_migrate_preconditions",
+          "description": "Check migration preconditions for a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "target"
+          ]
+        },
+        {
+          "name": "resize_vm_disk",
+          "description": "Resize a VM disk.",
+          "inputs": [
+            "node",
+            "vmid",
+            "disk",
+            "size",
+            "skiplock (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "move_vm_disk",
+          "description": "Move a VM disk to another storage or detach it.",
+          "inputs": [
+            "node",
+            "vmid",
+            "disk",
+            "storage (optional)",
+            "format (optional)",
+            "delete (optional)",
+            "digest (optional)",
+            "bwlimit (optional)",
+            "target-vmid (optional)",
+            "target-disk (optional)"
+          ]
+        },
+        {
+          "name": "unlink_vm_disk",
+          "description": "Unlink/detach disks from a VM config (optionally destroy them).",
+          "inputs": [
+            "node",
+            "vmid",
+            "idlist",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "import_vm_disk",
+          "description": "Import an external disk image into a storage for a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "source",
+            "storage",
+            "format (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_firewall_rules",
+          "description": "List firewall rules for a VM.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "add_vm_firewall_rule",
+          "description": "Add a firewall rule to a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "type",
+            "action",
+            "proto (optional)",
+            "dport (optional)",
+            "sport (optional)",
+            "source (optional)",
+            "dest (optional)",
+            "comment (optional)",
+            "enable (optional)",
+            "pos (optional)"
+          ]
+        },
+        {
+          "name": "delete_vm_firewall_rule",
+          "description": "Delete a firewall rule from a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "pos",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_firewall_options",
+          "description": "Get firewall options for a VM.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "set_vm_firewall_options",
+          "description": "Set firewall options for a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "enable (optional)",
+            "dhcp (optional)",
+            "macfilter (optional)",
+            "ndp (optional)",
+            "radv (optional)",
+            "ipfilter (optional)",
+            "log_level_in (optional)",
+            "log_level_out (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_firewall_log",
+          "description": "Get firewall log for a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "limit (optional)",
+            "start (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_rrddata",
+          "description": "Get RRD statistics data points for a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeframe",
+            "cf (optional)"
+          ]
+        },
+        {
+          "name": "vm_agent_exec",
+          "description": "Execute a program inside a VM via QEMU guest agent. Returns a PID; use vm_agent_exec_status to retrieve completion status and captured output.",
+          "inputs": [
+            "node",
+            "vmid",
+            "command",
+            "args (optional)",
+            "input-data (optional)"
+          ]
+        },
+        {
+          "name": "vm_agent_exec_status",
+          "description": "Get the completion status and captured stdout/stderr of a QEMU guest agent process started with vm_agent_exec.",
+          "inputs": [
+            "node",
+            "vmid",
+            "pid"
+          ]
+        },
+        {
+          "name": "vm_agent_get_fsinfo",
+          "description": "Get filesystem info from inside a VM via QEMU guest agent.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "vm_agent_get_network_interfaces",
+          "description": "Get network interface info from inside a VM via QEMU guest agent.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "vm_agent_get_osinfo",
+          "description": "Get OS info from inside a VM via QEMU guest agent.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "vm_agent_ping",
+          "description": "Ping the QEMU guest agent inside a VM.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "vm_agent_set_user_password",
+          "description": "Set a user password inside a VM via QEMU guest agent.",
+          "inputs": [
+            "node",
+            "vmid",
+            "username",
+            "password",
+            "crypted (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_feature",
+          "description": "Check if a VM supports a specific feature (e.g. snapshot, clone, copy).",
+          "inputs": [
+            "node",
+            "vmid",
+            "feature",
+            "snapname (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_vnc_proxy",
+          "description": "Get a VNC proxy ticket for a VM console.",
+          "inputs": [
+            "node",
+            "vmid",
+            "websocket (optional)",
+            "generate-password (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_spice_proxy",
+          "description": "Get a SPICE proxy config for a VM console.",
+          "inputs": [
+            "node",
+            "vmid",
+            "proxy (optional)"
+          ]
+        },
+        {
+          "name": "get_vm_cloudinit",
+          "description": "Get cloud-init config dump for a VM.",
+          "inputs": [
+            "node",
+            "vmid",
+            "type"
+          ]
+        },
+        {
+          "name": "regenerate_vm_cloudinit",
+          "description": "Regenerate cloud-init config ISO for a VM.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
         }
       ]
     },
     {
       "category": "container_management",
-      "description": "LXC container lifecycle management",
+      "description": "LXC container lifecycle, configuration, snapshots, migration, metrics and firewall",
       "capabilities": [
         {
           "name": "list_containers",
-          "description": "List all LXC containers on a node",
-          "inputs": ["node"],
-          "outputs": ["container_list"]
+          "description": "List all LXC containers on a node.",
+          "inputs": [
+            "node"
+          ]
         },
         {
           "name": "get_container_status",
-          "description": "Get status of an LXC container",
-          "inputs": ["node", "vmid"],
-          "outputs": ["container_status", "cpu_usage", "memory_usage", "uptime"]
+          "description": "Get current running status of an LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "get_container_config",
+          "description": "Get configuration of an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "current (optional)",
+            "snapshot (optional)"
+          ]
+        },
+        {
+          "name": "set_container_config",
+          "description": "Update LXC container configuration.",
+          "inputs": [
+            "node",
+            "vmid",
+            "hostname (optional)",
+            "description (optional)",
+            "memory (optional)",
+            "swap (optional)",
+            "cores (optional)",
+            "cpulimit (optional)",
+            "cpuunits (optional)",
+            "onboot (optional)",
+            "startup (optional)",
+            "net0 (optional)",
+            "net1 (optional)",
+            "mp0 (optional)",
+            "tags (optional)",
+            "features (optional)",
+            "delete (optional)",
+            "digest (optional)",
+            "unprivileged (optional)"
+          ]
+        },
+        {
+          "name": "get_container_pending",
+          "description": "Get pending config changes for an LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
         },
         {
           "name": "start_container",
-          "description": "Start an LXC container",
-          "inputs": ["node", "vmid"],
-          "outputs": ["task_id"]
+          "description": "Start an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "skiplock (optional)",
+            "debug (optional)"
+          ]
         },
         {
           "name": "stop_container",
-          "description": "Stop an LXC container",
-          "inputs": ["node", "vmid"],
-          "outputs": ["task_id"]
+          "description": "Force-stop an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "skiplock (optional)",
+            "overrule-shutdown (optional)"
+          ]
+        },
+        {
+          "name": "shutdown_container",
+          "description": "Gracefully shutdown an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeout (optional)",
+            "forceStop (optional)",
+            "skiplock (optional)"
+          ]
+        },
+        {
+          "name": "reboot_container",
+          "description": "Reboot an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeout (optional)"
+          ]
+        },
+        {
+          "name": "suspend_container",
+          "description": "Suspend an LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "resume_container",
+          "description": "Resume a suspended LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "create_container",
+          "description": "Create a new LXC container.",
+          "inputs": [
+            "node",
+            "vmid (optional)",
+            "ostemplate",
+            "hostname (optional)",
+            "memory (optional)",
+            "swap (optional)",
+            "cores (optional)",
+            "rootfs (optional)",
+            "net0 (optional)",
+            "password (optional)",
+            "ssh-public-keys (optional)",
+            "onboot (optional)",
+            "unprivileged (optional)",
+            "features (optional)",
+            "tags (optional)",
+            "pool (optional)",
+            "storage (optional)",
+            "start (optional)",
+            "description (optional)"
+          ]
+        },
+        {
+          "name": "clone_container",
+          "description": "Clone an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "newid (optional)",
+            "hostname (optional)",
+            "description (optional)",
+            "full (optional)",
+            "storage (optional)",
+            "pool (optional)",
+            "target (optional)",
+            "snapname (optional)"
+          ]
+        },
+        {
+          "name": "delete_container",
+          "description": "Delete an LXC container and its disks.",
+          "inputs": [
+            "node",
+            "vmid",
+            "purge (optional)",
+            "destroy-unreferenced-disks (optional)",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "resize_container_disk",
+          "description": "Resize an LXC container disk.",
+          "inputs": [
+            "node",
+            "vmid",
+            "disk",
+            "size",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "move_container_disk",
+          "description": "Move an LXC container disk to another storage.",
+          "inputs": [
+            "node",
+            "vmid",
+            "disk",
+            "storage",
+            "delete (optional)",
+            "digest (optional)",
+            "bwlimit (optional)",
+            "target-vmid (optional)",
+            "target-disk (optional)"
+          ]
+        },
+        {
+          "name": "migrate_container",
+          "description": "Migrate an LXC container to another node.",
+          "inputs": [
+            "node",
+            "vmid",
+            "target",
+            "online (optional)",
+            "restart (optional)",
+            "timeout (optional)",
+            "bwlimit (optional)",
+            "targetstorage (optional)"
+          ]
+        },
+        {
+          "name": "list_container_snapshots",
+          "description": "List all snapshots of an LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "create_container_snapshot",
+          "description": "Create a snapshot of an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname",
+            "description (optional)"
+          ]
+        },
+        {
+          "name": "rollback_container_snapshot",
+          "description": "Rollback an LXC container to a snapshot.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname",
+            "start (optional)"
+          ]
+        },
+        {
+          "name": "delete_container_snapshot",
+          "description": "Delete an LXC container snapshot.",
+          "inputs": [
+            "node",
+            "vmid",
+            "snapname",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "get_container_firewall_rules",
+          "description": "List firewall rules for an LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "add_container_firewall_rule",
+          "description": "Add a firewall rule to an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "type",
+            "action",
+            "proto (optional)",
+            "dport (optional)",
+            "sport (optional)",
+            "source (optional)",
+            "dest (optional)",
+            "comment (optional)",
+            "enable (optional)",
+            "pos (optional)"
+          ]
+        },
+        {
+          "name": "delete_container_firewall_rule",
+          "description": "Delete a firewall rule from an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "pos",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_container_firewall_options",
+          "description": "Get firewall options for an LXC container.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
+        },
+        {
+          "name": "set_container_firewall_options",
+          "description": "Set firewall options for an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "enable (optional)",
+            "dhcp (optional)",
+            "macfilter (optional)",
+            "ndp (optional)",
+            "radv (optional)",
+            "ipfilter (optional)",
+            "log_level_in (optional)",
+            "log_level_out (optional)"
+          ]
+        },
+        {
+          "name": "get_container_rrddata",
+          "description": "Get RRD statistics data points for an LXC container.",
+          "inputs": [
+            "node",
+            "vmid",
+            "timeframe",
+            "cf (optional)"
+          ]
+        },
+        {
+          "name": "convert_container_to_template",
+          "description": "Convert an LXC container to a template.",
+          "inputs": [
+            "node",
+            "vmid"
+          ]
         }
       ]
     },
     {
       "category": "storage_management",
-      "description": "Storage device monitoring and management",
+      "description": "Storage definitions, content and volumes, downloads, backup and restore",
       "capabilities": [
         {
           "name": "list_storage",
-          "description": "List all storage devices",
-          "inputs": ["node (optional)"],
-          "outputs": ["storage_list"]
+          "description": "List all storage configurations in the cluster.",
+          "inputs": [
+            "node (optional)",
+            "type (optional)",
+            "enabled (optional)"
+          ]
         },
         {
-          "name": "get_storage_status",
-          "description": "Get status of a specific storage device",
-          "inputs": ["node", "storage"],
-          "outputs": ["storage_status", "capacity", "usage", "available"]
-        }
-      ]
-    },
-    {
-      "category": "task_management",
-      "description": "Task tracking and monitoring",
-      "capabilities": [
-        {
-          "name": "list_tasks",
-          "description": "List running and recent tasks",
-          "inputs": ["node (optional)", "limit (optional)"],
-          "outputs": ["task_list"]
+          "name": "get_storage_config",
+          "description": "Get configuration for a specific storage.",
+          "inputs": [
+            "storage"
+          ]
         },
         {
-          "name": "get_task_status",
-          "description": "Get status of a specific task",
-          "inputs": ["node", "upid"],
-          "outputs": ["task_status", "progress", "exitstatus"]
+          "name": "create_storage",
+          "description": "Create a new storage configuration.",
+          "inputs": [
+            "storage",
+            "type",
+            "path (optional)",
+            "server (optional)",
+            "export (optional)",
+            "share (optional)",
+            "username (optional)",
+            "password (optional)",
+            "vgname (optional)",
+            "thinpool (optional)",
+            "pool (optional)",
+            "content (optional)",
+            "nodes (optional)",
+            "shared (optional)",
+            "disable (optional)",
+            "maxfiles (optional)"
+          ]
+        },
+        {
+          "name": "update_storage",
+          "description": "Update an existing storage configuration.",
+          "inputs": [
+            "storage",
+            "content (optional)",
+            "nodes (optional)",
+            "shared (optional)",
+            "disable (optional)",
+            "maxfiles (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_storage",
+          "description": "Delete a storage configuration.",
+          "inputs": [
+            "storage"
+          ]
+        },
+        {
+          "name": "get_node_storage_status",
+          "description": "Get status and usage for a specific storage on a node.",
+          "inputs": [
+            "node",
+            "storage"
+          ]
+        },
+        {
+          "name": "list_storage_content",
+          "description": "List volumes/content in a storage on a node (ISOs, backups, disk images, templates).",
+          "inputs": [
+            "node",
+            "storage",
+            "content (optional)",
+            "vmid (optional)"
+          ]
+        },
+        {
+          "name": "get_storage_volume_info",
+          "description": "Get info about a specific volume in storage.",
+          "inputs": [
+            "node",
+            "storage",
+            "volume"
+          ]
+        },
+        {
+          "name": "delete_storage_volume",
+          "description": "Delete a volume from storage.",
+          "inputs": [
+            "node",
+            "storage",
+            "volume",
+            "delay (optional)"
+          ]
+        },
+        {
+          "name": "copy_storage_volume",
+          "description": "Copy a volume to another storage/VM.",
+          "inputs": [
+            "node",
+            "storage",
+            "volume",
+            "target",
+            "target_node (optional)"
+          ]
+        },
+        {
+          "name": "download_url_to_storage",
+          "description": "Download a file (ISO, template) from a URL directly to storage on a node.",
+          "inputs": [
+            "node",
+            "storage",
+            "url",
+            "content",
+            "filename",
+            "checksum (optional)",
+            "checksum_algorithm (optional)",
+            "verify_certificates (optional)"
+          ]
+        },
+        {
+          "name": "backup_vm",
+          "description": "Create a backup of a VM or container using vzdump.",
+          "inputs": [
+            "node",
+            "vmid (optional)",
+            "storage (optional)",
+            "mode (optional)",
+            "compress (optional)",
+            "notes-template (optional)",
+            "protected (optional)",
+            "mailnotification (optional)",
+            "mailto (optional)",
+            "maxfiles (optional)",
+            "prune-backups (optional)",
+            "bwlimit (optional)",
+            "ionice (optional)",
+            "pigz (optional)",
+            "remove (optional)",
+            "all (optional)"
+          ]
+        },
+        {
+          "name": "restore_vm_backup",
+          "description": "Restore a VM from a backup file.",
+          "inputs": [
+            "node",
+            "vmid",
+            "archive",
+            "storage (optional)",
+            "name (optional)",
+            "force (optional)",
+            "unique (optional)",
+            "start (optional)",
+            "bwlimit (optional)",
+            "pool (optional)",
+            "live-restore (optional)"
+          ]
+        },
+        {
+          "name": "restore_container_backup",
+          "description": "Restore an LXC container from a backup file.",
+          "inputs": [
+            "node",
+            "vmid",
+            "ostemplate",
+            "storage (optional)",
+            "hostname (optional)",
+            "force (optional)",
+            "unique (optional)",
+            "start (optional)",
+            "bwlimit (optional)",
+            "pool (optional)",
+            "unprivileged (optional)"
+          ]
         }
       ]
     },
     {
       "category": "cluster_management",
-      "description": "Cluster-wide status and resource monitoring",
+      "description": "Cluster status, resources, options, logs, tasks, HA, replication and backup jobs",
       "capabilities": [
         {
           "name": "get_cluster_status",
-          "description": "Get overall cluster status and resources",
-          "inputs": [],
-          "outputs": ["cluster_status", "total_resources", "node_status"]
+          "description": "Get overall cluster status (nodes, quorum).",
+          "inputs": []
+        },
+        {
+          "name": "get_cluster_resources",
+          "description": "Get all cluster resources (nodes, VMs, containers, storage, pools) with usage stats.",
+          "inputs": [
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_version",
+          "description": "Get Proxmox VE API version.",
+          "inputs": []
+        },
+        {
+          "name": "get_cluster_nextid",
+          "description": "Get the next available VM/CT ID in the cluster.",
+          "inputs": [
+            "vmid (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_options",
+          "description": "Get cluster-wide configuration options.",
+          "inputs": []
+        },
+        {
+          "name": "set_cluster_options",
+          "description": "Set cluster-wide configuration options.",
+          "inputs": [
+            "keyboard (optional)",
+            "language (optional)",
+            "email_from (optional)",
+            "max_workers (optional)",
+            "migration_cidr (optional)",
+            "migration_type (optional)",
+            "next-id (optional)",
+            "notify (optional)",
+            "registered-tags (optional)",
+            "tag-style (optional)",
+            "delete (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_log",
+          "description": "Get cluster-wide log entries.",
+          "inputs": [
+            "max (optional)"
+          ]
+        },
+        {
+          "name": "list_cluster_tasks",
+          "description": "List recent cluster-wide tasks.",
+          "inputs": []
+        },
+        {
+          "name": "list_node_tasks",
+          "description": "List running and recent tasks on a node.",
+          "inputs": [
+            "node",
+            "limit (optional)",
+            "start (optional)",
+            "source (optional)",
+            "statusfilter (optional)",
+            "typefilter (optional)",
+            "userfilter (optional)",
+            "vmid (optional)",
+            "since (optional)",
+            "until (optional)"
+          ]
+        },
+        {
+          "name": "get_task_status",
+          "description": "Get status of a specific task by UPID.",
+          "inputs": [
+            "node",
+            "upid"
+          ]
+        },
+        {
+          "name": "get_task_log",
+          "description": "Get log output of a specific task.",
+          "inputs": [
+            "node",
+            "upid",
+            "limit (optional)",
+            "start (optional)",
+            "download (optional)"
+          ]
+        },
+        {
+          "name": "stop_task",
+          "description": "Stop/cancel a running task.",
+          "inputs": [
+            "node",
+            "upid"
+          ]
+        },
+        {
+          "name": "list_ha_resources",
+          "description": "List all HA-managed resources.",
+          "inputs": [
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_ha_resource",
+          "description": "Get HA configuration for a specific resource.",
+          "inputs": [
+            "sid"
+          ]
+        },
+        {
+          "name": "add_ha_resource",
+          "description": "Add a resource to HA management.",
+          "inputs": [
+            "sid",
+            "state (optional)",
+            "group (optional)",
+            "max_restart (optional)",
+            "max_relocate (optional)",
+            "comment (optional)"
+          ]
+        },
+        {
+          "name": "update_ha_resource",
+          "description": "Update HA configuration for a resource.",
+          "inputs": [
+            "sid",
+            "state (optional)",
+            "group (optional)",
+            "max_restart (optional)",
+            "max_relocate (optional)",
+            "comment (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_ha_resource",
+          "description": "Remove a resource from HA management.",
+          "inputs": [
+            "sid"
+          ]
+        },
+        {
+          "name": "list_ha_groups",
+          "description": "List all HA groups.",
+          "inputs": []
+        },
+        {
+          "name": "get_ha_status",
+          "description": "Get HA manager status.",
+          "inputs": []
+        },
+        {
+          "name": "list_replication_jobs",
+          "description": "List all replication jobs.",
+          "inputs": [
+            "guest (optional)"
+          ]
+        },
+        {
+          "name": "get_replication_job",
+          "description": "Get configuration of a replication job.",
+          "inputs": [
+            "id"
+          ]
+        },
+        {
+          "name": "create_replication_job",
+          "description": "Create a new replication job.",
+          "inputs": [
+            "id",
+            "target",
+            "type",
+            "schedule (optional)",
+            "rate (optional)",
+            "comment (optional)",
+            "disable (optional)"
+          ]
+        },
+        {
+          "name": "update_replication_job",
+          "description": "Update a replication job.",
+          "inputs": [
+            "id",
+            "schedule (optional)",
+            "rate (optional)",
+            "comment (optional)",
+            "disable (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_replication_job",
+          "description": "Delete a replication job.",
+          "inputs": [
+            "id",
+            "force (optional)",
+            "keep (optional)"
+          ]
+        },
+        {
+          "name": "list_backup_jobs",
+          "description": "List all scheduled backup jobs.",
+          "inputs": []
+        },
+        {
+          "name": "get_backup_job",
+          "description": "Get a scheduled backup job configuration.",
+          "inputs": [
+            "id"
+          ]
+        },
+        {
+          "name": "create_backup_job",
+          "description": "Create a new scheduled backup job.",
+          "inputs": [
+            "id (optional)",
+            "node (optional)",
+            "vmid (optional)",
+            "all (optional)",
+            "storage (optional)",
+            "schedule (optional)",
+            "mode (optional)",
+            "compress (optional)",
+            "mailnotification (optional)",
+            "mailto (optional)",
+            "notes-template (optional)",
+            "prune-backups (optional)",
+            "enabled (optional)",
+            "bwlimit (optional)",
+            "protected (optional)",
+            "pool (optional)",
+            "comment (optional)"
+          ]
+        },
+        {
+          "name": "update_backup_job",
+          "description": "Update a scheduled backup job.",
+          "inputs": [
+            "id",
+            "schedule (optional)",
+            "storage (optional)",
+            "vmid (optional)",
+            "enabled (optional)",
+            "prune-backups (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_backup_job",
+          "description": "Delete a scheduled backup job.",
+          "inputs": [
+            "id"
+          ]
+        },
+        {
+          "name": "bulk_start_guests",
+          "description": "Start multiple VMs/containers at once.",
+          "inputs": [
+            "vms (optional)",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "bulk_shutdown_guests",
+          "description": "Shutdown multiple VMs/containers at once.",
+          "inputs": [
+            "vms (optional)",
+            "force_stop (optional)"
+          ]
+        },
+        {
+          "name": "bulk_migrate_guests",
+          "description": "Migrate multiple VMs/containers to a target node.",
+          "inputs": [
+            "target",
+            "vms (optional)",
+            "maxworkers (optional)",
+            "with_local_disks (optional)"
+          ]
+        },
+        {
+          "name": "list_metrics_servers",
+          "description": "List configured external metrics servers (InfluxDB, Graphite).",
+          "inputs": []
+        },
+        {
+          "name": "create_metrics_server",
+          "description": "Add an external metrics server.",
+          "inputs": [
+            "id",
+            "type",
+            "server",
+            "port",
+            "disable (optional)",
+            "timeout (optional)",
+            "path (optional)",
+            "protocol (optional)",
+            "organization (optional)",
+            "bucket (optional)",
+            "token (optional)",
+            "mtu (optional)",
+            "api-path-prefix (optional)",
+            "max-body-size (optional)",
+            "verify-certificate (optional)"
+          ]
+        },
+        {
+          "name": "delete_metrics_server",
+          "description": "Remove an external metrics server.",
+          "inputs": [
+            "id"
+          ]
+        },
+        {
+          "name": "list_realm_sync_jobs",
+          "description": "List realm sync jobs.",
+          "inputs": []
+        },
+        {
+          "name": "analyze_schedule",
+          "description": "Analyze a Proxmox schedule string and return next execution times.",
+          "inputs": [
+            "schedule",
+            "iterations (optional)",
+            "starttime (optional)"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "access_control",
+      "description": "Users, API tokens, groups, roles, ACLs and authentication realms",
+      "capabilities": [
+        {
+          "name": "list_users",
+          "description": "List all users in Proxmox.",
+          "inputs": [
+            "enabled (optional)",
+            "full (optional)"
+          ]
+        },
+        {
+          "name": "get_user",
+          "description": "Get a specific user's configuration.",
+          "inputs": [
+            "userid"
+          ]
+        },
+        {
+          "name": "create_user",
+          "description": "Create a new Proxmox user.",
+          "inputs": [
+            "userid",
+            "password (optional)",
+            "email (optional)",
+            "firstname (optional)",
+            "lastname (optional)",
+            "comment (optional)",
+            "groups (optional)",
+            "enable (optional)",
+            "expire (optional)",
+            "keys (optional)"
+          ]
+        },
+        {
+          "name": "update_user",
+          "description": "Update a Proxmox user.",
+          "inputs": [
+            "userid",
+            "email (optional)",
+            "firstname (optional)",
+            "lastname (optional)",
+            "comment (optional)",
+            "groups (optional)",
+            "enable (optional)",
+            "expire (optional)",
+            "keys (optional)",
+            "append (optional)",
+            "delete (optional)"
+          ]
+        },
+        {
+          "name": "delete_user",
+          "description": "Delete a Proxmox user.",
+          "inputs": [
+            "userid"
+          ]
+        },
+        {
+          "name": "change_user_password",
+          "description": "Change a user's password.",
+          "inputs": [
+            "userid",
+            "password",
+            "confirmation-password (optional)"
+          ]
+        },
+        {
+          "name": "list_user_tokens",
+          "description": "List API tokens for a user.",
+          "inputs": [
+            "userid"
+          ]
+        },
+        {
+          "name": "get_user_token",
+          "description": "Get configuration for a specific API token.",
+          "inputs": [
+            "userid",
+            "tokenid"
+          ]
+        },
+        {
+          "name": "create_user_token",
+          "description": "Create an API token for a user.",
+          "inputs": [
+            "userid",
+            "tokenid",
+            "comment (optional)",
+            "expire (optional)",
+            "privsep (optional)"
+          ]
+        },
+        {
+          "name": "update_user_token",
+          "description": "Update an API token.",
+          "inputs": [
+            "userid",
+            "tokenid",
+            "comment (optional)",
+            "expire (optional)",
+            "privsep (optional)",
+            "delete (optional)"
+          ]
+        },
+        {
+          "name": "delete_user_token",
+          "description": "Delete an API token.",
+          "inputs": [
+            "userid",
+            "tokenid"
+          ]
+        },
+        {
+          "name": "list_groups",
+          "description": "List all groups.",
+          "inputs": []
+        },
+        {
+          "name": "get_group",
+          "description": "Get a group's configuration and members.",
+          "inputs": [
+            "groupid"
+          ]
+        },
+        {
+          "name": "create_group",
+          "description": "Create a new group.",
+          "inputs": [
+            "groupid",
+            "comment (optional)"
+          ]
+        },
+        {
+          "name": "update_group",
+          "description": "Update a group.",
+          "inputs": [
+            "groupid",
+            "comment (optional)"
+          ]
+        },
+        {
+          "name": "delete_group",
+          "description": "Delete a group.",
+          "inputs": [
+            "groupid"
+          ]
+        },
+        {
+          "name": "list_roles",
+          "description": "List all roles and their privileges.",
+          "inputs": []
+        },
+        {
+          "name": "get_role",
+          "description": "Get a role's privileges.",
+          "inputs": [
+            "roleid"
+          ]
+        },
+        {
+          "name": "create_role",
+          "description": "Create a custom role.",
+          "inputs": [
+            "roleid",
+            "privs (optional)"
+          ]
+        },
+        {
+          "name": "update_role",
+          "description": "Update a role's privileges.",
+          "inputs": [
+            "roleid",
+            "privs (optional)",
+            "append (optional)"
+          ]
+        },
+        {
+          "name": "delete_role",
+          "description": "Delete a custom role.",
+          "inputs": [
+            "roleid"
+          ]
+        },
+        {
+          "name": "get_acl",
+          "description": "Get the access control list (permissions tree).",
+          "inputs": []
+        },
+        {
+          "name": "update_acl",
+          "description": "Add or remove an ACL entry.",
+          "inputs": [
+            "path",
+            "roles",
+            "users (optional)",
+            "groups (optional)",
+            "tokens (optional)",
+            "propagate (optional)",
+            "delete (optional)"
+          ]
+        },
+        {
+          "name": "list_auth_domains",
+          "description": "List all authentication domains/realms.",
+          "inputs": []
+        },
+        {
+          "name": "get_auth_domain",
+          "description": "Get configuration for an authentication domain.",
+          "inputs": [
+            "realm"
+          ]
+        },
+        {
+          "name": "create_auth_domain",
+          "description": "Create a new authentication domain (LDAP, AD, OpenID).",
+          "inputs": [
+            "realm",
+            "type",
+            "server1 (optional)",
+            "server2 (optional)",
+            "base_dn (optional)",
+            "bind_dn (optional)",
+            "password (optional)",
+            "user_attr (optional)",
+            "default (optional)",
+            "comment (optional)",
+            "port (optional)",
+            "secure (optional)",
+            "tfa (optional)",
+            "sync-defaults-options (optional)",
+            "issuer-url (optional)",
+            "client-id (optional)",
+            "client-key (optional)",
+            "username-claim (optional)"
+          ]
+        },
+        {
+          "name": "update_auth_domain",
+          "description": "Update an authentication domain configuration.",
+          "inputs": [
+            "realm",
+            "comment (optional)",
+            "default (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_auth_domain",
+          "description": "Delete an authentication domain.",
+          "inputs": [
+            "realm"
+          ]
+        },
+        {
+          "name": "sync_auth_domain",
+          "description": "Sync users/groups from an LDAP/AD/OpenID realm.",
+          "inputs": [
+            "realm",
+            "dry-run (optional)",
+            "enable-new (optional)",
+            "full (optional)",
+            "purge (optional)",
+            "scope (optional)",
+            "remove-vanished (optional)"
+          ]
+        },
+        {
+          "name": "list_tfa",
+          "description": "List TFA configurations for all users.",
+          "inputs": [
+            "userid (optional)"
+          ]
+        },
+        {
+          "name": "get_user_tfa",
+          "description": "Get TFA configuration for a specific user.",
+          "inputs": [
+            "userid"
+          ]
+        },
+        {
+          "name": "add_tfa",
+          "description": "Add a TFA entry for a user.",
+          "inputs": [
+            "userid",
+            "type",
+            "description (optional)",
+            "totp (optional)",
+            "value (optional)",
+            "challenge (optional)",
+            "password (optional)"
+          ]
+        },
+        {
+          "name": "delete_tfa",
+          "description": "Delete a TFA entry for a user.",
+          "inputs": [
+            "userid",
+            "id",
+            "password (optional)"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "firewall_management",
+      "description": "Cluster and node firewall rules, security groups, aliases, IP sets and logs",
+      "capabilities": [
+        {
+          "name": "list_cluster_firewall_rules",
+          "description": "List all cluster-level firewall rules.",
+          "inputs": []
+        },
+        {
+          "name": "add_cluster_firewall_rule",
+          "description": "Add a cluster-level firewall rule.",
+          "inputs": [
+            "type",
+            "action",
+            "proto (optional)",
+            "dport (optional)",
+            "sport (optional)",
+            "source (optional)",
+            "dest (optional)",
+            "macro (optional)",
+            "comment (optional)",
+            "enable (optional)",
+            "pos (optional)"
+          ]
+        },
+        {
+          "name": "update_cluster_firewall_rule",
+          "description": "Update a cluster-level firewall rule.",
+          "inputs": [
+            "pos",
+            "type (optional)",
+            "action (optional)",
+            "proto (optional)",
+            "dport (optional)",
+            "source (optional)",
+            "dest (optional)",
+            "enable (optional)",
+            "comment (optional)",
+            "digest (optional)",
+            "moveto (optional)",
+            "delete (optional)"
+          ]
+        },
+        {
+          "name": "delete_cluster_firewall_rule",
+          "description": "Delete a cluster-level firewall rule.",
+          "inputs": [
+            "pos",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_firewall_options",
+          "description": "Get cluster firewall options.",
+          "inputs": []
+        },
+        {
+          "name": "set_cluster_firewall_options",
+          "description": "Set cluster firewall options.",
+          "inputs": [
+            "enable (optional)",
+            "policy_in (optional)",
+            "policy_out (optional)",
+            "log_ratelimit (optional)",
+            "ebtables (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "list_firewall_groups",
+          "description": "List all firewall security groups.",
+          "inputs": []
+        },
+        {
+          "name": "create_firewall_group",
+          "description": "Create a firewall security group.",
+          "inputs": [
+            "group",
+            "comment (optional)",
+            "rename (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_firewall_group",
+          "description": "Delete a firewall security group.",
+          "inputs": [
+            "group"
+          ]
+        },
+        {
+          "name": "list_firewall_group_rules",
+          "description": "List rules inside a firewall security group.",
+          "inputs": [
+            "group"
+          ]
+        },
+        {
+          "name": "add_firewall_group_rule",
+          "description": "Add a rule to a firewall security group.",
+          "inputs": [
+            "group",
+            "type",
+            "action",
+            "proto (optional)",
+            "dport (optional)",
+            "source (optional)",
+            "dest (optional)",
+            "comment (optional)",
+            "enable (optional)",
+            "pos (optional)"
+          ]
+        },
+        {
+          "name": "delete_firewall_group_rule",
+          "description": "Delete a rule from a firewall security group.",
+          "inputs": [
+            "group",
+            "pos",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "list_firewall_aliases",
+          "description": "List all firewall aliases (named IPs/CIDRs).",
+          "inputs": []
+        },
+        {
+          "name": "create_firewall_alias",
+          "description": "Create a firewall alias.",
+          "inputs": [
+            "name",
+            "cidr",
+            "comment (optional)"
+          ]
+        },
+        {
+          "name": "update_firewall_alias",
+          "description": "Update a firewall alias.",
+          "inputs": [
+            "name",
+            "cidr (optional)",
+            "comment (optional)",
+            "rename (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_firewall_alias",
+          "description": "Delete a firewall alias.",
+          "inputs": [
+            "name",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "list_firewall_ipsets",
+          "description": "List all firewall IPsets.",
+          "inputs": []
+        },
+        {
+          "name": "create_firewall_ipset",
+          "description": "Create a firewall IPset.",
+          "inputs": [
+            "name",
+            "comment (optional)",
+            "rename (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_firewall_ipset",
+          "description": "Delete a firewall IPset.",
+          "inputs": [
+            "name",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "list_firewall_ipset_entries",
+          "description": "List IPs in a firewall IPset.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "add_firewall_ipset_entry",
+          "description": "Add an IP/CIDR to a firewall IPset.",
+          "inputs": [
+            "name",
+            "cidr",
+            "comment (optional)",
+            "nomatch (optional)"
+          ]
+        },
+        {
+          "name": "delete_firewall_ipset_entry",
+          "description": "Remove an IP/CIDR from a firewall IPset.",
+          "inputs": [
+            "name",
+            "cidr",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "list_node_firewall_rules",
+          "description": "List firewall rules for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "add_node_firewall_rule",
+          "description": "Add a firewall rule to a node.",
+          "inputs": [
+            "node",
+            "type",
+            "action",
+            "proto (optional)",
+            "dport (optional)",
+            "source (optional)",
+            "dest (optional)",
+            "comment (optional)",
+            "enable (optional)",
+            "pos (optional)"
+          ]
+        },
+        {
+          "name": "delete_node_firewall_rule",
+          "description": "Delete a firewall rule from a node.",
+          "inputs": [
+            "node",
+            "pos",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_node_firewall_options",
+          "description": "Get firewall options for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "set_node_firewall_options",
+          "description": "Set firewall options for a node.",
+          "inputs": [
+            "node",
+            "enable (optional)",
+            "log_level_in (optional)",
+            "log_level_out (optional)",
+            "tcp_flags_log_level (optional)",
+            "smurf_log_level (optional)",
+            "nosmurfs (optional)",
+            "tcpflags (optional)",
+            "nf_conntrack_max (optional)",
+            "nf_conntrack_tcp_timeout_established (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "get_node_firewall_log",
+          "description": "Get firewall log for a node.",
+          "inputs": [
+            "node",
+            "limit (optional)",
+            "start (optional)",
+            "since (optional)",
+            "until (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_firewall_log",
+          "description": "Get cluster-level firewall log.",
+          "inputs": [
+            "limit (optional)",
+            "start (optional)",
+            "since (optional)",
+            "until (optional)"
+          ]
+        },
+        {
+          "name": "list_firewall_macros",
+          "description": "List available firewall macros (e.g. SSH, HTTP, Ping).",
+          "inputs": []
+        },
+        {
+          "name": "list_firewall_refs",
+          "description": "List firewall rule references (aliases and IPsets).",
+          "inputs": [
+            "type (optional)"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "disk_management",
+      "description": "Physical disks, SMART, LVM, LVM-thin, ZFS and directory storage",
+      "capabilities": [
+        {
+          "name": "list_node_disks",
+          "description": "List all physical disks on a node.",
+          "inputs": [
+            "node",
+            "include-partitions (optional)",
+            "skipsmart (optional)",
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_disk_smart",
+          "description": "Get SMART health data for a disk.",
+          "inputs": [
+            "node",
+            "disk",
+            "healthonly (optional)"
+          ]
+        },
+        {
+          "name": "wipe_disk",
+          "description": "Wipe a disk (destroy all data). USE WITH CAUTION.",
+          "inputs": [
+            "node",
+            "disk"
+          ]
+        },
+        {
+          "name": "init_disk_gpt",
+          "description": "Initialize a disk with a GPT partition table.",
+          "inputs": [
+            "node",
+            "disk",
+            "uuid (optional)"
+          ]
+        },
+        {
+          "name": "list_lvm_groups",
+          "description": "List LVM volume groups on a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_lvm_group",
+          "description": "Create an LVM volume group on a node.",
+          "inputs": [
+            "node",
+            "name",
+            "device",
+            "add_storage (optional)"
+          ]
+        },
+        {
+          "name": "delete_lvm_group",
+          "description": "Delete an LVM volume group.",
+          "inputs": [
+            "node",
+            "name",
+            "cleanup-config (optional)",
+            "cleanup-disks (optional)"
+          ]
+        },
+        {
+          "name": "list_lvmthin_pools",
+          "description": "List LVM thin pools on a node.",
+          "inputs": [
+            "node",
+            "vg (optional)"
+          ]
+        },
+        {
+          "name": "create_lvmthin_pool",
+          "description": "Create an LVM thin pool on a node.",
+          "inputs": [
+            "node",
+            "name",
+            "device",
+            "add_storage (optional)"
+          ]
+        },
+        {
+          "name": "delete_lvmthin_pool",
+          "description": "Delete an LVM thin pool.",
+          "inputs": [
+            "node",
+            "name",
+            "volume-group",
+            "cleanup-config (optional)",
+            "cleanup-disks (optional)"
+          ]
+        },
+        {
+          "name": "list_zfs_pools",
+          "description": "List ZFS pools on a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_zfs_pool",
+          "description": "Get details for a specific ZFS pool.",
+          "inputs": [
+            "node",
+            "name"
+          ]
+        },
+        {
+          "name": "create_zfs_pool",
+          "description": "Create a ZFS pool on a node.",
+          "inputs": [
+            "node",
+            "name",
+            "devices",
+            "raidlevel",
+            "ashift (optional)",
+            "compression (optional)",
+            "add_storage (optional)"
+          ]
+        },
+        {
+          "name": "delete_zfs_pool",
+          "description": "Delete a ZFS pool.",
+          "inputs": [
+            "node",
+            "name",
+            "cleanup-config (optional)",
+            "cleanup-disks (optional)",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "list_directory_storage",
+          "description": "List directory-based storages on a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_directory_storage",
+          "description": "Create a directory-based storage on a node.",
+          "inputs": [
+            "node",
+            "name",
+            "path",
+            "device (optional)",
+            "filesystem (optional)",
+            "add_storage (optional)"
+          ]
+        },
+        {
+          "name": "delete_directory_storage",
+          "description": "Delete a directory-based storage on a node.",
+          "inputs": [
+            "node",
+            "name",
+            "cleanup-config (optional)",
+            "cleanup-disks (optional)"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "ceph_management",
+      "description": "Ceph status, OSDs, monitors, managers, MDS, pools and flags",
+      "capabilities": [
+        {
+          "name": "get_ceph_status",
+          "description": "Get Ceph cluster status from a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_cluster_ceph_status",
+          "description": "Get Ceph cluster status from cluster level.",
+          "inputs": []
+        },
+        {
+          "name": "get_ceph_crush",
+          "description": "Get the CRUSH map for the Ceph cluster.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_ceph_log",
+          "description": "Get Ceph log entries.",
+          "inputs": [
+            "node",
+            "limit (optional)"
+          ]
+        },
+        {
+          "name": "get_ceph_config",
+          "description": "Get raw Ceph configuration.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_ceph_config_db",
+          "description": "Get Ceph config-key database.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "list_ceph_osds",
+          "description": "List all Ceph OSDs.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_ceph_osd",
+          "description": "Create a new Ceph OSD on a disk.",
+          "inputs": [
+            "node",
+            "dev",
+            "db_dev (optional)",
+            "wal_dev (optional)",
+            "encrypted (optional)",
+            "crush-device-class (optional)"
+          ]
+        },
+        {
+          "name": "delete_ceph_osd",
+          "description": "Destroy a Ceph OSD.",
+          "inputs": [
+            "node",
+            "osdid",
+            "cleanup (optional)",
+            "destroy (optional)"
+          ]
+        },
+        {
+          "name": "set_ceph_osd_in",
+          "description": "Mark a Ceph OSD as 'in' (active in cluster).",
+          "inputs": [
+            "node",
+            "osdid"
+          ]
+        },
+        {
+          "name": "set_ceph_osd_out",
+          "description": "Mark a Ceph OSD as 'out' (inactive).",
+          "inputs": [
+            "node",
+            "osdid"
+          ]
+        },
+        {
+          "name": "list_ceph_mons",
+          "description": "List Ceph monitor daemons.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_ceph_mon",
+          "description": "Create a Ceph monitor on a node.",
+          "inputs": [
+            "node",
+            "monid (optional)",
+            "mon-address (optional)"
+          ]
+        },
+        {
+          "name": "delete_ceph_mon",
+          "description": "Remove a Ceph monitor.",
+          "inputs": [
+            "node",
+            "monid"
+          ]
+        },
+        {
+          "name": "list_ceph_mgrs",
+          "description": "List Ceph manager daemons.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_ceph_mgr",
+          "description": "Create a Ceph manager daemon on a node.",
+          "inputs": [
+            "node",
+            "id (optional)"
+          ]
+        },
+        {
+          "name": "delete_ceph_mgr",
+          "description": "Remove a Ceph manager daemon.",
+          "inputs": [
+            "node",
+            "id"
+          ]
+        },
+        {
+          "name": "list_ceph_mds",
+          "description": "List Ceph MDS (metadata server) daemons.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_ceph_mds",
+          "description": "Create a Ceph MDS daemon.",
+          "inputs": [
+            "node",
+            "name (optional)",
+            "hotstandby (optional)"
+          ]
+        },
+        {
+          "name": "delete_ceph_mds",
+          "description": "Remove a Ceph MDS daemon.",
+          "inputs": [
+            "node",
+            "name"
+          ]
+        },
+        {
+          "name": "list_ceph_pools",
+          "description": "List Ceph storage pools.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "get_ceph_pool",
+          "description": "Get details of a specific Ceph pool.",
+          "inputs": [
+            "node",
+            "name"
+          ]
+        },
+        {
+          "name": "create_ceph_pool",
+          "description": "Create a new Ceph storage pool.",
+          "inputs": [
+            "node",
+            "name",
+            "size (optional)",
+            "min_size (optional)",
+            "pg_num (optional)",
+            "pg_autoscale_mode (optional)",
+            "crush_rule (optional)",
+            "application (optional)",
+            "add_storages (optional)"
+          ]
+        },
+        {
+          "name": "update_ceph_pool",
+          "description": "Update a Ceph pool configuration.",
+          "inputs": [
+            "node",
+            "name",
+            "size (optional)",
+            "min_size (optional)",
+            "pg_num (optional)",
+            "pg_autoscale_mode (optional)",
+            "crush_rule (optional)",
+            "application (optional)"
+          ]
+        },
+        {
+          "name": "delete_ceph_pool",
+          "description": "Delete a Ceph pool.",
+          "inputs": [
+            "node",
+            "name",
+            "force (optional)",
+            "remove_storages (optional)",
+            "remove_ecprofile (optional)"
+          ]
+        },
+        {
+          "name": "list_ceph_fs",
+          "description": "List CephFS filesystems.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "create_ceph_fs",
+          "description": "Create a CephFS filesystem.",
+          "inputs": [
+            "node",
+            "name (optional)",
+            "add-storage (optional)",
+            "pg_num (optional)"
+          ]
+        },
+        {
+          "name": "start_ceph",
+          "description": "Start Ceph services on a node.",
+          "inputs": [
+            "node",
+            "service (optional)"
+          ]
+        },
+        {
+          "name": "stop_ceph",
+          "description": "Stop Ceph services on a node.",
+          "inputs": [
+            "node",
+            "service (optional)"
+          ]
+        },
+        {
+          "name": "restart_ceph",
+          "description": "Restart Ceph services on a node.",
+          "inputs": [
+            "node",
+            "service (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_ceph_metadata",
+          "description": "Get Ceph daemon metadata (versions, host info).",
+          "inputs": [
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_cluster_ceph_flags",
+          "description": "Get Ceph cluster flags (e.g. noout, norebalance, noscrub).",
+          "inputs": []
+        },
+        {
+          "name": "set_cluster_ceph_flags",
+          "description": "Set Ceph cluster flags.",
+          "inputs": [
+            "noout (optional)",
+            "norebalance (optional)",
+            "noscrub (optional)",
+            "nodeep-scrub (optional)",
+            "noin (optional)",
+            "nobackfill (optional)",
+            "norecovery (optional)",
+            "pause (optional)",
+            "noup (optional)",
+            "nodown (optional)"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "certificate_management",
+      "description": "ACME accounts and plugins, node certificates",
+      "capabilities": [
+        {
+          "name": "list_acme_accounts",
+          "description": "List registered ACME accounts.",
+          "inputs": []
+        },
+        {
+          "name": "get_acme_account",
+          "description": "Get details of an ACME account.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "register_acme_account",
+          "description": "Register a new ACME account (Let's Encrypt).",
+          "inputs": [
+            "name (optional)",
+            "contact",
+            "directory (optional)",
+            "tos_url (optional)"
+          ]
+        },
+        {
+          "name": "deregister_acme_account",
+          "description": "Deregister an ACME account.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "list_acme_plugins",
+          "description": "List ACME challenge plugins.",
+          "inputs": [
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_acme_plugin",
+          "description": "Get an ACME plugin configuration.",
+          "inputs": [
+            "id"
+          ]
+        },
+        {
+          "name": "create_acme_plugin",
+          "description": "Create an ACME DNS challenge plugin.",
+          "inputs": [
+            "id",
+            "type",
+            "api (optional)",
+            "data (optional)",
+            "disable (optional)",
+            "validation-delay (optional)"
+          ]
+        },
+        {
+          "name": "update_acme_plugin",
+          "description": "Update an ACME plugin.",
+          "inputs": [
+            "id",
+            "data (optional)",
+            "disable (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_acme_plugin",
+          "description": "Delete an ACME plugin.",
+          "inputs": [
+            "id"
+          ]
+        },
+        {
+          "name": "get_node_certificates",
+          "description": "Get certificate info for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "order_node_acme_cert",
+          "description": "Order or renew an ACME certificate for a node.",
+          "inputs": [
+            "node",
+            "force (optional)"
+          ]
+        },
+        {
+          "name": "revoke_node_acme_cert",
+          "description": "Revoke the ACME certificate for a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "upload_node_custom_cert",
+          "description": "Upload a custom TLS certificate for a node.",
+          "inputs": [
+            "node",
+            "certificates",
+            "key (optional)",
+            "force (optional)",
+            "restart (optional)"
+          ]
+        },
+        {
+          "name": "delete_node_custom_cert",
+          "description": "Delete the custom TLS certificate for a node (reverts to self-signed).",
+          "inputs": [
+            "node",
+            "restart (optional)"
+          ]
+        },
+        {
+          "name": "list_acme_directories",
+          "description": "List available ACME directory URLs (Let's Encrypt, staging, etc.).",
+          "inputs": []
+        },
+        {
+          "name": "get_acme_tos",
+          "description": "Get the Terms of Service URL for an ACME directory.",
+          "inputs": [
+            "directory (optional)"
+          ]
+        },
+        {
+          "name": "list_acme_challenge_schemas",
+          "description": "List available ACME DNS challenge schemas (supported DNS providers).",
+          "inputs": []
+        }
+      ]
+    },
+    {
+      "category": "sdn_management",
+      "description": "Software-defined networking: zones, VNets and subnets",
+      "capabilities": [
+        {
+          "name": "apply_sdn",
+          "description": "Apply pending SDN configuration changes cluster-wide.",
+          "inputs": []
+        },
+        {
+          "name": "list_sdn_zones",
+          "description": "List all SDN zones.",
+          "inputs": [
+            "pending (optional)",
+            "running (optional)",
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "get_sdn_zone",
+          "description": "Get configuration of a specific SDN zone.",
+          "inputs": [
+            "zone",
+            "pending (optional)",
+            "running (optional)"
+          ]
+        },
+        {
+          "name": "create_sdn_zone",
+          "description": "Create a new SDN zone.",
+          "inputs": [
+            "zone",
+            "type",
+            "bridge (optional)",
+            "tag (optional)",
+            "vlan-protocol (optional)",
+            "mtu (optional)",
+            "peers (optional)",
+            "controller (optional)",
+            "vrf-vxlan (optional)",
+            "mac (optional)",
+            "nodes (optional)",
+            "ipam (optional)",
+            "dns (optional)",
+            "reversedns (optional)",
+            "dnszone (optional)"
+          ]
+        },
+        {
+          "name": "update_sdn_zone",
+          "description": "Update an SDN zone.",
+          "inputs": [
+            "zone",
+            "mtu (optional)",
+            "nodes (optional)",
+            "ipam (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_sdn_zone",
+          "description": "Delete an SDN zone.",
+          "inputs": [
+            "zone"
+          ]
+        },
+        {
+          "name": "list_sdn_vnets",
+          "description": "List all SDN VNets.",
+          "inputs": [
+            "pending (optional)",
+            "running (optional)"
+          ]
+        },
+        {
+          "name": "get_sdn_vnet",
+          "description": "Get configuration of an SDN VNet.",
+          "inputs": [
+            "vnet",
+            "pending (optional)",
+            "running (optional)"
+          ]
+        },
+        {
+          "name": "create_sdn_vnet",
+          "description": "Create a new SDN VNet.",
+          "inputs": [
+            "vnet",
+            "zone",
+            "tag (optional)",
+            "alias (optional)",
+            "vlanaware (optional)"
+          ]
+        },
+        {
+          "name": "update_sdn_vnet",
+          "description": "Update an SDN VNet.",
+          "inputs": [
+            "vnet",
+            "alias (optional)",
+            "tag (optional)",
+            "vlanaware (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_sdn_vnet",
+          "description": "Delete an SDN VNet.",
+          "inputs": [
+            "vnet"
+          ]
+        },
+        {
+          "name": "list_sdn_subnets",
+          "description": "List subnets in an SDN VNet.",
+          "inputs": [
+            "vnet",
+            "pending (optional)",
+            "running (optional)"
+          ]
+        },
+        {
+          "name": "create_sdn_subnet",
+          "description": "Create a subnet in an SDN VNet.",
+          "inputs": [
+            "vnet",
+            "subnet",
+            "type",
+            "gateway (optional)",
+            "snat (optional)",
+            "dhcp-range (optional)",
+            "dhcp-dns-server (optional)",
+            "dnszoneprefix (optional)"
+          ]
+        },
+        {
+          "name": "delete_sdn_subnet",
+          "description": "Delete a subnet from an SDN VNet.",
+          "inputs": [
+            "vnet",
+            "subnet"
+          ]
+        },
+        {
+          "name": "list_node_sdn_zones",
+          "description": "List SDN zones visible from a node.",
+          "inputs": [
+            "node"
+          ]
+        },
+        {
+          "name": "list_node_sdn_vnets",
+          "description": "List SDN VNets visible from a node.",
+          "inputs": [
+            "node"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "notification_management",
+      "description": "Notification endpoints (Gotify, sendmail, SMTP, webhook) and matchers",
+      "capabilities": [
+        {
+          "name": "list_notification_targets",
+          "description": "List all notification targets (combined view of all endpoint types).",
+          "inputs": []
+        },
+        {
+          "name": "list_gotify_endpoints",
+          "description": "List Gotify notification endpoints.",
+          "inputs": []
+        },
+        {
+          "name": "get_gotify_endpoint",
+          "description": "Get a Gotify endpoint configuration.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "create_gotify_endpoint",
+          "description": "Create a Gotify notification endpoint.",
+          "inputs": [
+            "name",
+            "server",
+            "token",
+            "comment (optional)",
+            "disable (optional)"
+          ]
+        },
+        {
+          "name": "update_gotify_endpoint",
+          "description": "Update a Gotify endpoint.",
+          "inputs": [
+            "name",
+            "server (optional)",
+            "token (optional)",
+            "comment (optional)",
+            "disable (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_gotify_endpoint",
+          "description": "Delete a Gotify endpoint.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "list_sendmail_endpoints",
+          "description": "List sendmail notification endpoints.",
+          "inputs": []
+        },
+        {
+          "name": "get_sendmail_endpoint",
+          "description": "Get a sendmail endpoint configuration.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "create_sendmail_endpoint",
+          "description": "Create a sendmail notification endpoint.",
+          "inputs": [
+            "name",
+            "mailto (optional)",
+            "mailto-user (optional)",
+            "from-address (optional)",
+            "author (optional)",
+            "comment (optional)",
+            "disable (optional)"
+          ]
+        },
+        {
+          "name": "update_sendmail_endpoint",
+          "description": "Update a sendmail endpoint.",
+          "inputs": [
+            "name",
+            "mailto (optional)",
+            "mailto-user (optional)",
+            "from-address (optional)",
+            "author (optional)",
+            "comment (optional)",
+            "disable (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_sendmail_endpoint",
+          "description": "Delete a sendmail endpoint.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "list_smtp_endpoints",
+          "description": "List SMTP notification endpoints.",
+          "inputs": []
+        },
+        {
+          "name": "create_smtp_endpoint",
+          "description": "Create an SMTP notification endpoint.",
+          "inputs": [
+            "name",
+            "server",
+            "port (optional)",
+            "mailto (optional)",
+            "mailto-user (optional)",
+            "from-address",
+            "author (optional)",
+            "mode (optional)",
+            "username (optional)",
+            "password (optional)",
+            "comment (optional)",
+            "disable (optional)"
+          ]
+        },
+        {
+          "name": "delete_smtp_endpoint",
+          "description": "Delete an SMTP endpoint.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "list_webhook_endpoints",
+          "description": "List webhook notification endpoints.",
+          "inputs": []
+        },
+        {
+          "name": "create_webhook_endpoint",
+          "description": "Create a webhook notification endpoint.",
+          "inputs": [
+            "name",
+            "url",
+            "method",
+            "secret (optional)",
+            "header (optional)",
+            "body (optional)",
+            "comment (optional)",
+            "disable (optional)"
+          ]
+        },
+        {
+          "name": "delete_webhook_endpoint",
+          "description": "Delete a webhook endpoint.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "list_notification_matchers",
+          "description": "List notification matchers (routing rules).",
+          "inputs": []
+        },
+        {
+          "name": "get_notification_matcher",
+          "description": "Get a notification matcher configuration.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "create_notification_matcher",
+          "description": "Create a notification matcher.",
+          "inputs": [
+            "name",
+            "target (optional)",
+            "match-field (optional)",
+            "match-severity (optional)",
+            "match-calendar (optional)",
+            "invert-match (optional)",
+            "comment (optional)",
+            "disable (optional)",
+            "mode (optional)"
+          ]
+        },
+        {
+          "name": "update_notification_matcher",
+          "description": "Update a notification matcher.",
+          "inputs": [
+            "name",
+            "target (optional)",
+            "match-field (optional)",
+            "match-severity (optional)",
+            "disable (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ]
+        },
+        {
+          "name": "delete_notification_matcher",
+          "description": "Delete a notification matcher.",
+          "inputs": [
+            "name"
+          ]
+        },
+        {
+          "name": "list_notification_matcher_fields",
+          "description": "List available notification matcher field names (e.g. type, hostname, job-id).",
+          "inputs": []
+        }
+      ]
+    },
+    {
+      "category": "pool_management",
+      "description": "Resource pools",
+      "capabilities": [
+        {
+          "name": "list_pools",
+          "description": "List all resource pools.",
+          "inputs": []
+        },
+        {
+          "name": "get_pool",
+          "description": "Get a resource pool and its members.",
+          "inputs": [
+            "poolid",
+            "type (optional)"
+          ]
+        },
+        {
+          "name": "create_pool",
+          "description": "Create a new resource pool.",
+          "inputs": [
+            "poolid",
+            "comment (optional)"
+          ]
+        },
+        {
+          "name": "update_pool",
+          "description": "Update a resource pool (add/remove members or update comment).",
+          "inputs": [
+            "poolid",
+            "comment (optional)",
+            "vms (optional)",
+            "storage (optional)",
+            "delete (optional)",
+            "allow-move (optional)"
+          ]
+        },
+        {
+          "name": "delete_pool",
+          "description": "Delete a resource pool.",
+          "inputs": [
+            "poolid"
+          ]
         }
       ]
     }
@@ -209,8 +3334,9 @@
   "requirements": {
     "python": ">=3.10",
     "dependencies": [
-      "mcp>=1.0.0",
-      "httpx>=0.27.0"
+      "mcp>=1.0.0,<2",
+      "httpx>=0.28.1",
+      "python-dotenv>=1.2.3"
     ],
     "proxmox": "Proxmox VE 6.0 or later"
   },
@@ -223,7 +3349,7 @@
       "Datastore.Audit",
       "Sys.Audit"
     ],
-    "description": "Minimum permissions required for full functionality. Adjust based on use case."
+    "description": "Recommended privileges for monitoring, power management and snapshots. Other tools need more (e.g. VM.Allocate, VM.Config.*, Datastore.Allocate, Sys.Modify, Permissions.Modify). Grant only what your use case needs; PVEAuditor is enough for read-only monitoring."
   },
   "endpoints": {
     "mcp": {
@@ -234,6 +3360,18 @@
         "/path/to/proxmox-mcp-server",
         "run",
         "proxmox-mcp-server"
+      ]
+    },
+    "docker": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--env-file",
+        ".env",
+        "ghcr.io/ry-ops/proxmox-mcp-server:latest"
       ]
     }
   },
