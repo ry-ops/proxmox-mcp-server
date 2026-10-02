@@ -6,9 +6,9 @@
 [![uv](https://img.shields.io/badge/uv-latest-green.svg)](https://github.com/astral-sh/uv)
 [![MCP](https://img.shields.io/badge/MCP-1.0-purple.svg)](https://modelcontextprotocol.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ry-ops/proxmox-mcp-server/pulls)
 
-A Model Context Protocol (MCP) server for interacting with Proxmox Virtual Environment API. This server provides comprehensive tools for managing VMs, containers, storage, and cluster resources through the MCP interface.
+A Model Context Protocol (MCP) server for the Proxmox Virtual Environment API. It exposes **338 tools** covering nodes, VMs, containers, storage, clustering and HA, users and permissions, firewall, disks, Ceph, ACME certificates, SDN, notifications and resource pools.
 
 **Built with Python and `uv` for fast, reliable dependency management.**
 
@@ -31,29 +31,25 @@ This server implements the **A2A protocol** for seamless agent-to-agent communic
 
 See the [A2A Protocol Documentation](#a2a-protocol) section below for integration details.
 
-### Virtual Machine Management
-- List all VMs (node-specific or cluster-wide)
-- Get VM configuration and status
-- Start, stop, shutdown, and reboot VMs
-- Create, list, and delete VM snapshots
+### Proxmox VE API Coverage
 
-### Container Management
-- List LXC containers
-- Get container status
-- Start and stop containers
+| Area | Tools | Highlights |
+|------|------:|------------|
+| Nodes | 38 | Status, config, DNS/hosts/time, network interfaces, services, APT updates, syslog, power |
+| QEMU VMs | 46 | Lifecycle, create/clone/delete, config, snapshots, migration, disk resize/move, RRD metrics, guest agent (`vm_agent_exec`, `vm_agent_exec_status`), VNC proxy |
+| LXC containers | 28 | Lifecycle, create/clone/delete, config, snapshots, migration, resize |
+| Storage & backup | 14 | Storage definitions, content and volumes, URL downloads, `vzdump` backup and restore |
+| Cluster | 37 | Status, resources, options, log, tasks, HA resources/groups, replication, backup jobs |
+| Access control | 33 | Users, API tokens, groups, roles, ACLs, realms |
+| Firewall | 31 | Cluster and node rules, security groups, aliases, IP sets, macros, logs (per-VM/container rules are in the guest modules) |
+| Disks | 17 | SMART, wipe, GPT init, LVM, LVM-thin, ZFS, directory storage |
+| Ceph | 33 | Status, OSDs, monitors, managers, MDS, pools, flags, CRUSH |
+| ACME & certificates | 17 | ACME accounts and plugins, node certificate ordering, custom certs |
+| SDN | 16 | Zones, VNets, subnets, apply |
+| Notifications | 23 | Gotify, sendmail, SMTP and webhook endpoints, matchers |
+| Pools | 5 | Resource pool CRUD |
 
-### Node & Cluster Management
-- List all cluster nodes
-- Get node status and resource usage
-- Get overall cluster status
-
-### Storage Management
-- List storage devices
-- Get storage status and usage
-
-### Task Management
-- List running and recent tasks
-- Get task status and progress
+See [Available Tools](#available-tools) for how to browse the full list.
 
 ## Quick Start
 
@@ -103,13 +99,29 @@ cd proxmox-mcp-server
 uv sync
 ```
 
+### Docker
+
+A multi-arch image is published to GitHub Container Registry on every push to `main` and for each release tag:
+
+```bash
+docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. :2.1.0
+```
+
+MCP clients talk to the server over stdio, so run the container interactively (`-i`) and pass configuration as environment variables:
+
+```bash
+docker run -i --rm --env-file .env ghcr.io/ry-ops/proxmox-mcp-server:latest
+```
+
+`docker-compose.yaml` in this repository does the same using your `.env` file (copy `.env.example` to get started).
+
 ## Configuration
 
 The server is configured via environment variables:
 
 ### Required Variables
 
-- `PROXMOX_HOST`: Proxmox server hostname or IP address
+- `PROXMOX_HOST`: Proxmox server hostname or IP address, without scheme or port (e.g. `192.168.1.100`, not `https://192.168.1.100:8006`)
 - `PROXMOX_USER`: Username (e.g., `root@pam`, `admin@pve`)
 
 ### Authentication (choose one method)
@@ -125,6 +137,8 @@ The server is configured via environment variables:
 
 - `PROXMOX_PORT`: API port (default: `8006`)
 - `PROXMOX_VERIFY_SSL`: Verify SSL certificates (default: `false`)
+
+When running from a clone, a `.env` file in the project directory is loaded automatically. See [`.env.example`](.env.example).
 
 ## Setting Up Proxmox Authentication
 
@@ -205,48 +219,56 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-**Important**: Use the absolute path to your project directory!
+### With Docker
+
+```json
+{
+  "mcpServers": {
+    "proxmox": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "PROXMOX_HOST",
+        "-e", "PROXMOX_USER",
+        "-e", "PROXMOX_TOKEN_NAME",
+        "-e", "PROXMOX_TOKEN_VALUE",
+        "ghcr.io/ry-ops/proxmox-mcp-server:latest"
+      ],
+      "env": {
+        "PROXMOX_HOST": "192.168.1.100",
+        "PROXMOX_USER": "root@pam",
+        "PROXMOX_TOKEN_NAME": "automation",
+        "PROXMOX_TOKEN_VALUE": "your-token-value-here"
+      }
+    }
+  }
+}
+```
+
+**Important**: For the `uv` configurations, use the absolute path to your project directory!
 
 ## Available Tools
 
-### Node Management
+The server registers 338 tools, grouped by API area in [`proxmox_mcp/tools/`](proxmox_mcp/tools/), one module per area. Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`.
 
-- **list_nodes**: List all nodes in the cluster
-- **get_node_status**: Get status and resource usage for a specific node
+Some commonly used tools:
 
-### Virtual Machine Tools
+| Task | Tools |
+|------|-------|
+| Inventory | `list_nodes`, `get_cluster_resources`, `list_vms`, `list_containers`, `list_storage` |
+| VM lifecycle | `start_vm`, `shutdown_vm`, `stop_vm`, `reboot_vm`, `create_vm`, `clone_vm`, `migrate_vm` |
+| Snapshots | `create_vm_snapshot`, `list_vm_snapshots`, `rollback_vm_snapshot`, `delete_vm_snapshot` |
+| Monitoring | `get_node_status`, `get_vm_status`, `get_vm_rrddata`, `get_node_storage_status` |
+| Tasks | `list_cluster_tasks`, `list_node_tasks`, `get_task_status`, `get_task_log` |
+| Guest agent | `vm_agent_exec` (returns a PID), then `vm_agent_exec_status` for exit code and output |
 
-- **list_vms**: List all VMs (optionally filtered by node)
-- **get_vm_config**: Get VM configuration
-- **get_vm_status**: Get current VM status
-- **start_vm**: Start a VM
-- **stop_vm**: Force stop a VM
-- **shutdown_vm**: Gracefully shutdown a VM
-- **reboot_vm**: Reboot a VM
-- **create_vm_snapshot**: Create a VM snapshot
-- **list_vm_snapshots**: List all VM snapshots
-- **delete_vm_snapshot**: Delete a VM snapshot
+Your MCP client lists every tool with its full input schema. To print them all locally:
 
-### Container Tools
+```bash
+uv run python -c "from proxmox_mcp.server import ALL_TOOLS; print('\n'.join(sorted(t.name for t in ALL_TOOLS)))"
+```
 
-- **list_containers**: List all LXC containers on a node
-- **get_container_status**: Get container status
-- **start_container**: Start a container
-- **stop_container**: Stop a container
-
-### Storage Tools
-
-- **list_storage**: List all storage devices
-- **get_storage_status**: Get storage status and usage
-
-### Task Tools
-
-- **list_tasks**: List running and recent tasks
-- **get_task_status**: Get status of a specific task
-
-### Cluster Tools
-
-- **get_cluster_status**: Get overall cluster status and resources
+See [USAGE.md](USAGE.md) for worked examples.
 
 ## Example Usage
 
@@ -264,6 +286,10 @@ Once configured, you can ask Claude to interact with your Proxmox environment:
 
 > "List all running tasks in the cluster"
 
+> "Clone VM 9000 to a new VM called web-02 and start it"
+
+> "Run `df -h` inside VM 120 using the guest agent and show me the output"
+
 ## Development
 
 ```bash
@@ -280,11 +306,9 @@ PROXMOX_TOKEN_NAME=automation \
 PROXMOX_TOKEN_VALUE=your-token \
 uv run proxmox-mcp-server
 
-# Install development dependencies
-uv sync --all-extras
-
-# Run tests (if implemented)
-uv run pytest
+# Lint and format (dev dependencies are installed by `uv sync`)
+uv run ruff check .
+uv run black .
 ```
 
 ## Project Structure
@@ -295,14 +319,19 @@ proxmox-mcp-server/
 │   ├── server.py             # MCP server entrypoint and tool registry
 │   ├── client.py             # Proxmox API client (token/password auth)
 │   └── tools/                # Tool definitions and handlers, one module per API area
+│       ├── nodes.py, qemu.py, lxc.py, storage.py, cluster.py, access.py
+│       └── firewall.py, disks.py, ceph.py, acme.py, sdn.py, notifications.py, pools.py
+├── Dockerfile                # Container image (stdio transport)
+├── docker-compose.yaml       # Compose setup using .env
+├── agent-card.json           # A2A agent card
 ├── pyproject.toml            # Project configuration
-├── uv.lock                   # Locked dependencies (generated)
+├── uv.lock                   # Locked dependencies
 ├── .env.example              # Environment variable template
-├── .gitignore                # Git ignore patterns
 ├── setup.sh                  # Automated setup script
 ├── test-connection.sh        # Connection test script
 ├── README.md                 # This file
-├── QUICKSTART.md            # 5-minute setup guide
+├── CHANGELOG.md              # Release history
+├── QUICKSTART.md             # 5-minute setup guide
 ├── SETUP.md                  # Detailed setup guide
 └── USAGE.md                  # Usage examples
 
@@ -312,7 +341,7 @@ proxmox-mcp-server/
 
 - **API Tokens** are more secure than password authentication as they can be revoked independently
 - Set `PROXMOX_VERIFY_SSL=true` in production environments with valid SSL certificates
-- Grant minimal required permissions to API tokens
+- Grant minimal required permissions to API tokens. The server exposes destructive operations (deleting VMs, wiping disks, running commands inside guests via the agent), and the token's permissions are the only thing limiting what a connected AI client can do. For monitoring-only use, a token with the `PVEAuditor` role is enough
 - Store credentials securely and never commit them to version control
 - Consider network restrictions (firewall rules) for API access
 
@@ -392,7 +421,7 @@ The `agent-card.json` file serves as the agent's identity and capability manifes
 
 ### Available Skills
 
-The agent provides **20 tools** organized into **6 skill categories**:
+The agent card currently describes a **core subset of 21 tools** in **6 skill categories**. The server itself exposes all 338 tools (see [Available Tools](#available-tools)).
 
 #### 1. Node Management
 - `list_nodes` - List all cluster nodes
@@ -418,10 +447,10 @@ The agent provides **20 tools** organized into **6 skill categories**:
 
 #### 4. Storage Management
 - `list_storage` - List storage devices
-- `get_storage_status` - Get storage usage and capacity
+- `get_node_storage_status` - Get storage usage and capacity
 
 #### 5. Task Management
-- `list_tasks` - List running and recent tasks
+- `list_cluster_tasks` - List running and recent tasks
 - `get_task_status` - Get task progress and status
 
 #### 6. Cluster Management
@@ -567,56 +596,6 @@ async def monitor_infrastructure():
             await alert_agent.send_alert(f"High CPU on {node['node']}")
 ```
 
-#### Example 2: Auto-scaling Agent
-
-```python
-# Auto-scaling agent that manages VM capacity
-async def autoscale_vms():
-    # Get current VM statuses
-    vms = await proxmox_agent.call_tool("list_vms", {})
-
-    # Analyze load across VMs
-    for vm in vms['data']:
-        status = await proxmox_agent.call_tool("get_vm_status", {
-            "node": vm['node'],
-            "vmid": vm['vmid']
-        })
-
-        # Scale based on metrics
-        if needs_scaling(status):
-            await proxmox_agent.call_tool("start_vm", {
-                "node": "pve2",
-                "vmid": get_next_vm_id()
-            })
-```
-
-#### Example 3: Disaster Recovery Agent
-
-```python
-# DR agent that coordinates backup and recovery
-async def disaster_recovery():
-    # Take snapshots of all critical VMs
-    critical_vms = [100, 101, 102]
-
-    for vmid in critical_vms:
-        # Find which node hosts the VM
-        vms = await proxmox_agent.call_tool("list_vms", {})
-        vm = next(v for v in vms['data'] if v['vmid'] == vmid)
-
-        # Create snapshot
-        await proxmox_agent.call_tool("create_vm_snapshot", {
-            "node": vm['node'],
-            "vmid": vmid,
-            "snapname": f"dr-{datetime.now().isoformat()}"
-        })
-
-        # Verify snapshot
-        snapshots = await proxmox_agent.call_tool("list_vm_snapshots", {
-            "node": vm['node'],
-            "vmid": vmid
-        })
-```
-
 ## API Documentation
 
 For more information about the Proxmox VE API:
@@ -626,23 +605,19 @@ For more information about the Proxmox VE API:
 
 ## Dependencies
 
-- **mcp** (>=1.0.0): Model Context Protocol SDK
-- **httpx** (>=0.27.0): Modern HTTP client for Python
+- **mcp** (>=1.0.0, <2): Model Context Protocol SDK. 2.x changed the server API and is not supported yet
+- **httpx** (>=0.28.1): Async HTTP client for the Proxmox API
+- **python-dotenv** (>=1.2.3): Loads configuration from `.env`
 
 ## Roadmap
 
-Future enhancements may include:
+- Streamable-HTTP transport for running the server as a network service ([#24](https://github.com/ry-ops/proxmox-mcp-server/pull/24), [#29](https://github.com/ry-ops/proxmox-mcp-server/pull/29))
+- Read-only mode that blocks all write operations
+- Support for `mcp` 2.x
+- Automatic ticket refresh for long-running password-authenticated sessions
+- Automated test suite
 
-- VM creation and deletion
-- Container creation and deletion
-- Backup management
-- Network configuration
-- User and permission management
-- Resource pool management
-- HA (High Availability) management
-- Firewall rule management
-- Certificate management
-- Real-time monitoring and alerts
+See [CHANGELOG.md](CHANGELOG.md) for what has shipped.
 
 ## Contributing
 
@@ -658,7 +633,7 @@ Areas for improvement:
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
 
 ## Related Projects
 
