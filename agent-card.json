@@ -1,7 +1,7 @@
 {
   "name": "proxmox-mcp-server",
   "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides comprehensive control over VMs, containers, storage, nodes, and cluster resources through the Proxmox VE API.",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
     "type": "MCP",
