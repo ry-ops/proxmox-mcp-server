@@ -421,40 +421,23 @@ The `agent-card.json` file serves as the agent's identity and capability manifes
 
 ### Available Skills
 
-The agent card currently describes a **core subset of 21 tools** in **6 skill categories**. The server itself exposes all 338 tools (see [Available Tools](#available-tools)).
+The agent card lists all **338 tools** in **13 skill categories**, generated from the server's tool registry. Each entry has the tool's name, description and inputs:
 
-#### 1. Node Management
-- `list_nodes` - List all cluster nodes
-- `get_node_status` - Get node resource usage and status
-
-#### 2. Virtual Machine Management
-- `list_vms` - List VMs (node-specific or cluster-wide)
-- `get_vm_config` - Get VM configuration
-- `get_vm_status` - Get VM status and metrics
-- `start_vm` - Start a VM
-- `stop_vm` - Force stop a VM
-- `shutdown_vm` - Gracefully shutdown a VM
-- `reboot_vm` - Reboot a VM
-- `create_vm_snapshot` - Create VM snapshot
-- `list_vm_snapshots` - List VM snapshots
-- `delete_vm_snapshot` - Delete VM snapshot
-
-#### 3. Container Management
-- `list_containers` - List LXC containers
-- `get_container_status` - Get container status
-- `start_container` - Start container
-- `stop_container` - Stop container
-
-#### 4. Storage Management
-- `list_storage` - List storage devices
-- `get_node_storage_status` - Get storage usage and capacity
-
-#### 5. Task Management
-- `list_cluster_tasks` - List running and recent tasks
-- `get_task_status` - Get task progress and status
-
-#### 6. Cluster Management
-- `get_cluster_status` - Get overall cluster status and resources
+| Category | Tools |
+|----------|------:|
+| `node_management` | 38 |
+| `virtual_machine_management` | 46 |
+| `container_management` | 28 |
+| `storage_management` | 14 |
+| `cluster_management` | 37 |
+| `access_control` | 33 |
+| `firewall_management` | 31 |
+| `disk_management` | 17 |
+| `ceph_management` | 33 |
+| `certificate_management` | 17 |
+| `sdn_management` | 16 |
+| `notification_management` | 23 |
+| `pool_management` | 5 |
 
 ### Agent-to-Agent Integration
 

@@ -703,7 +703,7 @@ List all storage devices with capacity and usage
 
 ### Complete Tool List
 
-The MCP server provides 20 tools:
+The MCP server provides 338 tools across 13 API areas (see the [README](README.md#proxmox-ve-api-coverage) for the full coverage table). This reference covers the core tools for everyday use:
 
 #### Node Tools (2)
 - `list_nodes` - List all cluster nodes
@@ -729,10 +729,11 @@ The MCP server provides 20 tools:
 
 #### Storage Tools (2)
 - `list_storage` - List storage devices
-- `get_storage_status` - Get storage status
+- `get_node_storage_status` - Get storage status
 
-#### Task Tools (2)
-- `list_tasks` - List running/recent tasks
+#### Task Tools (3)
+- `list_cluster_tasks` - List recent cluster-wide tasks
+- `list_node_tasks` - List running/recent tasks on a node
 - `get_task_status` - Get specific task status
 
 #### Cluster Tools (1)
@@ -1396,7 +1397,7 @@ List all storage
 List storage on pve1
 ```
 
-#### get_storage_status
+#### get_node_storage_status
 Gets status of a specific storage device.
 
 **Parameters:**
@@ -1451,17 +1452,26 @@ Delete the snapshot "backup-2025" from VM 100 on pve1
 
 ### Task Tools
 
-#### list_tasks
-Lists running and recent tasks.
+#### list_cluster_tasks
+Lists recent tasks across the whole cluster.
+
+**Parameters:** none
+
+**Example:**
+```
+Show me recent tasks in the cluster
+```
+
+#### list_node_tasks
+Lists running and recent tasks on a node.
 
 **Parameters:**
-- `node` (string, optional): Node name to filter by
-- `limit` (number, optional): Maximum number of tasks (default: 50)
+- `node` (string, required): Node name
+- `limit` (number, optional): Maximum number of tasks
+- `vmid` (number, optional): Only tasks for this guest
+- `statusfilter`, `typefilter`, `userfilter`, `source`, `since`, `until`, `start` (optional): Further filters
 
-**Examples:**
-```
-Show me running tasks
-```
+**Example:**
 ```
 List the last 30 tasks on pve1
 ```
