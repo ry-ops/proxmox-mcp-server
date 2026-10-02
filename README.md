@@ -137,7 +137,7 @@ The server is configured via environment variables:
 
 - `PROXMOX_PORT`: API port (default: `8006`)
 - `PROXMOX_VERIFY_SSL`: Verify SSL certificates (default: `false`)
-- `PROXMOX_READ_ONLY`: Block all writes — only GET requests are allowed; any create/update/delete/action tool is refused (default: `false`)
+- `PROXMOX_READ_ONLY`: Block all writes — only GET requests are allowed; any create/update/delete/action tool is refused (default: `false`). 149 of the 338 tools are read-only and keep working. Three read-style tools also send POST requests and are blocked: `vm_agent_ping`, plus `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets
 
 When running from a clone, a `.env` file in the project directory is loaded automatically. See [`.env.example`](.env.example).
 
@@ -341,6 +341,7 @@ proxmox-mcp-server/
 ## Security Considerations
 
 - **API Tokens** are more secure than password authentication as they can be revoked independently
+- For monitoring-only deployments, set `PROXMOX_READ_ONLY=true` *and* use a `PVEAuditor` token. The flag stops the server from sending writes, and the token permissions enforce the same limit on the Proxmox side
 - Set `PROXMOX_VERIFY_SSL=true` in production environments with valid SSL certificates
 - Grant minimal required permissions to API tokens. The server exposes destructive operations (deleting VMs, wiping disks, running commands inside guests via the agent), and the token's permissions are the only thing limiting what a connected AI client can do. For monitoring-only use, a token with the `PVEAuditor` role is enough
 - Store credentials securely and never commit them to version control
@@ -596,7 +597,6 @@ For more information about the Proxmox VE API:
 ## Roadmap
 
 - Streamable-HTTP transport for running the server as a network service ([#24](https://github.com/ry-ops/proxmox-mcp-server/pull/24), [#29](https://github.com/ry-ops/proxmox-mcp-server/pull/29))
-- Read-only mode that blocks all write operations
 - Support for `mcp` 2.x
 - Automatic ticket refresh for long-running password-authenticated sessions
 - Automated test suite
