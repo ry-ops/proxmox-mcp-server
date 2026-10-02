@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `PROXMOX_READ_ONLY` mode: when `true`, the client refuses every POST/PUT/DELETE
+  request, so only read tools work (#24, thanks @volodic-vinted).
+
 ## [2.1.0] - 2026-10-01
 
 First tagged release since 1.0.0.1. It includes the 2.0.0 rewrite, which was never
