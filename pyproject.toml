@@ -33,7 +33,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "mcp>=1.0.0",
+    # mcp 2.x removed the @app.list_tools()/@app.call_tool() decorator API used in server.py.
+    "mcp>=1.0.0,<2",
     "httpx>=0.28.1",
     "python-dotenv>=1.2.3",
 ]
@@ -107,7 +108,7 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
-    "--cov=proxmox_mcp_server",
+    "--cov=proxmox_mcp",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]

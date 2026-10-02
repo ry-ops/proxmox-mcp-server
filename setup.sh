@@ -115,53 +115,11 @@ print_header "Creating Directory Structure"
 print_info "Creating project directories..."
 
 # Create main directories
-mkdir -p src/proxmox_mcp_server
 mkdir -p docs
 mkdir -p .github/ISSUE_TEMPLATE
 mkdir -p .github/workflows
 
 print_success "Directories created"
-
-# Create __init__.py if it doesn't exist or is empty
-print_info "Setting up Python package..."
-
-if [ ! -f "src/proxmox_mcp_server/__init__.py" ] || [ ! -s "src/proxmox_mcp_server/__init__.py" ]; then
-    cat > src/proxmox_mcp_server/__init__.py << 'EOF'
-"""
-Proxmox MCP Server
-==================
-
-A Model Context Protocol (MCP) server for managing Proxmox Virtual Environment.
-
-GitHub: https://github.com/ry-ops/proxmox-mcp-server
-Documentation: https://github.com/ry-ops/proxmox-mcp-server#readme
-
-Author: ry-ops
-License: MIT
-"""
-
-__version__ = "1.0.0"
-__author__ = "ry-ops"
-__license__ = "MIT"
-__url__ = "https://github.com/ry-ops/proxmox-mcp-server"
-
-__all__ = [
-    "__version__",
-    "__author__",
-    "__license__",
-    "__url__",
-]
-EOF
-    print_success "__init__.py created"
-else
-    print_success "__init__.py already exists"
-fi
-
-# Check if server.py exists
-if [ ! -f "src/proxmox_mcp_server/server.py" ]; then
-    print_warning "server.py not found in src/proxmox_mcp_server/"
-    print_info "Please add server.py to src/proxmox_mcp_server/ directory"
-fi
 
 echo ""
 
@@ -244,10 +202,10 @@ print_header "Verifying Installation"
 
 print_info "Checking package installation..."
 
-if uv run python -c "import proxmox_mcp_server; print(f'Version: {proxmox_mcp_server.__version__}')" 2>/dev/null; then
+if uv run python -c "import proxmox_mcp.server" 2>/dev/null; then
     print_success "Package installed correctly"
 else
-    print_warning "Package verification incomplete (this is normal if server.py is not yet added)"
+    print_warning "Package verification failed — try running: uv sync"
 fi
 
 echo ""
