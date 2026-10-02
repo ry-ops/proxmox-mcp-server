@@ -15,6 +15,7 @@ PROXMOX_TOKEN_NAME = os.getenv("PROXMOX_TOKEN_NAME", "")
 PROXMOX_TOKEN_VALUE = os.getenv("PROXMOX_TOKEN_VALUE", "")
 PROXMOX_PASSWORD = os.getenv("PROXMOX_PASSWORD", "")
 PROXMOX_VERIFY_SSL = os.getenv("PROXMOX_VERIFY_SSL", "false").lower() == "true"
+PROXMOX_READ_ONLY = os.getenv("PROXMOX_READ_ONLY", "false").lower() == "true"
 
 
 def _validate_config() -> None:
@@ -71,6 +72,10 @@ class ProxmoxClient:
         path: str,
         data: Optional[dict[str, Any]] = None,
     ) -> Any:
+        if PROXMOX_READ_ONLY and method != "GET":
+            raise PermissionError(
+                f"Read-only mode (PROXMOX_READ_ONLY): refusing {method} {path}"
+            )
         url = f"{self.base_url}{path}"
         headers = self._headers(method)
         if method == "GET":

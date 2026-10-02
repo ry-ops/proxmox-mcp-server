@@ -10,12 +10,20 @@ Configuration (environment variables):
     PROXMOX_TOKEN_VALUE API token value (required if no password)
     PROXMOX_PASSWORD    Password (alternative to token auth)
     PROXMOX_VERIFY_SSL  Verify SSL certs (default: false)
+    PROXMOX_READ_ONLY   Block all writes (POST/PUT/DELETE); GET only (default: false)
+
+Transport (environment variables):
+    MCP_TRANSPORT       "stdio" (default) or "http" (streamable-HTTP for remote clients)
+    MCP_HOST            HTTP bind host (default: 0.0.0.0)  [http only]
+    MCP_PORT            HTTP bind port (default: 8080)     [http only]
+    MCP_AUTH_TOKEN      If set, require "Authorization: Bearer <token>" [http only]
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 from typing import Any
 
@@ -42,6 +50,11 @@ from .tools import (
 )
 
 load_dotenv()
+
+MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "stdio").lower()
+MCP_HOST = os.getenv("MCP_HOST", "0.0.0.0")
+MCP_PORT = int(os.getenv("MCP_PORT", "8080"))
+MCP_AUTH_TOKEN = os.getenv("MCP_AUTH_TOKEN", "")
 
 # --- Build unified tool registry ---
 
@@ -98,25 +111,81 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         return [TextContent(type="text", text=json.dumps(error, indent=2))]
 
 
-async def main() -> None:
-    _validate_config()
+def _authorized(headers: list[tuple[bytes, bytes]]) -> bool:
+    # ponytail: single static token; swap for OAuth only if per-identity is needed.
+    if not MCP_AUTH_TOKEN:
+        return True
+    auth = dict(headers).get(b"authorization", b"").decode()
+    return auth == f"Bearer {MCP_AUTH_TOKEN}"
 
+
+def _banner() -> None:
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server", file=sys.stderr)
+    print(f"Transport: {MCP_TRANSPORT}", file=sys.stderr)
     print(f"Tools: {len(ALL_TOOLS)}", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
 
-    await proxmox.authenticate()
 
-    print(f"✓ Ready — {len(ALL_TOOLS)} tools available", file=sys.stderr)
-    print("=" * 60, file=sys.stderr)
-
+async def _serve_stdio() -> None:
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         await app.run(
             read_stream,
             write_stream,
             app.create_initialization_options(),
         )
+
+
+async def _serve_http() -> None:
+    # Imported lazily so stdio deployments don't need starlette/uvicorn.
+    import contextlib
+
+    import uvicorn
+    from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+    from starlette.applications import Starlette
+    from starlette.responses import PlainTextResponse
+    from starlette.routing import Mount, Route
+
+    session_manager = StreamableHTTPSessionManager(app=app, stateless=True)
+
+    async def handle_mcp(scope: Any, receive: Any, send: Any) -> None:
+        if not _authorized(scope.get("headers") or []):
+            await PlainTextResponse("Unauthorized", status_code=401)(scope, receive, send)
+            return
+        await session_manager.handle_request(scope, receive, send)
+
+    async def health(_request):
+        return PlainTextResponse("ok")
+
+    @contextlib.asynccontextmanager
+    async def lifespan(_app: Starlette):
+        async with session_manager.run():
+            yield
+
+    # /health is unauthenticated for infra probes. Mount MCP at root (like the
+    # vita relay) so the endpoint is the host URL itself and there's no
+    # trailing-slash redirect that would sidestep the auth check.
+    star = Starlette(
+        routes=[Route("/health", health), Mount("/", app=handle_mcp)],
+        lifespan=lifespan,
+    )
+    auth_state = "on" if MCP_AUTH_TOKEN else "off"
+    print(f"✓ HTTP on {MCP_HOST}:{MCP_PORT}/ — auth: {auth_state}", file=sys.stderr)
+    config = uvicorn.Config(star, host=MCP_HOST, port=MCP_PORT, log_level="info")
+    await uvicorn.Server(config).serve()
+
+
+async def main() -> None:
+    _validate_config()
+    _banner()
+    await proxmox.authenticate()
+    print(f"✓ Ready — {len(ALL_TOOLS)} tools available", file=sys.stderr)
+    print("=" * 60, file=sys.stderr)
+
+    if MCP_TRANSPORT == "http":
+        await _serve_http()
+    else:
+        await _serve_stdio()
 
 
 def run() -> None:
