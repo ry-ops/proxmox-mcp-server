@@ -4,11 +4,23 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.2.0] - 2026-10-02
 
 ### Added
 - `PROXMOX_READ_ONLY` mode: when `true`, the client refuses every POST/PUT/DELETE
-  request, so only read tools work (#24, thanks @volodic-vinted).
+  request before it reaches the Proxmox API, so only read tools work. 149 of the 338
+  tools keep working (#42, from #24, thanks @volodic-vinted).
+- First automated tests (`tests/test_read_only.py`) (#42).
+
+### Changed
+- `agent-card.json` lists all 338 tools in 13 skill categories, generated from the
+  tool registry (it previously described 21 v1 tools) (#41).
+
+### Fixed
+- Release builds can attach the SBOM to the GitHub release. The v2.1.0 build failed
+  at that step for lack of `contents: write` (#40).
+- `USAGE.md` referred to tools that no longer exist (`get_storage_status`,
+  `list_tasks`) (#41).
 
 ## [2.1.0] - 2026-10-01
 
@@ -54,5 +66,6 @@ released on its own.
 
 Initial release.
 
+[2.2.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v1.0.0.1...v2.1.0
 [1.0.0.1]: https://github.com/ry-ops/proxmox-mcp-server/releases/tag/v1.0.0.1
