@@ -7,6 +7,10 @@ import sys
 from typing import Any, Optional
 
 import httpx
+from dotenv import load_dotenv
+
+# Load .env before reading the settings below; they are read once, at import time.
+load_dotenv()
 
 PROXMOX_HOST = os.getenv("PROXMOX_HOST", "")
 PROXMOX_PORT = os.getenv("PROXMOX_PORT", "8006")
