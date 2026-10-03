@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 338 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications and resource pools.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 339 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.2.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -504,8 +504,14 @@
             "ostype (optional)",
             "scsihw (optional)",
             "scsi0 (optional)",
+            "scsi1 (optional)",
             "ide2 (optional)",
             "net0 (optional)",
+            "net1 (optional)",
+            "net2 (optional)",
+            "net3 (optional)",
+            "serial0 (optional)",
+            "vga (optional)",
             "boot (optional)",
             "onboot (optional)",
             "agent (optional)",
@@ -513,7 +519,8 @@
             "tags (optional)",
             "pool (optional)",
             "start (optional)",
-            "template (optional)"
+            "template (optional)",
+            "extra_config (optional)"
           ]
         },
         {
@@ -666,13 +673,15 @@
         },
         {
           "name": "import_vm_disk",
-          "description": "Import an external disk image into a storage for a VM.",
+          "description": "Import a disk image into a VM as a new disk (Proxmox import-from). The source is an import-content volume such as local:import/disk.qcow2 (see download_url_to_storage with content=import), another VM's volume, or an absolute path on the node.",
           "inputs": [
             "node",
             "vmid",
             "source",
             "storage",
-            "format (optional)"
+            "disk (optional)",
+            "format (optional)",
+            "options (optional)"
           ]
         },
         {
@@ -1307,7 +1316,7 @@
         },
         {
           "name": "download_url_to_storage",
-          "description": "Download a file (ISO, template) from a URL directly to storage on a node.",
+          "description": "Download a file from a URL directly to storage on a node: an ISO, a container template, or a disk image for import (content=import, PVE 8.4+; .qcow2, .raw, .vmdk, .img or .ova) that create_vm/import_vm_disk can then use via import-from.",
           "inputs": [
             "node",
             "storage",
@@ -3327,6 +3336,37 @@
           "description": "Delete a resource pool.",
           "inputs": [
             "poolid"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "appliances",
+      "description": "Deploy network appliances as ready-to-boot VMs (FortiGate-VM)",
+      "capabilities": [
+        {
+          "name": "deploy_fortigate_vm",
+          "description": "Deploy a FortiGate-VM from Fortinet's KVM qcow2 image: import the disk, create the VM with a WAN NIC (port1) and optional LAN/extra NICs (port2, port3...) on chosen bridges and VLANs, wait for the import, and optionally start it. Give either image (an import-content volume such as local:import/fortios.qcow2) or image_url (a URL of the .qcow2 itself; Fortinet's download is a .zip, so unzip it and serve the qcow2). Defaults (1 vCPU, 2 GB) fit the free permanent evaluation license, which allows at most 3 interfaces. Returns each FortiGate port with its MAC so you can reserve DHCP leases.",
+          "inputs": [
+            "node",
+            "vmid (optional)",
+            "name (optional)",
+            "image (optional)",
+            "image_url (optional)",
+            "image_storage (optional)",
+            "disk_storage (optional)",
+            "wan_bridge (optional)",
+            "wan_vlan (optional)",
+            "lan_bridge (optional)",
+            "lan_vlan (optional)",
+            "extra_nics (optional)",
+            "cores (optional)",
+            "memory (optional)",
+            "log_disk_gb (optional)",
+            "start (optional)",
+            "onboot (optional)",
+            "tags (optional)",
+            "description (optional)"
           ]
         }
       ]

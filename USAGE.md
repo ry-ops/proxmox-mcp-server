@@ -703,7 +703,7 @@ List all storage devices with capacity and usage
 
 ### Complete Tool List
 
-The MCP server provides 338 tools across 13 API areas (see the [README](README.md#proxmox-ve-api-coverage) for the full coverage table). This reference covers the core tools for everyday use:
+The MCP server provides 339 tools across 14 API areas (see the [README](README.md#proxmox-ve-api-coverage) for the full coverage table). This reference covers the core tools for everyday use:
 
 #### Node Tools (2)
 - `list_nodes` - List all cluster nodes

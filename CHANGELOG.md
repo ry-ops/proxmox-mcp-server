@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `deploy_fortigate_vm`: deploy a FortiGate-VM from Fortinet's KVM qcow2 image. It imports
+  the disk (from an `import` volume, or downloads the image first), creates the VM with a WAN
+  NIC and optional LAN/extra NICs on chosen bridges and VLANs, an optional log disk and a
+  serial console, waits for the import, optionally starts it, and returns each FortiGate port
+  with its MAC. Defaults (1 vCPU, 2 GB) fit the free permanent evaluation license.
+- `create_vm` accepts `net1`–`net3`, `scsi1`, `serial0`, `vga` and `extra_config` (any other
+  VM config key), so multi-NIC and cloud-init VMs no longer need a follow-up `set_vm_config`.
+
 ### Fixed
 - A `.env` file is now actually loaded. `client.py` read its settings at import time,
   before `server.py` called `load_dotenv()`, so a clone configured only through `.env`
@@ -13,6 +22,15 @@ All notable changes to this project are documented here. The format is based on
 - The server no longer prints a `RuntimeError: Event loop is closed` traceback on exit.
   The HTTP client was closed in a new event loop instead of the one its connections
   belonged to.
+- API errors now include the reason Proxmox gives. A failed request used to report only
+  "400 Parameter verification failed"; it now names the offending parameter, e.g.
+  `net0.tag: value must have a maximum value of 4094`.
+- `download_url_to_storage` sent `checksum_algorithm` and `verify_certificates`, which the API
+  rejects; it now sends `checksum-algorithm` and `verify-certificates`. The tool also documents
+  `content=import` for disk images.
+- `import_vm_disk` called a nonexistent `/importdisk` endpoint. It now imports through the VM
+  config (`<disk>: <storage>:0,import-from=<volume>`), with optional `disk`, `format` and
+  `options`.
 
 ## [2.2.0] - 2026-10-02
 
