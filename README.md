@@ -105,7 +105,7 @@ uv sync
 A multi-arch image is published to GitHub Container Registry on every push to `main` and for each release tag:
 
 ```bash
-docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. :2.2.0
+docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. :2.3.0
 ```
 
 MCP clients talk to the server over stdio, so run the container interactively (`-i`) and pass configuration as environment variables:
