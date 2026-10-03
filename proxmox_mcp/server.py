@@ -20,7 +20,6 @@ import json
 import sys
 from typing import Any
 
-from dotenv import load_dotenv
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 import mcp.server.stdio
@@ -41,8 +40,6 @@ from .tools import (
     sdn,
     storage,
 )
-
-load_dotenv()
 
 # --- Build unified tool registry ---
 
