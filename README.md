@@ -658,3 +658,8 @@ This project uses:
 **Need detailed setup?** → See [SETUP.md](SETUP.md)
 
 **Want examples?** → Check [USAGE.md](USAGE.md)
+
+<!-- org-footer -->
+---
+
+<p align="center"><sub>Part of <a href="https://github.com/ry-ops">ry-ops</a> · building the pipes between infrastructure, automation, and observability · built by <a href="https://github.com/ry-ops">ry-ops</a></sub></p>
