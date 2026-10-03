@@ -10,6 +10,9 @@ All notable changes to this project are documented here. The format is based on
 - A `.env` file is now actually loaded. `client.py` read its settings at import time,
   before `server.py` called `load_dotenv()`, so a clone configured only through `.env`
   stopped with "PROXMOX_HOST and PROXMOX_USER must be set".
+- The server no longer prints a `RuntimeError: Event loop is closed` traceback on exit.
+  The HTTP client was closed in a new event loop instead of the one its connections
+  belonged to.
 
 ## [2.2.0] - 2026-10-02
 
