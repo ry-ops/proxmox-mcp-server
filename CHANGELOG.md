@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-10-03
+
 ### Added
 - `deploy_fortigate_vm`: deploy a FortiGate-VM from Fortinet's KVM qcow2 image. It imports
   the disk (from an `import` volume, or downloads the image first), creates the VM with a WAN
@@ -94,6 +96,7 @@ released on its own.
 
 Initial release.
 
+[2.3.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v1.0.0.1...v2.1.0
 [1.0.0.1]: https://github.com/ry-ops/proxmox-mcp-server/releases/tag/v1.0.0.1
