@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ry-ops/proxmox-mcp-server/pulls)
 
-A Model Context Protocol (MCP) server for the Proxmox Virtual Environment API. It exposes **338 tools** covering nodes, VMs, containers, storage, clustering and HA, users and permissions, firewall, disks, Ceph, ACME certificates, SDN, notifications and resource pools.
+A Model Context Protocol (MCP) server for the Proxmox Virtual Environment API. It exposes **339 tools** covering nodes, VMs, containers, storage, clustering and HA, users and permissions, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.
 
 **Built with Python and `uv` for fast, reliable dependency management.**
 
@@ -48,6 +48,7 @@ See the [A2A Protocol Documentation](#a2a-protocol) section below for integratio
 | SDN | 16 | Zones, VNets, subnets, apply |
 | Notifications | 23 | Gotify, sendmail, SMTP and webhook endpoints, matchers |
 | Pools | 5 | Resource pool CRUD |
+| Appliances | 1 | `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license |
 
 See [Available Tools](#available-tools) for how to browse the full list.
 
@@ -137,7 +138,7 @@ The server is configured via environment variables:
 
 - `PROXMOX_PORT`: API port (default: `8006`)
 - `PROXMOX_VERIFY_SSL`: Verify SSL certificates (default: `false`)
-- `PROXMOX_READ_ONLY`: Block all writes — only GET requests are allowed; any create/update/delete/action tool is refused (default: `false`). 149 of the 338 tools are read-only and keep working. Three read-style tools also send POST requests and are blocked: `vm_agent_ping`, plus `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets
+- `PROXMOX_READ_ONLY`: Block all writes — only GET requests are allowed; any create/update/delete/action tool is refused (default: `false`). 149 of the 339 tools are read-only and keep working. Three read-style tools also send POST requests and are blocked: `vm_agent_ping`, plus `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets
 
 When running from a clone, a `.env` file in the project directory is loaded automatically. See [`.env.example`](.env.example).
 
@@ -250,7 +251,7 @@ Add to your Claude Desktop configuration file:
 
 ## Available Tools
 
-The server registers 338 tools, grouped by API area in [`proxmox_mcp/tools/`](proxmox_mcp/tools/), one module per area. Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`.
+The server registers 339 tools, grouped by API area in [`proxmox_mcp/tools/`](proxmox_mcp/tools/), one module per area. Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`.
 
 Some commonly used tools:
 
@@ -258,6 +259,7 @@ Some commonly used tools:
 |------|-------|
 | Inventory | `list_nodes`, `get_cluster_resources`, `list_vms`, `list_containers`, `list_storage` |
 | VM lifecycle | `start_vm`, `shutdown_vm`, `stop_vm`, `reboot_vm`, `create_vm`, `clone_vm`, `migrate_vm` |
+| Disk images | `download_url_to_storage` with `content=import`, then `create_vm` with `scsi0=local-lvm:0,import-from=local:import/<image>` or `import_vm_disk` |
 | Snapshots | `create_vm_snapshot`, `list_vm_snapshots`, `rollback_vm_snapshot`, `delete_vm_snapshot` |
 | Monitoring | `get_node_status`, `get_vm_status`, `get_vm_rrddata`, `get_node_storage_status` |
 | Tasks | `list_cluster_tasks`, `list_node_tasks`, `get_task_status`, `get_task_log` |
@@ -423,7 +425,7 @@ The `agent-card.json` file serves as the agent's identity and capability manifes
 
 ### Available Skills
 
-The agent card lists all **338 tools** in **13 skill categories**, generated from the server's tool registry. Each entry has the tool's name, description and inputs:
+The agent card lists all **339 tools** in **14 skill categories**, generated from the server's tool registry. Each entry has the tool's name, description and inputs:
 
 | Category | Tools |
 |----------|------:|

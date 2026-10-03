@@ -28,6 +28,7 @@ from .client import ProxmoxClient, _validate_config
 from .tools import (
     acme,
     access,
+    appliances,
     ceph,
     cluster,
     disks,
@@ -57,6 +58,7 @@ MODULES = [
     sdn,
     notifications,
     pools,
+    appliances,
 ]
 
 ALL_TOOLS: list[Tool] = []

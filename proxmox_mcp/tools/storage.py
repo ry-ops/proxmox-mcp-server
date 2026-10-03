@@ -164,14 +164,18 @@ TOOLS = [
     },
     {
         "name": "download_url_to_storage",
-        "description": "Download a file (ISO, template) from a URL directly to storage on a node.",
+        "description": (
+            "Download a file from a URL directly to storage on a node: an ISO, a container "
+            "template, or a disk image for import (content=import, PVE 8.4+; .qcow2, .raw, .vmdk, "
+            ".img or .ova) that create_vm/import_vm_disk can then use via import-from."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "node": NODE,
                 "storage": OPT_STR("Storage ID"),
                 "url": OPT_STR("Download URL"),
-                "content": OPT_STR("Content type: iso or vztmpl"),
+                "content": OPT_STR("Content type: iso, vztmpl or import"),
                 "filename": OPT_STR("Target filename"),
                 "checksum": OPT_STR("Expected checksum"),
                 "checksum_algorithm": OPT_STR("Checksum algorithm: md5, sha1, sha224, sha256, sha384, sha512"),
@@ -306,6 +310,10 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
 
     elif name == "download_url_to_storage":
         data = {k: v for k, v in args.items() if k not in ("node", "storage")}
+        # The API spells these with hyphens; underscores fail with "400 Parameter verification failed".
+        for snake, hyphen in (("checksum_algorithm", "checksum-algorithm"), ("verify_certificates", "verify-certificates")):
+            if snake in data:
+                data[hyphen] = data.pop(snake)
         return await client.post(f"/nodes/{args['node']}/storage/{args['storage']}/download-url", data)
 
     elif name == "backup_vm":

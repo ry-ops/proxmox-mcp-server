@@ -36,6 +36,31 @@ def _validate_config() -> None:
         sys.exit(1)
 
 
+def _api_error(response: httpx.Response) -> httpx.HTTPStatusError:
+    """An HTTPStatusError that keeps the reason Proxmox gives in the response body.
+
+    Proxmox puts the useful detail there, e.g. {"errors": {"scsi0": "invalid format ..."}}
+    for "400 Parameter verification failed", which the status line alone does not show.
+    """
+    detail = ""
+    try:
+        body = response.json()
+    except ValueError:
+        body = None
+    if isinstance(body, dict):
+        errors = body.get("errors")
+        if isinstance(errors, dict) and errors:
+            detail = "; ".join(f"{k}: {str(v).strip()}" for k, v in errors.items())
+        elif body.get("message"):
+            detail = str(body["message"]).strip()
+    elif response.text:
+        detail = response.text.strip()[:300]
+    message = f"{response.status_code} {response.reason_phrase} for {response.request.method} {response.request.url.path}"
+    if detail:
+        message += f": {detail}"
+    return httpx.HTTPStatusError(message, request=response.request, response=response)
+
+
 class ProxmoxClient:
     def __init__(self) -> None:
         self.base_url = f"https://{PROXMOX_HOST}:{PROXMOX_PORT}/api2/json"
@@ -54,7 +79,8 @@ class ProxmoxClient:
                 f"{self.base_url}/access/ticket",
                 data={"username": PROXMOX_USER, "password": PROXMOX_PASSWORD},
             )
-            response.raise_for_status()
+            if response.is_error:
+                raise _api_error(response)
             data = response.json()["data"]
             self.ticket = data["ticket"]
             self.csrf_token = data["CSRFPreventionToken"]
@@ -95,7 +121,8 @@ class ProxmoxClient:
             response = await self.client.delete(url, headers=headers, params=data)
         else:
             raise ValueError(f"Unsupported method: {method}")
-        response.raise_for_status()
+        if response.is_error:
+            raise _api_error(response)
         return response.json()
 
     async def get(self, path: str, params: Optional[dict[str, Any]] = None) -> Any:

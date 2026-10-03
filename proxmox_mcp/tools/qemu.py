@@ -204,9 +204,18 @@ TOOLS = [
                 "cpu": OPT_STR("CPU type (e.g. host)"),
                 "ostype": OPT_STR("OS type: l26, l24, win10, win11, win2022, other, etc."),
                 "scsihw": OPT_STR("SCSI hardware type (virtio-scsi-pci, lsi, etc.)"),
-                "scsi0": OPT_STR("SCSI disk 0 (e.g. local-lvm:32)"),
-                "ide2": OPT_STR("IDE device 2 (e.g. local:iso/ubuntu.iso,media=cdrom)"),
-                "net0": OPT_STR("Network interface 0 (e.g. virtio,bridge=vmbr0)"),
+                "scsi0": OPT_STR(
+                    "SCSI disk 0, e.g. local-lvm:32, or import an image: "
+                    "local-lvm:0,import-from=local:import/disk.qcow2"
+                ),
+                "scsi1": OPT_STR("SCSI disk 1 (e.g. local-lvm:8)"),
+                "ide2": OPT_STR("IDE device 2 (e.g. local:iso/ubuntu.iso,media=cdrom, or local-lvm:cloudinit)"),
+                "net0": OPT_STR("Network interface 0 (e.g. virtio,bridge=vmbr0,tag=150)"),
+                "net1": OPT_STR("Network interface 1"),
+                "net2": OPT_STR("Network interface 2"),
+                "net3": OPT_STR("Network interface 3"),
+                "serial0": OPT_STR("Serial port 0 (e.g. socket)"),
+                "vga": OPT_STR("Display (e.g. std, serial0)"),
                 "boot": OPT_STR("Boot order (e.g. order=scsi0;ide2)"),
                 "onboot": OPT_BOOL("Start on boot"),
                 "agent": OPT_STR("QEMU agent config (e.g. enabled=1)"),
@@ -215,6 +224,14 @@ TOOLS = [
                 "pool": OPT_STR("Resource pool"),
                 "start": OPT_BOOL("Start VM after creation"),
                 "template": OPT_BOOL("Create as template"),
+                "extra_config": {
+                    "type": "object",
+                    "description": (
+                        "Any other VM config keys passed to the API as-is, e.g. "
+                        "{\"net4\": \"virtio,bridge=vmbr1\", \"ciuser\": \"ubuntu\", \"ipconfig0\": \"ip=dhcp\"}"
+                    ),
+                    "additionalProperties": True,
+                },
             },
             "required": ["node"],
         },
@@ -421,15 +438,21 @@ TOOLS = [
     },
     {
         "name": "import_vm_disk",
-        "description": "Import an external disk image into a storage for a VM.",
+        "description": (
+            "Import a disk image into a VM as a new disk (Proxmox import-from). The source is an "
+            "import-content volume such as local:import/disk.qcow2 (see download_url_to_storage "
+            "with content=import), another VM's volume, or an absolute path on the node."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "node": NODE,
                 "vmid": VMID,
-                "source": OPT_STR("Path to source disk image"),
-                "storage": OPT_STR("Target storage ID"),
-                "format": OPT_STR("Format: raw, qcow2, vmdk"),
+                "source": OPT_STR("Volume ID (local:import/disk.qcow2) or absolute path on the node"),
+                "storage": OPT_STR("Target storage ID for the new disk, e.g. local-lvm"),
+                "disk": OPT_STR("Disk slot to attach it as (default scsi0)"),
+                "format": OPT_STR("Target format on file storages: raw, qcow2, vmdk"),
+                "options": OPT_STR("Extra disk options, e.g. discard=on,ssd=1"),
             },
             "required": ["node", "vmid", "source", "storage"],
         },
@@ -762,7 +785,8 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.post(f"{vm}/status/resume", data or None)
 
     elif name == "create_vm":
-        data = {k: v for k, v in args.items() if k != "node"}
+        data = {k: v for k, v in args.items() if k not in ("node", "extra_config")}
+        data.update(args.get("extra_config") or {})
         return await client.post(base, data)
 
     elif name == "clone_vm":
@@ -829,10 +853,13 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.put(f"{vm}/unlink", data)
 
     elif name == "import_vm_disk":
-        data = {"source": args["source"], "storage": args["storage"]}
-        if "format" in args:
-            data["format"] = args["format"]
-        return await client.post(f"{vm}/importdisk", data)
+        # There is no /importdisk API endpoint; imports go through the VM config with import-from.
+        spec = f"{args['storage']}:0,import-from={args['source']}"
+        if args.get("format"):
+            spec += f",format={args['format']}"
+        if args.get("options"):
+            spec += f",{args['options']}"
+        return await client.post(f"{vm}/config", {args.get("disk", "scsi0"): spec})
 
     elif name == "get_vm_firewall_rules":
         return await client.get(f"{vm}/firewall/rules")
