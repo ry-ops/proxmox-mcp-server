@@ -104,17 +104,21 @@ async def main() -> None:
     print(f"Tools: {len(ALL_TOOLS)}", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
 
-    await proxmox.authenticate()
+    # Close the HTTP client in this event loop: its connections are bound to it.
+    try:
+        await proxmox.authenticate()
 
-    print(f"✓ Ready — {len(ALL_TOOLS)} tools available", file=sys.stderr)
-    print("=" * 60, file=sys.stderr)
+        print(f"✓ Ready — {len(ALL_TOOLS)} tools available", file=sys.stderr)
+        print("=" * 60, file=sys.stderr)
 
-    async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-        await app.run(
-            read_stream,
-            write_stream,
-            app.create_initialization_options(),
-        )
+        async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
+            await app.run(
+                read_stream,
+                write_stream,
+                app.create_initialization_options(),
+            )
+    finally:
+        await proxmox.close()
 
 
 def run() -> None:
@@ -125,8 +129,6 @@ def run() -> None:
     except Exception as e:
         print(f"\n✗ Fatal: {e}", file=sys.stderr)
         sys.exit(1)
-    finally:
-        asyncio.run(proxmox.close())
 
 
 if __name__ == "__main__":
