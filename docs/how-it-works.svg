@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" role="img" aria-labelledby="t d">
+  <title id="t">How Proxmox MCP Server works, and read-only mode</title>
+  <desc id="d">Any MCP client, such as Claude Desktop or Claude Code, talks to proxmox-mcp-server over stdio. The server calls the Proxmox VE REST API over HTTPS on port 8006 with an API token or a password. With PROXMOX_READ_ONLY set to true, GET requests still reach Proxmox, while POST, PUT and DELETE are refused inside the server before they reach the network.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes gA0 { 0%,3.33% { transform: translateX(0); opacity: 0; } 4.17% { opacity: 1; } 16.67% { transform: translateX(300px); opacity: 1; } 18.33%,100% { transform: translateX(300px); opacity: 0; } } .gA0 { animation: gA0 12.0s infinite; }
+    @keyframes pA0 { 0%,6.67% { transform: translateX(0); opacity: 0; } 7.50% { opacity: 1; } 20.00% { transform: translateX(300px); opacity: 1; } 21.67%,100% { transform: translateX(300px); opacity: 0; } } .pA0 { animation: pA0 12.0s infinite; }
+    @keyframes dA0 { 0%,10.00% { transform: translateX(0); opacity: 0; } 10.83% { opacity: 1; } 23.33% { transform: translateX(300px); opacity: 1; } 25.00%,100% { transform: translateX(300px); opacity: 0; } } .dA0 { animation: dA0 12.0s infinite; }
+    @keyframes gB0 { 0%,53.33% { transform: translateX(0); opacity: 0; } 54.17% { opacity: 1; } 66.67% { transform: translateX(300px); opacity: 1; } 68.33%,100% { transform: translateX(300px); opacity: 0; } } .gB0 { animation: gB0 12.0s infinite; }
+    @keyframes pB0 { 0%,56.67% { transform: translateX(0); opacity: 0; } 57.50% { opacity: 1; } 70.00% { transform: translateX(54px); opacity: 1; } 71.67%,100% { transform: translateX(54px); opacity: 0; } } .pB0 { animation: pB0 12.0s infinite; }
+    @keyframes dB0 { 0%,60.00% { transform: translateX(0); opacity: 0; } 60.83% { opacity: 1; } 73.33% { transform: translateX(54px); opacity: 1; } 75.00%,100% { transform: translateX(54px); opacity: 0; } } .dB0 { animation: dB0 12.0s infinite; }
+    @keyframes gA1 { 0%,21.67% { transform: translateX(0); opacity: 0; } 22.50% { opacity: 1; } 35.00% { transform: translateX(300px); opacity: 1; } 36.67%,100% { transform: translateX(300px); opacity: 0; } } .gA1 { animation: gA1 12.0s infinite; }
+    @keyframes pA1 { 0%,25.00% { transform: translateX(0); opacity: 0; } 25.83% { opacity: 1; } 38.33% { transform: translateX(300px); opacity: 1; } 40.00%,100% { transform: translateX(300px); opacity: 0; } } .pA1 { animation: pA1 12.0s infinite; }
+    @keyframes dA1 { 0%,28.33% { transform: translateX(0); opacity: 0; } 29.17% { opacity: 1; } 41.67% { transform: translateX(300px); opacity: 1; } 43.33%,100% { transform: translateX(300px); opacity: 0; } } .dA1 { animation: dA1 12.0s infinite; }
+    @keyframes gB1 { 0%,71.67% { transform: translateX(0); opacity: 0; } 72.50% { opacity: 1; } 85.00% { transform: translateX(300px); opacity: 1; } 86.67%,100% { transform: translateX(300px); opacity: 0; } } .gB1 { animation: gB1 12.0s infinite; }
+    @keyframes pB1 { 0%,75.00% { transform: translateX(0); opacity: 0; } 75.83% { opacity: 1; } 88.33% { transform: translateX(54px); opacity: 1; } 90.00%,100% { transform: translateX(54px); opacity: 0; } } .pB1 { animation: pB1 12.0s infinite; }
+    @keyframes dB1 { 0%,78.33% { transform: translateX(0); opacity: 0; } 79.17% { opacity: 1; } 91.67% { transform: translateX(54px); opacity: 1; } 93.33%,100% { transform: translateX(54px); opacity: 0; } } .dB1 { animation: dB1 12.0s infinite; }
+    @keyframes offlab { 0%,0.00% { opacity: 0; } 2.08%,47.92% { opacity: 1; } 50.00%,100% { opacity: 0; } } .offlab { animation: offlab 12.0s infinite; }
+    @keyframes onlab { 0%,50.00% { opacity: 0; } 52.08%,97.92% { opacity: 1; } 100.00%,100% { opacity: 0; } } .onlab { animation: onlab 12.0s infinite; }
+    @keyframes xp0 { 0%,70.00% { opacity: 0; } 72.08%,76.25% { opacity: 1; } 78.33%,100% { opacity: 0; } } .xp0 { animation: xp0 12.0s infinite; }
+    @keyframes xd0 { 0%,73.33% { opacity: 0; } 75.42%,79.58% { opacity: 1; } 81.67%,100% { opacity: 0; } } .xd0 { animation: xd0 12.0s infinite; }
+    @keyframes xp1 { 0%,88.33% { opacity: 0; } 90.42%,94.58% { opacity: 1; } 96.67%,100% { opacity: 0; } } .xp1 { animation: xp1 12.0s infinite; }
+    @keyframes xd1 { 0%,91.67% { opacity: 0; } 93.75%,97.92% { opacity: 1; } 100.00%,100% { opacity: 0; } } .xd1 { animation: xd1 12.0s infinite; }
+    @keyframes knob { 0%,48.33% { transform: translateX(0); } 50.83%,98.33% { transform: translateX(26px); } 100% { transform: translateX(0); } } .knob { animation: knob 12.0s infinite; }
+    @keyframes track { 0%,48.33% { fill: #3a4459; } 50.83%,98.33% { fill: #3ec7ff; } 100% { fill: #3a4459; } } .track { animation: track 12.0s infinite; }
+    @keyframes gate { 0%,48.33% { opacity: .15; } 50.83%,98.33% { opacity: 1; } 100% { opacity: .15; } } .gate { animation: gate 12.0s infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } .onlab, [class^="x"] { opacity: 0; } }
+  </style>
+
+  <rect width="960" height="440" rx="20" fill="#0f1420"/>
+  <text x="40" y="52" font-size="28" font-weight="800">How it works</text>
+  <text x="40" y="78" font-size="15" class="muted">Your MCP client ⇄ stdio ⇄ proxmox-mcp-server ⇄ HTTPS :8006 ⇄ Proxmox VE. One switch makes it look-but-don't-touch.</text>
+
+  <!-- Clients -->
+  <text x="40" y="122" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">MCP CLIENTS</text>
+  <rect x="40" y="134" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="159" font-size="14" font-weight="600">Claude Desktop</text><rect x="40" y="184" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="209" font-size="14" font-weight="600">Claude Code</text><rect x="40" y="234" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="259" font-size="14" font-weight="600">Any MCP client</text><rect x="40" y="284" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="309" font-size="14" font-weight="600">A2A agents</text>
+  <text x="58" y="345" font-size="11" class="muted mono">agent-card.json: 339 tools</text>
+  <path d="M244 246 H330" stroke="#ff8a1f" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round"/>
+  <text x="252" y="236" font-size="11" class="muted mono">stdio</text>
+
+  <!-- Server -->
+  <rect x="336" y="134" width="380" height="214" rx="16" fill="#1d2536" stroke="#ff8a1f" stroke-width="2.5"/>
+  <line x1="566" y1="150" x2="566" y2="332" stroke="#2c3750" stroke-dasharray="3 5"/>
+  <text x="356" y="164" font-size="16" font-weight="800">proxmox-mcp-server</text>
+  <text x="356" y="186" font-size="12" class="muted">Python · httpx · MCP SDK</text>
+  <text x="356" y="206" font-size="12" class="muted">run with <tspan class="mono">uv</tspan> or the ghcr.io image</text>
+  <rect x="356" y="222" width="186" height="24" rx="12" fill="#10283a" stroke="#3ec7ff"/><text x="449" y="238" text-anchor="middle" font-size="11" class="mono" style="fill:#a8e4ff">API token or password</text>
+  <text x="356" y="276" font-size="11" class="mono muted">PROXMOX_READ_ONLY</text>
+  <g transform="translate(356 286)">
+    <rect class="track" width="54" height="28" rx="14" fill="#3a4459"/>
+    <g class="knob"><circle cx="14" cy="14" r="11" fill="#e6ebf5"/></g>
+  </g>
+  <g class="offlab"><text x="420" y="306" font-size="13" font-weight="800" class="muted">false</text></g>
+  <g class="onlab"><text x="420" y="306" font-size="13" font-weight="800" style="fill:#3ec7ff">true · 149 tools work</text></g>
+
+  <!-- Gate -->
+  <g class="gate"><rect x="690" y="226" width="8" height="90" rx="4" fill="#3ec7ff"/><text x="694" y="334" text-anchor="middle" font-size="10" font-weight="700" style="fill:#3ec7ff">READ-ONLY GATE</text></g>
+
+  <!-- Lanes -->
+  <line x1="572" y1="196" x2="900" y2="196" stroke="#232c3f" stroke-width="2"/>
+  <line x1="572" y1="246" x2="900" y2="246" stroke="#232c3f" stroke-width="2"/>
+  <line x1="572" y1="296" x2="900" y2="296" stroke="#232c3f" stroke-width="2"/>
+  <g class="gA0"><rect x="572" y="185" width="60" height="22" rx="11" fill="#3ddc84"/><text x="602" y="200" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">GET</text></g><g class="pA0"><rect x="572" y="235" width="60" height="22" rx="11" fill="#ffb02e"/><text x="602" y="250" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">POST</text></g><g class="dA0"><rect x="572" y="285" width="60" height="22" rx="11" fill="#ff5c6e"/><text x="602" y="300" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">DELETE</text></g><g class="gB0"><rect x="572" y="185" width="60" height="22" rx="11" fill="#3ddc84"/><text x="602" y="200" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">GET</text></g><g class="pB0"><rect x="572" y="235" width="60" height="22" rx="11" fill="#ffb02e"/><text x="602" y="250" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">POST</text></g><g class="dB0"><rect x="572" y="285" width="60" height="22" rx="11" fill="#ff5c6e"/><text x="602" y="300" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">DELETE</text></g><g class="gA1"><rect x="572" y="185" width="60" height="22" rx="11" fill="#3ddc84"/><text x="602" y="200" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">GET</text></g><g class="pA1"><rect x="572" y="235" width="60" height="22" rx="11" fill="#ffb02e"/><text x="602" y="250" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">POST</text></g><g class="dA1"><rect x="572" y="285" width="60" height="22" rx="11" fill="#ff5c6e"/><text x="602" y="300" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">DELETE</text></g><g class="gB1"><rect x="572" y="185" width="60" height="22" rx="11" fill="#3ddc84"/><text x="602" y="200" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">GET</text></g><g class="pB1"><rect x="572" y="235" width="60" height="22" rx="11" fill="#ffb02e"/><text x="602" y="250" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">POST</text></g><g class="dB1"><rect x="572" y="285" width="60" height="22" rx="11" fill="#ff5c6e"/><text x="602" y="300" text-anchor="middle" font-size="11" font-weight="800" style="fill:#0f1420">DELETE</text></g>
+  <g class="xp0"><text x="584" y="232" font-size="12" font-weight="800" style="fill:#ff9aa5">✕ refused</text></g><g class="xd0"><text x="584" y="282" font-size="12" font-weight="800" style="fill:#ff9aa5">✕ refused</text></g><g class="xp1"><text x="584" y="232" font-size="12" font-weight="800" style="fill:#ff9aa5">✕ refused</text></g><g class="xd1"><text x="584" y="282" font-size="12" font-weight="800" style="fill:#ff9aa5">✕ refused</text></g>
+
+  <!-- Proxmox -->
+  <rect x="880" y="134" width="56" height="214" rx="14" fill="#2d1f10" stroke="#ff8a1f" stroke-width="2"/>
+  <text x="908" y="241" text-anchor="middle" font-size="12" font-weight="800" transform="rotate(-90 908 241)" style="fill:#ffc48a">PROXMOX VE · :8006</text>
+
+  <text x="40" y="392" font-size="13">Read-only mode refuses every POST, PUT and DELETE <tspan font-weight="700">inside the server</tspan>, before anything leaves your machine.</text>
+  <text x="40" y="414" font-size="13" class="muted">Pair it with a <tspan class="mono">PVEAuditor</tspan> token and Proxmox enforces the same limit on its side.</text>
+</svg>

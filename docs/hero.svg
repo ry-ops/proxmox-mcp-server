@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" role="img" aria-labelledby="t d">
+  <title id="t">Proxmox MCP Server: talk to your Proxmox cluster</title>
+  <desc id="d">You ask your AI assistant to clone VM 9000 to web-02 and start it. The request travels over MCP to proxmox-mcp-server, which calls clone_vm and start_vm on the Proxmox VE API. A new VM appears on node pve2 and turns green: running.</desc>
+  <defs>
+    <linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#ff8a1f"/><stop offset=".55" stop-color="#ff5c8a"/><stop offset="1" stop-color="#b58cff"/></linearGradient>
+    <clipPath id="typeclip"><rect class="typing" x="58" y="128" width="300" height="30"/></clipPath>
+  </defs>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes bub { 0%,2.00% { opacity: 0; transform: translateY(8px); } 5.50%,94.00% { opacity: 1; transform: translateY(0); } 97.00%,100% { opacity: 0; } } .bub { animation: bub 10.0s infinite; }
+    @keyframes c1 { 0%,16.00% { opacity: 0; transform: translateX(-8px); } 19.50%,94.00% { opacity: 1; transform: translateX(0); } 97.00%,100% { opacity: 0; } } .c1 { animation: c1 10.0s infinite; }
+    @keyframes c1ok { 0%,34.00% { opacity: 0; } 37.50%,94.00% { opacity: 1; } 97.00%,100% { opacity: 0; } } .c1ok { animation: c1ok 10.0s infinite; }
+    @keyframes c2 { 0%,40.00% { opacity: 0; transform: translateX(-8px); } 43.50%,94.00% { opacity: 1; transform: translateX(0); } 97.00%,100% { opacity: 0; } } .c2 { animation: c2 10.0s infinite; }
+    @keyframes c2ok { 0%,60.00% { opacity: 0; } 63.50%,94.00% { opacity: 1; } 97.00%,100% { opacity: 0; } } .c2ok { animation: c2ok 10.0s infinite; }
+    @keyframes reply { 0%,66.00% { opacity: 0; transform: translateY(6px); } 69.50%,94.00% { opacity: 1; transform: translateY(0); } 97.00%,100% { opacity: 0; } } .reply { animation: reply 10.0s infinite; }
+    @keyframes vmnew { 0%,30.00% { opacity: 0; transform: scale(.3); } 33.50%,94.00% { opacity: 1; transform: scale(1); } 97.00%,100% { opacity: 0; } } .vmnew { animation: vmnew 10.0s infinite; }
+    @keyframes vmrun { 0%,58.00% { opacity: 0; } 61.50%,94.00% { opacity: 1; } 97.00%,100% { opacity: 0; } } .vmrun { animation: vmrun 10.0s infinite; }
+    @keyframes lab1 { 0%,32.00% { opacity: 0; } 35.50%,56.00% { opacity: 1; } 59.00%,100% { opacity: 0; } } .lab1 { animation: lab1 10.0s infinite; }
+    @keyframes lab2 { 0%,59.00% { opacity: 0; } 62.50%,94.00% { opacity: 1; } 97.00%,100% { opacity: 0; } } .lab2 { animation: lab2 10.0s infinite; }
+    @keyframes typing { 0%,4.00% { width: 0; } 14.00%,97.00% { width: 300px; } 100% { width: 0; } } .typing { animation: typing 10.0s steps(36) infinite; }
+    @keyframes p1 { 0%,17.00% { transform: translateX(0); opacity: 0; } 18.00% { opacity: 1; } 29.00% { transform: translateX(300px); opacity: 1; } 30.00%,100% { transform: translateX(300px); opacity: 0; } } .p1 { animation: p1 10.0s infinite; }
+    @keyframes p2 { 0%,41.00% { transform: translateX(0); opacity: 0; } 42.00% { opacity: 1; } 56.00% { transform: translateX(300px); opacity: 1; } 57.00%,100% { transform: translateX(300px); opacity: 0; } } .p2 { animation: p2 10.0s infinite; }
+    @keyframes core { 0%,20.00%,32.00%,44.00%,58.00%,100% { stroke-width: 2.5; } 25.00%,50.00% { stroke-width: 6; } } .core { animation: core 10.0s infinite; }
+    .vmnew { transform-box: fill-box; transform-origin: center; }
+    .blink { animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .hum { animation: hum 2.4s ease-in-out infinite; }
+    @keyframes hum { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } .typing { width: 300px; } }
+  </style>
+
+  <rect width="960" height="420" rx="20" fill="#0f1420"/>
+  <text x="40" y="66" font-size="44" font-weight="800" style="fill:url(#title)">Proxmox MCP Server</text>
+  <text x="42" y="98" font-size="17" class="muted">Talk to your Proxmox cluster. <tspan style="fill:#e6ebf5" font-weight="700">339 tools</tspan>, one conversation.</text>
+  <g font-size="12" font-weight="700">
+    <rect x="604" y="40" width="88" height="24" rx="12" fill="#2d1f10" stroke="#ff8a1f"/><text x="648" y="56" text-anchor="middle" style="fill:#ffc48a">339 tools</text>
+    <rect x="700" y="40" width="88" height="24" rx="12" fill="#221a33" stroke="#b58cff"/><text x="744" y="56" text-anchor="middle" style="fill:#d9c6ff">14 areas</text>
+    <rect x="796" y="40" width="128" height="24" rx="12" fill="#10283a" stroke="#3ec7ff"/><text x="860" y="56" text-anchor="middle" style="fill:#a8e4ff">read-only mode</text>
+  </g>
+
+  <!-- Chat -->
+  <rect x="30" y="118" width="360" height="270" rx="16" fill="#161d2b" stroke="#2c3750"/>
+  <text x="50" y="146" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">YOU</text>
+  <g class="bub">
+    <rect x="46" y="154" width="328" height="36" rx="12" fill="#2a3550"/>
+  </g>
+  <g transform="translate(0 30)" clip-path="url(#typeclip)"><text x="60" y="148" font-size="14">Clone VM 9000 to web-02 and start it</text></g>
+  <text x="50" y="216" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">ASSISTANT</text>
+  <g class="c1"><rect x="46" y="224" width="200" height="28" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="243" font-size="13" class="mono" style="fill:#ffc48a">clone_vm</text><text x="128" y="243" font-size="11" class="muted mono">9000 → 123</text></g>
+  <g class="c1ok"><text x="230" y="243" font-size="14" style="fill:#3ddc84">✓</text></g>
+  <g class="c2"><rect x="46" y="258" width="200" height="28" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="277" font-size="13" class="mono" style="fill:#ffc48a">start_vm</text><text x="128" y="277" font-size="11" class="muted mono">pve2 · 123</text></g>
+  <g class="c2ok"><text x="230" y="277" font-size="14" style="fill:#3ddc84">✓</text></g>
+  <g class="reply"><rect x="46" y="300" width="328" height="60" rx="12" fill="#1d2536"/>
+    <text x="60" y="324" font-size="14"><tspan font-weight="700">web-02</tspan> is up on <tspan font-weight="700">pve2</tspan> ✅</text>
+    <text x="60" y="345" font-size="12" class="muted">Cloned from template 9000 as VM 123, then started.</text></g>
+
+  <!-- Wire + server -->
+  <line x1="390" y1="253" x2="690" y2="253" stroke="#2c3750" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>
+  <g class="p1"><circle cx="392" cy="253" r="7" fill="#ff8a1f"/></g>
+  <g class="p2"><circle cx="392" cy="253" r="7" fill="#ff8a1f"/></g>
+  <text x="398" y="240" font-size="11" class="muted mono">MCP · stdio</text>
+  <text x="600" y="240" font-size="11" class="muted mono">HTTPS :8006</text>
+  <rect class="core" x="480" y="208" width="104" height="90" rx="16" fill="#1d2536" stroke="#ff8a1f" stroke-width="2.5"/>
+  <text x="532" y="246" text-anchor="middle" font-size="13" font-weight="800">proxmox</text>
+  <text x="532" y="263" text-anchor="middle" font-size="13" font-weight="800">mcp-server</text>
+  <text x="532" y="283" text-anchor="middle" font-size="11" class="muted">339 tools</text>
+
+  <!-- Cluster -->
+  <text x="700" y="132" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">PROXMOX VE CLUSTER</text>
+  
+  <g transform="translate(700 142)">
+    <rect width="230" height="72" rx="12" fill="#161d2b" stroke="#2c3750"/>
+    <circle class="hum" cx="18" cy="18" r="4" fill="#3ddc84"/>
+    <text x="30" y="22" font-size="13" font-weight="700">pve1</text>
+    <text x="222" y="22" text-anchor="end" font-size="11" class="muted mono">cpu 31%</text>
+    <rect x="14" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="56" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="98" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="140" y="34" width="36" height="26" rx="5" fill="#3a4459"/><rect x="182" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/>
+  </g>
+  <g transform="translate(700 224)">
+    <rect width="230" height="72" rx="12" fill="#161d2b" stroke="#2c3750"/>
+    <circle class="hum" cx="18" cy="18" r="4" fill="#3ddc84"/>
+    <text x="30" y="22" font-size="13" font-weight="700">pve2</text>
+    <text x="222" y="22" text-anchor="end" font-size="11" class="muted mono">cpu 18%</text>
+    <rect x="14" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="56" y="34" width="36" height="26" rx="5" fill="#3a4459"/><rect x="98" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/>
+  </g>
+  <g transform="translate(700 306)">
+    <rect width="230" height="72" rx="12" fill="#161d2b" stroke="#2c3750"/>
+    <circle class="hum" cx="18" cy="18" r="4" fill="#3ddc84"/>
+    <text x="30" y="22" font-size="13" font-weight="700">pve3</text>
+    <text x="222" y="22" text-anchor="end" font-size="11" class="muted mono">cpu 44%</text>
+    <rect x="14" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="56" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="98" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/><rect x="140" y="34" width="36" height="26" rx="5" fill="#2b5f3f"/>
+  </g>
+  <!-- the new VM on pve2 -->
+  <g transform="translate(700 224)">
+    <g class="vmnew"><rect x="140" y="34" width="36" height="26" rx="5" fill="#ff8a1f"/></g>
+    <g class="vmrun"><rect x="140" y="34" width="36" height="26" rx="5" fill="#3ddc84"/></g>
+  </g>
+  <g class="lab1"><text x="818" y="246" text-anchor="middle" font-size="11" font-weight="700" style="fill:#ffc48a">web-02 · cloning</text></g>
+  <g class="lab2"><text x="818" y="246" text-anchor="middle" font-size="11" font-weight="700" style="fill:#9ff0c4">web-02 · running</text></g>
+</svg>

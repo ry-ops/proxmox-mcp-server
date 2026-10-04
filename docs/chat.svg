@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" role="img" aria-labelledby="t d">
+  <title id="t">Talk to your cluster</title>
+  <desc id="d">You ask to run df -h inside VM 120. The assistant calls vm_agent_exec through the QEMU guest agent, gets a PID, calls vm_agent_exec_status, and shows the disk usage: root is 69 percent full. It offers resize_vm_disk. A side panel cycles through other questions and the tools that answer them.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes u { 0%,2.14% { opacity: 0; transform: translateY(6px); } 4.64%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .u { animation: u 14.0s infinite; }
+    @keyframes t1 { 0%,11.43% { opacity: 0; transform: translateY(6px); } 13.93%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .t1 { animation: t1 14.0s infinite; }
+    @keyframes r1 { 0%,18.57% { opacity: 0; transform: translateY(6px); } 21.07%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .r1 { animation: r1 14.0s infinite; }
+    @keyframes t2 { 0%,24.29% { opacity: 0; transform: translateY(6px); } 26.79%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .t2 { animation: t2 14.0s infinite; }
+    @keyframes r2 { 0%,30.71% { opacity: 0; transform: translateY(6px); } 33.21%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .r2 { animation: r2 14.0s infinite; }
+    @keyframes o0 { 0%,35.71% { opacity: 0; transform: translateY(0px); } 38.21%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .o0 { animation: o0 14.0s infinite; }
+    @keyframes o1 { 0%,38.93% { opacity: 0; transform: translateY(0px); } 41.43%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .o1 { animation: o1 14.0s infinite; }
+    @keyframes o2 { 0%,42.14% { opacity: 0; transform: translateY(0px); } 44.64%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .o2 { animation: o2 14.0s infinite; }
+    @keyframes o3 { 0%,45.36% { opacity: 0; transform: translateY(0px); } 47.86%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .o3 { animation: o3 14.0s infinite; }
+    @keyframes a { 0%,52.86% { opacity: 0; transform: translateY(6px); } 55.36%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .a { animation: a 14.0s infinite; }
+    @keyframes chip { 0%,61.43% { opacity: 0; transform: translateY(6px); } 63.93%,95.71% { opacity: 1; transform: translateY(0); } 97.86%,100% { opacity: 0; } } .chip { animation: chip 14.0s infinite; }
+    @keyframes q0 { 0%,0.00% { opacity: 0; transform: translateY(10px); } 2.86%,17.14% { opacity: 1; transform: translateY(0); } 20.00%,100% { opacity: 0; transform: translateY(-10px); } } .q0 { animation: q0 14.0s infinite; }
+    @keyframes q1 { 0%,20.00% { opacity: 0; transform: translateY(10px); } 22.86%,37.14% { opacity: 1; transform: translateY(0); } 40.00%,100% { opacity: 0; transform: translateY(-10px); } } .q1 { animation: q1 14.0s infinite; }
+    @keyframes q2 { 0%,40.00% { opacity: 0; transform: translateY(10px); } 42.86%,57.14% { opacity: 1; transform: translateY(0); } 60.00%,100% { opacity: 0; transform: translateY(-10px); } } .q2 { animation: q2 14.0s infinite; }
+    @keyframes q3 { 0%,60.00% { opacity: 0; transform: translateY(10px); } 62.86%,77.14% { opacity: 1; transform: translateY(0); } 80.00%,100% { opacity: 0; transform: translateY(-10px); } } .q3 { animation: q3 14.0s infinite; }
+    @keyframes q4 { 0%,80.00% { opacity: 0; transform: translateY(10px); } 82.86%,97.14% { opacity: 1; transform: translateY(0); } 100.00%,100% { opacity: 0; transform: translateY(-10px); } } .q4 { animation: q4 14.0s infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } [class^="q"]:not(.q0) { opacity: 0; } }
+  </style>
+
+  <rect width="960" height="440" rx="20" fill="#0f1420"/>
+  <text x="40" y="52" font-size="28" font-weight="800">Talk to your cluster</text>
+  <text x="40" y="78" font-size="15" class="muted">Plain English in. The right Proxmox API calls out, even inside your guests.</text>
+
+  <!-- Conversation -->
+  <rect x="30" y="98" width="600" height="320" rx="16" fill="#161d2b" stroke="#2c3750"/>
+  <g class="u"><rect x="330" y="112" width="284" height="34" rx="12" fill="#2a3550"/><text x="346" y="134" font-size="14">Run <tspan class="mono">df -h</tspan> inside VM 120</text></g>
+  <g class="t1"><rect x="46" y="158" width="400" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="176" font-size="12.5" class="mono"><tspan style="fill:#ffc48a">vm_agent_exec</tspan><tspan class="muted"> vmid=120 command=["df","-h"]</tspan></text></g>
+  <g class="r1"><text x="456" y="176" font-size="12.5" class="mono" style="fill:#9ff0c4">→ pid 4242</text></g>
+  <g class="t2"><rect x="46" y="190" width="400" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="208" font-size="12.5" class="mono"><tspan style="fill:#ffc48a">vm_agent_exec_status</tspan><tspan class="muted"> vmid=120 pid=4242</tspan></text></g>
+  <g class="r2"><text x="456" y="208" font-size="12.5" class="mono" style="fill:#9ff0c4">→ exited 0</text></g>
+  <rect x="58" y="226" width="556" height="96" rx="10" fill="#0b0f18"/>
+  <text x="70" y="243" font-size="10" font-weight="700" class="muted" letter-spacing=".1em">OUTPUT · VM 120 · via QEMU guest agent</text>
+  <g class="o0"><text x="70" y="262" font-size="12.5" class="mono" style="fill:#8b96ad" xml:space="preserve">Filesystem      Size  Used Avail Use% Mounted on</text></g>
+  <g class="o1"><text x="70" y="281" font-size="12.5" class="mono" style="fill:#e6ebf5" xml:space="preserve">/dev/sda1        32G   21G  9.5G  69% /</text></g>
+  <g class="o2"><text x="70" y="300" font-size="12.5" class="mono" style="fill:#e6ebf5" xml:space="preserve">tmpfs           2.0G     0  2.0G   0% /dev/shm</text></g>
+  <g class="o3"><text x="70" y="319" font-size="12.5" class="mono" style="fill:#e6ebf5" xml:space="preserve">/dev/sdb1       100G   12G   88G  12% /data</text></g>
+  
+  <g class="a"><text x="46" y="350" font-size="14">Root is <tspan font-weight="700" style="fill:#ffb02e">69% full</tspan> (9.5 GB free); <tspan class="mono">/data</tspan> has plenty of room.</text>
+  <text x="46" y="372" font-size="14">Want me to grow the root disk?</text></g>
+  <g class="chip"><rect x="46" y="384" width="190" height="24" rx="12" fill="#2d1f10" stroke="#ff8a1f"/><text x="141" y="400" text-anchor="middle" font-size="12" class="mono" style="fill:#ffc48a">resize_vm_disk +10G</text>
+  <text x="248" y="400" font-size="12" class="muted">a suggestion, not an action</text></g>
+
+  <!-- More to ask -->
+  <text x="660" y="122" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">MORE THINGS TO ASK</text>
+  <text x="660" y="150" font-size="13" class="muted">Every question maps to real tools.</text>
+  <g class="q0">
+    <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>
+    <text x="676" y="220" font-size="14" font-weight="600">“Which VMs are using the most CPU?”</text>
+    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ get_cluster_resources</text>
+  </g>
+  <g class="q1">
+    <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>
+    <text x="676" y="220" font-size="14" font-weight="600">“Snapshot VM 100 before upgrading”</text>
+    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ create_vm_snapshot</text>
+  </g>
+  <g class="q2">
+    <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>
+    <text x="676" y="220" font-size="14" font-weight="600">“Move container 210 to pve3”</text>
+    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ migrate_container</text>
+  </g>
+  <g class="q3">
+    <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>
+    <text x="676" y="220" font-size="14" font-weight="600">“Any backups fail this week?”</text>
+    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ list_cluster_tasks</text>
+  </g>
+  <g class="q4">
+    <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>
+    <text x="676" y="220" font-size="14" font-weight="600">“Grab the Debian 13 cloud image”</text>
+    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ download_url_to_storage</text>
+  </g>
+  
+  <rect x="660" y="290" width="270" height="128" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <text x="676" y="316" font-size="13" font-weight="700">Under the hood</text>
+  <text x="676" y="340" font-size="12" class="muted">nodes · VMs · containers · storage</text>
+  <text x="676" y="360" font-size="12" class="muted">cluster &amp; HA · users · firewall · disks</text>
+  <text x="676" y="380" font-size="12" class="muted">Ceph · ACME · SDN · notifications</text>
+  <text x="676" y="400" font-size="12" class="muted">pools · appliances</text>
+</svg>
