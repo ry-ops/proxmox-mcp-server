@@ -11,10 +11,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
 </p>
 
-<p align="center">
-  <b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client,<br>
-  the <b>whole Proxmox VE API</b>: 339 tools across VMs, containers, storage, clustering, Ceph, SDN and more.
-</p>
+<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 339 tools across VMs, containers, storage, clustering, Ceph, SDN and more.</p>
 
 <p align="center">
   <a href="#talk">Talk to it</a> ·
