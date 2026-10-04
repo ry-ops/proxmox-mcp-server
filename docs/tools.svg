@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="960" height="480" role="img" aria-labelledby="t d">
+  <title id="t">339 tools across 14 areas of the Proxmox VE API</title>
+  <desc id="d">A tile map of the server's tools by API area, bigger tiles for more tools: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC containers 28, notifications 23, disks 17, ACME and certificates 17, SDN 16, storage and backup 14, pools 5, appliances 1.</desc>
+  <defs>
+    <linearGradient id="shine" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes t0 { 0%,2.50% { opacity: 0; transform: scale(.85); } 5.83%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t0 { animation: t0 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t1 { 0%,5.42% { opacity: 0; transform: scale(.85); } 8.75%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t1 { animation: t1 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t2 { 0%,8.33% { opacity: 0; transform: scale(.85); } 11.67%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t2 { animation: t2 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t3 { 0%,11.25% { opacity: 0; transform: scale(.85); } 14.58%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t3 { animation: t3 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t4 { 0%,14.17% { opacity: 0; transform: scale(.85); } 17.50%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t4 { animation: t4 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t5 { 0%,17.08% { opacity: 0; transform: scale(.85); } 20.42%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t5 { animation: t5 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t6 { 0%,20.00% { opacity: 0; transform: scale(.85); } 23.33%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t6 { animation: t6 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t7 { 0%,22.92% { opacity: 0; transform: scale(.85); } 26.25%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t7 { animation: t7 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t8 { 0%,25.83% { opacity: 0; transform: scale(.85); } 29.17%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t8 { animation: t8 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t9 { 0%,28.75% { opacity: 0; transform: scale(.85); } 32.08%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t9 { animation: t9 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t10 { 0%,31.67% { opacity: 0; transform: scale(.85); } 35.00%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t10 { animation: t10 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t11 { 0%,34.58% { opacity: 0; transform: scale(.85); } 37.92%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t11 { animation: t11 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t12 { 0%,37.50% { opacity: 0; transform: scale(.85); } 40.83%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t12 { animation: t12 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes t13 { 0%,40.42% { opacity: 0; transform: scale(.85); } 43.75%,94% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } } .t13 { animation: t13 12.0s infinite; transform-box: fill-box; transform-origin: center; }
+    .sweep { animation: sweep 12s ease-in-out infinite; }
+    @keyframes sweep { 0%,45% { transform: translateX(-300px); } 75%,100% { transform: translateX(1000px); } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="960" height="480" rx="20" fill="#0f1420"/>
+  <text x="30" y="56" font-size="28" font-weight="800">The whole Proxmox VE API</text>
+  <text x="30" y="84" font-size="15" class="muted">One module per area, every tool with a full input schema. Bigger tile, more tools.</text>
+  <text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">339</text>
+  <text x="930" y="84" text-anchor="end" font-size="13" class="muted">tools · 14 areas</text>
+  <g class="t0">
+    <rect x="30" y="112" width="338" height="104" rx="12" fill="#ff8a1f" fill-opacity=".12" stroke="#ff8a1f" stroke-opacity=".7"/>
+    <text x="44" y="138" font-size="15" font-weight="700">QEMU VMs</text>
+    <text x="356" y="139" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff8a1f">46</text>
+    <text x="44" y="204" font-size="11" class="mono" style="fill:#ff8a1f" opacity=".85">vm_agent_exec</text><text x="44" y="189" font-size="11" class="mono" style="fill:#ff8a1f" opacity=".85">migrate_vm</text><text x="44" y="174" font-size="11" class="mono" style="fill:#ff8a1f" opacity=".85">clone_vm</text>
+  </g>
+  <g class="t1">
+    <rect x="374" y="112" width="279" height="104" rx="12" fill="#3ec7ff" fill-opacity=".12" stroke="#3ec7ff" stroke-opacity=".7"/>
+    <text x="388" y="138" font-size="15" font-weight="700">Nodes</text>
+    <text x="640" y="139" text-anchor="end" font-size="20" font-weight="800" style="fill:#3ec7ff">38</text>
+    <text x="388" y="204" font-size="11" class="mono" style="fill:#3ec7ff" opacity=".85">list_node_services</text><text x="388" y="189" font-size="11" class="mono" style="fill:#3ec7ff" opacity=".85">get_node_status</text>
+  </g>
+  <g class="t2">
+    <rect x="658" y="112" width="272" height="104" rx="12" fill="#b58cff" fill-opacity=".12" stroke="#b58cff" stroke-opacity=".7"/>
+    <text x="672" y="138" font-size="15" font-weight="700">Cluster &amp; HA</text>
+    <text x="918" y="139" text-anchor="end" font-size="20" font-weight="800" style="fill:#b58cff">37</text>
+    <text x="672" y="204" font-size="11" class="mono" style="fill:#b58cff" opacity=".85">list_ha_resources</text><text x="672" y="189" font-size="11" class="mono" style="fill:#b58cff" opacity=".85">get_cluster_resources</text>
+  </g>
+  <g class="t3">
+    <rect x="30" y="222" width="302" height="90" rx="12" fill="#3ddc84" fill-opacity=".12" stroke="#3ddc84" stroke-opacity=".7"/>
+    <text x="44" y="248" font-size="15" font-weight="700">Access control</text>
+    <text x="320" y="249" text-anchor="end" font-size="20" font-weight="800" style="fill:#3ddc84">33</text>
+    <text x="44" y="300" font-size="11" class="mono" style="fill:#3ddc84" opacity=".85">update_acl</text><text x="44" y="285" font-size="11" class="mono" style="fill:#3ddc84" opacity=".85">create_user_token</text>
+  </g>
+  <g class="t4">
+    <rect x="338" y="222" width="302" height="90" rx="12" fill="#ff5c8a" fill-opacity=".12" stroke="#ff5c8a" stroke-opacity=".7"/>
+    <text x="352" y="248" font-size="15" font-weight="700">Ceph</text>
+    <text x="628" y="249" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff5c8a">33</text>
+    <text x="352" y="300" font-size="11" class="mono" style="fill:#ff5c8a" opacity=".85">create_ceph_pool</text><text x="352" y="285" font-size="11" class="mono" style="fill:#ff5c8a" opacity=".85">list_ceph_osds</text>
+  </g>
+  <g class="t5">
+    <rect x="646" y="222" width="284" height="90" rx="12" fill="#ffb02e" fill-opacity=".12" stroke="#ffb02e" stroke-opacity=".7"/>
+    <text x="660" y="248" font-size="15" font-weight="700">Firewall</text>
+    <text x="918" y="249" text-anchor="end" font-size="20" font-weight="800" style="fill:#ffb02e">31</text>
+    <text x="660" y="300" font-size="11" class="mono" style="fill:#ffb02e" opacity=".85">add_cluster_firewall_rule</text>
+  </g>
+  <g class="t6">
+    <rect x="30" y="318" width="291" height="80" rx="12" fill="#3ec7ff" fill-opacity=".12" stroke="#3ec7ff" stroke-opacity=".7"/>
+    <text x="44" y="344" font-size="15" font-weight="700">LXC containers</text>
+    <text x="309" y="345" text-anchor="end" font-size="20" font-weight="800" style="fill:#3ec7ff">28</text>
+    <text x="44" y="386" font-size="11" class="mono" style="fill:#3ec7ff" opacity=".85">migrate_container</text><text x="44" y="371" font-size="11" class="mono" style="fill:#3ec7ff" opacity=".85">start_container</text>
+  </g>
+  <g class="t7">
+    <rect x="327" y="318" width="239" height="80" rx="12" fill="#b58cff" fill-opacity=".12" stroke="#b58cff" stroke-opacity=".7"/>
+    <text x="341" y="344" font-size="15" font-weight="700">Notifications</text>
+    <text x="553" y="345" text-anchor="end" font-size="20" font-weight="800" style="fill:#b58cff">23</text>
+    <text x="341" y="386" font-size="11" class="mono" style="fill:#b58cff" opacity=".85">create_gotify_endpoint</text>
+  </g>
+  <g class="t8">
+    <rect x="571" y="318" width="176" height="80" rx="12" fill="#3ddc84" fill-opacity=".12" stroke="#3ddc84" stroke-opacity=".7"/>
+    <text x="585" y="344" font-size="15" font-weight="700">Disks</text>
+    <text x="736" y="345" text-anchor="end" font-size="20" font-weight="800" style="fill:#3ddc84">17</text>
+    <text x="585" y="386" font-size="11" class="mono" style="fill:#3ddc84" opacity=".85">get_disk_smart</text>
+  </g>
+  <g class="t9">
+    <rect x="754" y="318" width="176" height="80" rx="12" fill="#ff5c8a" fill-opacity=".12" stroke="#ff5c8a" stroke-opacity=".7"/>
+    <text x="768" y="344" font-size="15" font-weight="700">ACME &amp; certs</text>
+    <text x="918" y="345" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff5c8a">17</text>
+    <text x="768" y="386" font-size="11" class="mono" style="fill:#ff5c8a" opacity=".85">order_node_acme_cert</text>
+  </g>
+  <g class="t10">
+    <rect x="30" y="404" width="200" height="64" rx="12" fill="#ffb02e" fill-opacity=".12" stroke="#ffb02e" stroke-opacity=".7"/>
+    <text x="44" y="430" font-size="15" font-weight="700">SDN</text>
+    <text x="218" y="431" text-anchor="end" font-size="20" font-weight="800" style="fill:#ffb02e">16</text>
+    <text x="44" y="456" font-size="11" class="mono" style="fill:#ffb02e" opacity=".85">apply_sdn</text>
+  </g>
+  <g class="t11">
+    <rect x="236" y="404" width="240" height="64" rx="12" fill="#ff8a1f" fill-opacity=".12" stroke="#ff8a1f" stroke-opacity=".7"/>
+    <text x="250" y="430" font-size="15" font-weight="700">Storage &amp; backup</text>
+    <text x="464" y="431" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff8a1f">14</text>
+    <text x="250" y="456" font-size="11" class="mono" style="fill:#ff8a1f" opacity=".85">backup_vm</text>
+  </g>
+  <g class="t12">
+    <rect x="482" y="404" width="176" height="64" rx="12" fill="#3ec7ff" fill-opacity=".12" stroke="#3ec7ff" stroke-opacity=".7"/>
+    <text x="496" y="430" font-size="15" font-weight="700">Pools</text>
+    <text x="646" y="431" text-anchor="end" font-size="20" font-weight="800" style="fill:#3ec7ff">5</text>
+    <text x="496" y="456" font-size="11" class="mono" style="fill:#3ec7ff" opacity=".85">create_pool</text>
+  </g>
+  <g class="t13">
+    <rect x="664" y="404" width="266" height="64" rx="12" fill="#ff5c8a" fill-opacity=".12" stroke="#ff5c8a" stroke-opacity=".7"/>
+    <text x="678" y="430" font-size="15" font-weight="700">Appliances</text>
+    <text x="918" y="431" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff5c8a">1</text>
+    <text x="678" y="456" font-size="11" class="mono" style="fill:#ff5c8a" opacity=".85">deploy_fortigate_vm</text>
+  </g>
+  <rect class="sweep" x="0" y="112" width="240" height="356" fill="url(#shine)"/>
+</svg>

@@ -1,37 +1,82 @@
-<img src="https://github.com/ry-ops/proxmox-mcp-server/blob/main/proxmox-mcp-server.png" width="100%">
+<p align="center">
+  <img src="docs/hero.svg" width="100%" alt="You ask your assistant to clone VM 9000 to web-02 and start it; clone_vm and start_vm flow through proxmox-mcp-server to the Proxmox cluster, and the new VM lights up on pve2.">
+</p>
 
-# Proxmox MCP Server
+<p align="center">
+  <a href="https://github.com/ry-ops/proxmox-mcp-server/releases"><img src="https://img.shields.io/github/v/release/ry-ops/proxmox-mcp-server?color=ff8a1f&label=release" alt="Release"></a>
+  <img src="https://img.shields.io/badge/tools-339-ff8a1f" alt="339 tools">
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-3ec7ff" alt="Python 3.10+"></a>
+  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-1.x-b58cff" alt="MCP"></a>
+  <a href="https://github.com/ry-ops/proxmox-mcp-server/pkgs/container/proxmox-mcp-server"><img src="https://img.shields.io/badge/docker-ghcr.io-3ddc84" alt="Docker image on ghcr.io"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
+</p>
 
-[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![uv](https://img.shields.io/badge/uv-latest-green.svg)](https://github.com/astral-sh/uv)
-[![MCP](https://img.shields.io/badge/MCP-1.0-purple.svg)](https://modelcontextprotocol.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ry-ops/proxmox-mcp-server/pulls)
+<p align="center">
+  <b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client,<br>
+  the <b>whole Proxmox VE API</b>: 339 tools across VMs, containers, storage, clustering, Ceph, SDN and more.
+</p>
 
-A Model Context Protocol (MCP) server for the Proxmox Virtual Environment API. It exposes **339 tools** covering nodes, VMs, containers, storage, clustering and HA, users and permissions, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.
+<p align="center">
+  <a href="#talk">Talk to it</a> ·
+  <a href="#how">How it works</a> ·
+  <a href="#tools">339 tools</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#read-only">Read-only mode</a> ·
+  <a href="#a2a">A2A</a> ·
+  <a href="#troubleshooting">Troubleshooting</a>
+</p>
 
-**Built with Python and `uv` for fast, reliable dependency management.**
+---
 
-## Features
+## ✨ Highlights
 
-### Agent-to-Agent (A2A) Protocol Support
+- 🧰 **The whole API, not a demo.** 339 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
+- 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
+- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and 149 read-only tools keep working.
+- 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
+- 🐳 **Runs anywhere.** Use `uv` from a clone, or the multi-arch image on `ghcr.io`.
+- 🤝 **A2A-ready.** `agent-card.json` lists every tool in 14 skill categories, for agent-to-agent discovery.
+- 🛡️ **Appliances.** `deploy_fortigate_vm` builds a FortiGate-VM from Fortinet's KVM image, with WAN/LAN NICs on the bridges and VLANs you choose.
 
-This server implements the **A2A protocol** for seamless agent-to-agent communication. The included `agent-card.json` file provides:
+<a id="talk"></a>
 
-- **Structured agent capabilities** - Detailed skill definitions for AI-to-AI discovery
-- **Authentication specifications** - Clear auth requirements for automated integration
-- **Tool catalog** - Complete inventory of available operations organized by category
-- **MCP protocol support** - Native Model Context Protocol implementation
+## 💬 Talk to your cluster
 
-**Use Cases:**
-- Multi-agent orchestration systems
-- Automated infrastructure workflows
-- Agent discovery and composition
-- Cross-system AI collaboration
+<p align="center">
+  <img src="docs/chat.svg" width="100%" alt="A chat runs df -h inside VM 120 via the QEMU guest agent and shows the disk usage; a side panel cycles through more questions and the tools that answer them.">
+</p>
 
-See the [A2A Protocol Documentation](#a2a-protocol) section below for integration details.
+Once it's connected, just ask:
 
-### Proxmox VE API Coverage
+> *"Can you list all VMs in my Proxmox cluster?"*
+> *"What's the status of VM 100 on node pve1?"*
+> *"Create a snapshot called 'backup-2025' for VM 100 on pve1."*
+> *"Show me the storage usage on all nodes."*
+> *"List all running tasks in the cluster."*
+> *"Clone VM 9000 to a new VM called web-02 and start it."*
+> *"Run `df -h` inside VM 120 using the guest agent and show me the output."*
+
+There are more worked examples in [USAGE.md](USAGE.md).
+
+<a id="how"></a>
+
+## ⚙️ How it works
+
+<p align="center">
+  <img src="docs/how-it-works.svg" width="100%" alt="MCP clients talk to proxmox-mcp-server over stdio; the server calls the Proxmox VE API over HTTPS on port 8006. With read-only mode on, GET requests pass and POST, PUT and DELETE are refused inside the server.">
+</p>
+
+- **Your MCP client** (Claude Desktop, Claude Code, or anything that speaks MCP) starts the server and talks to it over **stdio**.
+- **The server** (Python, `httpx`, the MCP SDK) turns each tool call into a request to the **Proxmox VE REST API** over HTTPS on port **8006**, authenticated with an **API token** or a **password**.
+- **Read-only mode** is checked in the server's HTTP client, so a refused write never leaves your machine.
+
+<a id="tools"></a>
+
+## 🧰 339 tools, 14 areas
+
+<p align="center">
+  <img src="docs/tools.svg" width="100%" alt="A tile map of the 339 tools by API area: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 1.">
+</p>
 
 | Area | Tools | Highlights |
 |------|------:|------------|
@@ -41,7 +86,7 @@ See the [A2A Protocol Documentation](#a2a-protocol) section below for integratio
 | Storage & backup | 14 | Storage definitions, content and volumes, URL downloads, `vzdump` backup and restore |
 | Cluster | 37 | Status, resources, options, log, tasks, HA resources/groups, replication, backup jobs |
 | Access control | 33 | Users, API tokens, groups, roles, ACLs, realms |
-| Firewall | 31 | Cluster and node rules, security groups, aliases, IP sets, macros, logs (per-VM/container rules are in the guest modules) |
+| Firewall | 31 | Cluster and node rules, security groups, aliases, IP sets, macros, logs (per-VM and per-container rules are in the guest modules) |
 | Disks | 17 | SMART, wipe, GPT init, LVM, LVM-thin, ZFS, directory storage |
 | Ceph | 33 | Status, OSDs, monitors, managers, MDS, pools, flags, CRUSH |
 | ACME & certificates | 17 | ACME accounts and plugins, node certificate ordering, custom certs |
@@ -50,143 +95,76 @@ See the [A2A Protocol Documentation](#a2a-protocol) section below for integratio
 | Pools | 5 | Resource pool CRUD |
 | Appliances | 1 | `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license |
 
-See [Available Tools](#available-tools) for how to browse the full list.
-
-## Quick Start
+Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`. Each area is one module in [`proxmox_mcp/tools/`](proxmox_mcp/tools/). Your MCP client shows every tool with its full input schema, or you can list them all locally:
 
 ```bash
-# 1. Install uv (if not already installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+uv run python -c "from proxmox_mcp.server import ALL_TOOLS; print('\n'.join(sorted(t.name for t in ALL_TOOLS)))"
+```
 
-# 2. Run setup script
-chmod +x setup.sh
-./setup.sh
+### Handy recipes
 
-# 3. Set environment variables
+| Task | Tools |
+|------|-------|
+| Inventory | `list_nodes`, `get_cluster_resources`, `list_vms`, `list_containers`, `list_storage` |
+| VM lifecycle | `start_vm`, `shutdown_vm`, `stop_vm`, `reboot_vm`, `create_vm`, `clone_vm`, `migrate_vm` |
+| Disk images | `download_url_to_storage` with `content=import`, then `create_vm` with `scsi0=local-lvm:0,import-from=local:import/<image>`, or `import_vm_disk` |
+| Snapshots | `create_vm_snapshot`, `list_vm_snapshots`, `rollback_vm_snapshot`, `delete_vm_snapshot` |
+| Monitoring | `get_node_status`, `get_vm_status`, `get_vm_rrddata`, `get_node_storage_status` |
+| Tasks | `list_cluster_tasks`, `list_node_tasks`, `get_task_status`, `get_task_log` |
+| Guest agent | `vm_agent_exec` (returns a PID), then `vm_agent_exec_status` for the exit code and output |
+
+<a id="quick-start"></a>
+
+## 🚀 Quick start
+
+You need **Python 3.10+** with [`uv`](https://github.com/astral-sh/uv), or Docker, and **Proxmox VE 6.0 or later**.
+
+**1. Make an API token.** In the Proxmox UI, go to **Datacenter → Permissions → API Tokens → Add**. For full access, uncheck *Privilege Separation* so the token inherits your user's permissions. Copy the secret; you won't see it again. The full token ID looks like `root@pam!automation`.
+
+**2. Run the server** with one of these:
+
+<details open>
+<summary><b>uv, from a clone</b></summary>
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh     # if you don't have uv
+git clone https://github.com/ry-ops/proxmox-mcp-server && cd proxmox-mcp-server
+./setup.sh                                          # or: uv sync
+
 export PROXMOX_HOST="192.168.1.100"
 export PROXMOX_USER="root@pam"
 export PROXMOX_TOKEN_NAME="automation"
 export PROXMOX_TOKEN_VALUE="your-token-here"
-
-# 4. Test connection
-./test-connection.sh
-
-# 5. Configure Claude Desktop and restart
+./test-connection.sh                                # checks connection, auth and permissions
 ```
 
-See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
+A `.env` file in the project directory is loaded automatically; see [`.env.example`](.env.example).
+</details>
 
-## Installation
-
-### Prerequisites
-
-- Python 3.10 or higher
-- `uv` package manager
-- Proxmox VE 6.0 or later
-
-### Setup
-
-```bash
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Clone or download this repository
-cd proxmox-mcp-server
-
-# Run setup script (installs dependencies)
-./setup.sh
-
-# Or manually:
-uv sync
-```
-
-### Docker
+<details>
+<summary><b>Docker</b></summary>
 
 A multi-arch image is published to GitHub Container Registry on every push to `main` and for each release tag:
 
 ```bash
 docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. :2.3.0
-```
-
-MCP clients talk to the server over stdio, so run the container interactively (`-i`) and pass configuration as environment variables:
-
-```bash
 docker run -i --rm --env-file .env ghcr.io/ry-ops/proxmox-mcp-server:latest
 ```
 
-`docker-compose.yaml` in this repository does the same using your `.env` file (copy `.env.example` to get started).
+MCP clients talk over stdio, so run the container interactively (`-i`). `docker-compose.yaml` does the same using your `.env`.
+</details>
 
-## Configuration
+**3. Connect your MCP client.** For Claude Desktop, edit `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or `%APPDATA%/Claude/claude_desktop_config.json` on Windows:
 
-The server is configured via environment variables:
-
-### Required Variables
-
-- `PROXMOX_HOST`: Proxmox server hostname or IP address, without scheme or port (e.g. `192.168.1.100`, not `https://192.168.1.100:8006`)
-- `PROXMOX_USER`: Username (e.g., `root@pam`, `admin@pve`)
-
-### Authentication (choose one method)
-
-**Option 1: API Token (Recommended)**
-- `PROXMOX_TOKEN_NAME`: API token name
-- `PROXMOX_TOKEN_VALUE`: API token value
-
-**Option 2: Password**
-- `PROXMOX_PASSWORD`: User password
-
-### Optional Variables
-
-- `PROXMOX_PORT`: API port (default: `8006`)
-- `PROXMOX_VERIFY_SSL`: Verify SSL certificates (default: `false`)
-- `PROXMOX_READ_ONLY`: Block all writes — only GET requests are allowed; any create/update/delete/action tool is refused (default: `false`). 149 of the 339 tools are read-only and keep working. Three read-style tools also send POST requests and are blocked: `vm_agent_ping`, plus `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets
-
-When running from a clone, a `.env` file in the project directory is loaded automatically. See [`.env.example`](.env.example).
-
-## Setting Up Proxmox Authentication
-
-### Creating an API Token (Recommended)
-
-1. Log into your Proxmox web interface
-2. Navigate to **Datacenter** → **Permissions** → **API Tokens**
-3. Click **Add** and create a token for your user
-4. Uncheck "Privilege Separation" to inherit user permissions
-5. Copy the Token ID and Secret (you won't see it again!)
-
-Example token format:
-```bash
-PROXMOX_TOKEN_NAME=automation
-PROXMOX_TOKEN_VALUE=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-```
-
-The full token identifier will be: `root@pam!automation`
-
-### Using Password Authentication
-
-Simply set your user password:
-```bash
-export PROXMOX_PASSWORD=yourpassword
-```
-
-## MCP Configuration
-
-Add to your Claude Desktop configuration file:
-
-**MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
-**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
-
-### With API Token (Recommended)
+<details open>
+<summary><b>uv + API token (recommended)</b></summary>
 
 ```json
 {
   "mcpServers": {
     "proxmox": {
       "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/proxmox-mcp-server",
-        "run",
-        "proxmox-mcp-server"
-      ],
+      "args": ["--directory", "/absolute/path/to/proxmox-mcp-server", "run", "proxmox-mcp-server"],
       "env": {
         "PROXMOX_HOST": "192.168.1.100",
         "PROXMOX_USER": "root@pam",
@@ -197,20 +175,18 @@ Add to your Claude Desktop configuration file:
   }
 }
 ```
+Use the **absolute** path to your clone.
+</details>
 
-### With Password
+<details>
+<summary><b>uv + password</b></summary>
 
 ```json
 {
   "mcpServers": {
     "proxmox": {
       "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/proxmox-mcp-server",
-        "run",
-        "proxmox-mcp-server"
-      ],
+      "args": ["--directory", "/absolute/path/to/proxmox-mcp-server", "run", "proxmox-mcp-server"],
       "env": {
         "PROXMOX_HOST": "192.168.1.100",
         "PROXMOX_USER": "root@pam",
@@ -220,22 +196,19 @@ Add to your Claude Desktop configuration file:
   }
 }
 ```
+</details>
 
-### With Docker
+<details>
+<summary><b>Docker</b></summary>
 
 ```json
 {
   "mcpServers": {
     "proxmox": {
       "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-e", "PROXMOX_HOST",
-        "-e", "PROXMOX_USER",
-        "-e", "PROXMOX_TOKEN_NAME",
-        "-e", "PROXMOX_TOKEN_VALUE",
-        "ghcr.io/ry-ops/proxmox-mcp-server:latest"
-      ],
+      "args": ["run", "-i", "--rm",
+        "-e", "PROXMOX_HOST", "-e", "PROXMOX_USER", "-e", "PROXMOX_TOKEN_NAME", "-e", "PROXMOX_TOKEN_VALUE",
+        "ghcr.io/ry-ops/proxmox-mcp-server:latest"],
       "env": {
         "PROXMOX_HOST": "192.168.1.100",
         "PROXMOX_USER": "root@pam",
@@ -246,420 +219,209 @@ Add to your Claude Desktop configuration file:
   }
 }
 ```
+</details>
 
-**Important**: For the `uv` configurations, use the absolute path to your project directory!
+**4. Restart your client completely** (quit it, don't just close the window), and ask it to list your VMs. More detail in [QUICKSTART.md](QUICKSTART.md) and [SETUP.md](SETUP.md).
 
-## Available Tools
+## 🔧 Configuration
 
-The server registers 339 tools, grouped by API area in [`proxmox_mcp/tools/`](proxmox_mcp/tools/), one module per area. Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`.
+| Variable | Required | Default | What it does |
+|---|:---:|---|---|
+| `PROXMOX_HOST` | ✅ | | Hostname or IP, **without** scheme or port (`192.168.1.100`, not `https://192.168.1.100:8006`) |
+| `PROXMOX_USER` | ✅ | | e.g. `root@pam`, `admin@pve` |
+| `PROXMOX_TOKEN_NAME` + `PROXMOX_TOKEN_VALUE` | one of | | API token auth (recommended) |
+| `PROXMOX_PASSWORD` | one of | | Password auth |
+| `PROXMOX_PORT` | | `8006` | API port |
+| `PROXMOX_VERIFY_SSL` | | `false` | Verify the server's TLS certificate |
+| `PROXMOX_READ_ONLY` | | `false` | Refuse every write; see below |
 
-Some commonly used tools:
+<a id="read-only"></a>
 
-| Task | Tools |
-|------|-------|
-| Inventory | `list_nodes`, `get_cluster_resources`, `list_vms`, `list_containers`, `list_storage` |
-| VM lifecycle | `start_vm`, `shutdown_vm`, `stop_vm`, `reboot_vm`, `create_vm`, `clone_vm`, `migrate_vm` |
-| Disk images | `download_url_to_storage` with `content=import`, then `create_vm` with `scsi0=local-lvm:0,import-from=local:import/<image>` or `import_vm_disk` |
-| Snapshots | `create_vm_snapshot`, `list_vm_snapshots`, `rollback_vm_snapshot`, `delete_vm_snapshot` |
-| Monitoring | `get_node_status`, `get_vm_status`, `get_vm_rrddata`, `get_node_storage_status` |
-| Tasks | `list_cluster_tasks`, `list_node_tasks`, `get_task_status`, `get_task_log` |
-| Guest agent | `vm_agent_exec` (returns a PID), then `vm_agent_exec_status` for exit code and output |
+## 🔒 Read-only mode and security
 
-Your MCP client lists every tool with its full input schema. To print them all locally:
+**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **149 of the 339 tools are read-only and keep working.** Three read-style tools send POST requests, so they're blocked too:
+- `vm_agent_ping`;
+- `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets.
 
-```bash
-uv run python -c "from proxmox_mcp.server import ALL_TOOLS; print('\n'.join(sorted(t.name for t in ALL_TOOLS)))"
-```
+The rest of the security picture:
 
-See [USAGE.md](USAGE.md) for worked examples.
+- **For monitoring-only use, combine both locks:** `PROXMOX_READ_ONLY=true` *and* a token with the **`PVEAuditor`** role. The flag stops the server sending writes; the role makes Proxmox refuse them anyway.
+- **The token's permissions are the real limit.** The server exposes destructive operations: deleting VMs, wiping disks, and running commands inside guests. Whatever the token can do, a connected AI client can ask for. Grant the minimum.
+- **Prefer API tokens** over passwords. They can be revoked on their own.
+- **Set `PROXMOX_VERIFY_SSL=true`** in production with valid certificates.
+- **Keep credentials out of version control**, and restrict network access to the API with firewall rules.
 
-## Example Usage
+<a id="a2a"></a>
 
-Once configured, you can ask Claude to interact with your Proxmox environment:
+## 🤝 Agent-to-agent (A2A)
 
-> "Can you list all VMs in my Proxmox cluster?"
+[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It's generated from the tool registry, and lists **all 339 tools in 14 skill categories**, each with its name, description and inputs. It also covers authentication requirements and MCP protocol details.
 
-> "What's the status of VM 100 on node pve1?"
+| Category | Tools | Category | Tools |
+|---|--:|---|--:|
+| `node_management` | 38 | `disk_management` | 17 |
+| `virtual_machine_management` | 46 | `ceph_management` | 33 |
+| `container_management` | 28 | `certificate_management` | 17 |
+| `storage_management` | 14 | `sdn_management` | 16 |
+| `cluster_management` | 37 | `notification_management` | 23 |
+| `access_control` | 33 | `pool_management` | 5 |
+| `firewall_management` | 31 | `appliances` | 1 |
 
-> "Start VM 105 on node pve1"
-
-> "Create a snapshot called 'backup-2025' for VM 100 on pve1"
-
-> "Show me the storage usage on all nodes"
-
-> "List all running tasks in the cluster"
-
-> "Clone VM 9000 to a new VM called web-02 and start it"
-
-> "Run `df -h` inside VM 120 using the guest agent and show me the output"
-
-## Development
-
-```bash
-# Install dependencies
-uv sync
-
-# Run the server directly
-uv run proxmox-mcp-server
-
-# Run with custom environment
-PROXMOX_HOST=192.168.1.100 \
-PROXMOX_USER=root@pam \
-PROXMOX_TOKEN_NAME=automation \
-PROXMOX_TOKEN_VALUE=your-token \
-uv run proxmox-mcp-server
-
-# Lint and format (dev dependencies are installed by `uv sync`)
-uv run ruff check .
-uv run black .
-```
-
-## Project Structure
-
-```
-proxmox-mcp-server/
-├── proxmox_mcp/
-│   ├── server.py             # MCP server entrypoint and tool registry
-│   ├── client.py             # Proxmox API client (token/password auth)
-│   └── tools/                # Tool definitions and handlers, one module per API area
-│       ├── nodes.py, qemu.py, lxc.py, storage.py, cluster.py, access.py
-│       └── firewall.py, disks.py, ceph.py, acme.py, sdn.py, notifications.py, pools.py
-├── Dockerfile                # Container image (stdio transport)
-├── docker-compose.yaml       # Compose setup using .env
-├── agent-card.json           # A2A agent card
-├── pyproject.toml            # Project configuration
-├── uv.lock                   # Locked dependencies
-├── .env.example              # Environment variable template
-├── setup.sh                  # Automated setup script
-├── test-connection.sh        # Connection test script
-├── README.md                 # This file
-├── CHANGELOG.md              # Release history
-├── QUICKSTART.md             # 5-minute setup guide
-├── SETUP.md                  # Detailed setup guide
-└── USAGE.md                  # Usage examples
-
-```
-
-## Security Considerations
-
-- **API Tokens** are more secure than password authentication as they can be revoked independently
-- For monitoring-only deployments, set `PROXMOX_READ_ONLY=true` *and* use a `PVEAuditor` token. The flag stops the server from sending writes, and the token permissions enforce the same limit on the Proxmox side
-- Set `PROXMOX_VERIFY_SSL=true` in production environments with valid SSL certificates
-- Grant minimal required permissions to API tokens. The server exposes destructive operations (deleting VMs, wiping disks, running commands inside guests via the agent), and the token's permissions are the only thing limiting what a connected AI client can do. For monitoring-only use, a token with the `PVEAuditor` role is enough
-- Store credentials securely and never commit them to version control
-- Consider network restrictions (firewall rules) for API access
-
-## Troubleshooting
-
-### Authentication Errors
-
-- Verify your credentials are correct
-- Check that the user has appropriate permissions
-- For API tokens, ensure the token hasn't expired or been revoked
-- Ensure "Privilege Separation" was unchecked when creating the token
-
-### Connection Errors
-
-- Verify `PROXMOX_HOST` and `PROXMOX_PORT` are correct
-- Check network connectivity to the Proxmox host
-- If using SSL verification, ensure certificates are valid
-- Test with: `curl -k https://YOUR_HOST:8006/api2/json/version`
-
-### Permission Errors
-
-- The user/token needs appropriate privileges for the operations
-- Common required privileges: `VM.Monitor`, `VM.Audit`, `Datastore.Audit`, `Sys.Audit`, `VM.PowerMgmt`, `VM.Snapshot`
-
-### Debug Mode
-
-To see detailed logs, check stderr output when running the server. The server logs authentication method and connection status to stderr (visible in Claude Desktop logs).
-
-### Tools Not Showing in Claude
-
-- Verify the path in Claude config is absolute, not relative
-- Check that the config file is valid JSON
-- Ensure you completely quit and restarted Claude Desktop (not just closed the window)
-- Check Claude Desktop logs for errors
-
-## Testing Connection
-
-Before configuring Claude, test your Proxmox connection:
-
-```bash
-# Set environment variables
-export PROXMOX_HOST="192.168.1.100"
-export PROXMOX_USER="root@pam"
-export PROXMOX_TOKEN_NAME="automation"
-export PROXMOX_TOKEN_VALUE="your-token-here"
-
-# Run test script
-./test-connection.sh
-```
-
-The script will verify:
-1. Connection to Proxmox
-2. API availability
-3. Authentication
-4. Permission to list nodes
-5. Access to cluster resources
-
-## A2A Protocol
-
-### Overview
-
-This Proxmox MCP server implements the **Agent-to-Agent (A2A) protocol**, enabling AI agents to discover, communicate with, and orchestrate infrastructure management tasks autonomously.
-
-### Agent Card
-
-The `agent-card.json` file serves as the agent's identity and capability manifest. It provides:
-
-**Location:** `/agent-card.json` (repository root)
-
-**Contents:**
-- Agent name, version, and description
-- MCP protocol version and capabilities
-- Authentication methods and requirements
-- Skill catalog organized by functional category
-- Required permissions and dependencies
-- Endpoint configuration
-
-### Available Skills
-
-The agent card lists all **339 tools** in **14 skill categories**, generated from the server's tool registry. Each entry has the tool's name, description and inputs:
-
-| Category | Tools |
-|----------|------:|
-| `node_management` | 38 |
-| `virtual_machine_management` | 46 |
-| `container_management` | 28 |
-| `storage_management` | 14 |
-| `cluster_management` | 37 |
-| `access_control` | 33 |
-| `firewall_management` | 31 |
-| `disk_management` | 17 |
-| `ceph_management` | 33 |
-| `certificate_management` | 17 |
-| `sdn_management` | 16 |
-| `notification_management` | 23 |
-| `pool_management` | 5 |
-
-### Agent-to-Agent Integration
-
-#### Discovery
-
-Other agents can discover this agent's capabilities by reading the agent card:
+<details>
+<summary><b>Discover the agent's skills</b></summary>
 
 ```python
 import json
 
-# Load agent card
 with open('agent-card.json') as f:
     agent_card = json.load(f)
 
-# Discover capabilities
-print(f"Agent: {agent_card['name']}")
-print(f"Version: {agent_card['version']}")
-print(f"Skills: {len(agent_card['skills'])} categories")
-
-# List available skills
+print(f"Agent: {agent_card['name']}  Version: {agent_card['version']}")
 for skill in agent_card['skills']:
     print(f"\n{skill['category']}:")
     for capability in skill['capabilities']:
         print(f"  - {capability['name']}: {capability['description']}")
 ```
+</details>
 
-#### Authentication Setup
-
-Agents can programmatically configure authentication:
-
-```python
-# API Token (recommended)
-env_config = {
-    "PROXMOX_HOST": "192.168.1.100",
-    "PROXMOX_USER": "root@pam",
-    "PROXMOX_TOKEN_NAME": "automation",
-    "PROXMOX_TOKEN_VALUE": "your-token-value"
-}
-
-# Or Password-based
-env_config = {
-    "PROXMOX_HOST": "192.168.1.100",
-    "PROXMOX_USER": "root@pam",
-    "PROXMOX_PASSWORD": "your-password"
-}
-```
-
-#### Tool Invocation
-
-Agents communicate via MCP protocol:
+<details>
+<summary><b>Call its tools over MCP</b></summary>
 
 ```python
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-# Connect to the agent
 server_params = StdioServerParameters(
     command="uv",
     args=["--directory", "/path/to/proxmox-mcp-server", "run", "proxmox-mcp-server"],
-    env=env_config
+    env={
+        "PROXMOX_HOST": "192.168.1.100",
+        "PROXMOX_USER": "root@pam",
+        "PROXMOX_TOKEN_NAME": "automation",
+        "PROXMOX_TOKEN_VALUE": "your-token-value",
+    },
 )
 
 async with stdio_client(server_params) as (read, write):
     async with ClientSession(read, write) as session:
-        # Initialize session
         await session.initialize()
-
-        # List available tools
         tools = await session.list_tools()
-
-        # Call a tool
         result = await session.call_tool("list_vms", arguments={})
         print(result.content)
 ```
+</details>
 
-#### Multi-Agent Orchestration Example
-
-Example workflow with multiple agents:
+<details>
+<summary><b>Orchestrate it with other agents</b></summary>
 
 ```python
-# Agent orchestration: VM backup workflow
+# Snapshot every VM, then hand off to other agents
 async def backup_workflow():
-    # 1. Proxmox agent: List VMs
     vms = await proxmox_agent.call_tool("list_vms", {})
-
-    # 2. Proxmox agent: Create snapshots for each VM
     for vm in vms['data']:
-        snapshot_name = f"backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         await proxmox_agent.call_tool("create_vm_snapshot", {
             "node": vm['node'],
             "vmid": vm['vmid'],
-            "snapname": snapshot_name
+            "snapname": f"backup-{datetime.now():%Y%m%d-%H%M%S}",
         })
+    await storage_agent.call_tool("check_capacity", {})
+    await notification_agent.call_tool("send_alert", {"message": f"Backup completed: {len(vms['data'])} VMs"})
+```
+</details>
 
-    # 3. Storage agent: Verify backup storage capacity
-    storage_status = await storage_agent.call_tool("check_capacity", {})
+<a id="troubleshooting"></a>
 
-    # 4. Notification agent: Send completion report
-    await notification_agent.call_tool("send_alert", {
-        "message": f"Backup completed: {len(vms['data'])} VMs"
-    })
+## 🩺 Troubleshooting
+
+<details>
+<summary><b>Authentication errors</b></summary>
+
+- Double-check the credentials and that the user has the permissions you need.
+- For API tokens, make sure the token hasn't expired or been revoked.
+- If the token was created with *Privilege Separation* on, give the token its own permissions, or recreate it with that option off.
+</details>
+
+<details>
+<summary><b>Connection errors</b></summary>
+
+- Check `PROXMOX_HOST` (no scheme, no port) and `PROXMOX_PORT`.
+- Check you can reach the host: `curl -k https://YOUR_HOST:8006/api2/json/version`
+- If `PROXMOX_VERIFY_SSL=true`, the certificate must be valid for that host.
+</details>
+
+<details>
+<summary><b>Permission errors</b></summary>
+
+The user or token needs privileges for each operation. Common ones: `VM.Monitor`, `VM.Audit`, `Datastore.Audit`, `Sys.Audit`, `VM.PowerMgmt`, `VM.Snapshot`.
+</details>
+
+<details>
+<summary><b>Tools don't show up in Claude</b></summary>
+
+- The path in the config must be **absolute**.
+- The config file must be valid JSON.
+- Quit Claude Desktop completely and start it again.
+- Check Claude Desktop's logs. The server logs its authentication method and connection status to stderr, which shows up there.
+</details>
+
+<details>
+<summary><b>Check the connection before involving Claude</b></summary>
+
+```bash
+./test-connection.sh
 ```
 
-### A2A Protocol Benefits
+It checks the connection, the API, authentication, permission to list nodes, and access to cluster resources.
+</details>
 
-**For AI Agents:**
-- **Self-documenting** - Agent card provides complete capability discovery
-- **Type-safe** - Structured skill definitions with input/output schemas
-- **Composable** - Skills can be combined for complex workflows
-- **Secure** - Clear authentication requirements and permissions
+## 🛠️ Development
 
-**For Orchestration Systems:**
-- **Dynamic discovery** - Find and integrate agents at runtime
-- **Capability matching** - Match tasks to agent skills automatically
-- **Parallel execution** - Coordinate multiple agents simultaneously
-- **Error handling** - Standardized error responses and retry logic
-
-### Integration Examples
-
-#### Example 1: Infrastructure Monitoring Agent
-
-```python
-# Monitoring agent that uses Proxmox agent skills
-async def monitor_infrastructure():
-    # Get cluster status
-    cluster = await proxmox_agent.call_tool("get_cluster_status", {})
-
-    # Get all nodes
-    nodes = await proxmox_agent.call_tool("list_nodes", {})
-
-    # Check each node's status
-    for node in nodes['data']:
-        status = await proxmox_agent.call_tool("get_node_status", {
-            "node": node['node']
-        })
-
-        # Alert if resource usage is high
-        if status['data']['cpu'] > 0.9:
-            await alert_agent.send_alert(f"High CPU on {node['node']}")
+```bash
+uv sync                          # dependencies, including dev tools
+uv run proxmox-mcp-server        # run the server directly
+uv run pytest                    # tests
+uv run ruff check . && uv run black .
 ```
 
-## API Documentation
+```
+proxmox_mcp/
+├── server.py        MCP server entrypoint and tool registry
+├── client.py        Proxmox API client: token/password auth, read-only guard
+└── tools/           one module per API area:
+                     nodes, qemu, lxc, storage, cluster, access, firewall,
+                     disks, ceph, acme, sdn, notifications, pools, appliances
+docs/                the animations on this page
+agent-card.json      A2A agent card
+Dockerfile, docker-compose.yaml, setup.sh, test-connection.sh
+QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
+```
 
-For more information about the Proxmox VE API:
-- [Proxmox VE API Documentation](https://pve.proxmox.com/wiki/Proxmox_VE_API)
-- [API Viewer](https://pve.proxmox.com/pve-docs/api-viewer/)
-- [Proxmox VE Administration Guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html)
+**Dependencies:**
+- **`mcp`** (>=1.0.0, <2): 2.x changed the server API and isn't supported yet.
+- **`httpx`**: the async HTTP client.
+- **`python-dotenv`**: loads `.env`.
 
-## Dependencies
+## 🗺️ Roadmap
 
-- **mcp** (>=1.0.0, <2): Model Context Protocol SDK. 2.x changed the server API and is not supported yet
-- **httpx** (>=0.28.1): Async HTTP client for the Proxmox API
-- **python-dotenv** (>=1.2.3): Loads configuration from `.env`
-
-## Roadmap
-
-- Streamable-HTTP transport for running the server as a network service ([#24](https://github.com/ry-ops/proxmox-mcp-server/pull/24), [#29](https://github.com/ry-ops/proxmox-mcp-server/pull/29))
+- Streamable-HTTP transport, to run the server as a network service ([#24](https://github.com/ry-ops/proxmox-mcp-server/pull/24), [#29](https://github.com/ry-ops/proxmox-mcp-server/pull/29))
 - Support for `mcp` 2.x
 - Automatic ticket refresh for long-running password-authenticated sessions
-- Automated test suite
+- A broader automated test suite
 
-See [CHANGELOG.md](CHANGELOG.md) for what has shipped.
+What has shipped is in [CHANGELOG.md](CHANGELOG.md).
 
-## Contributing
+## 🙌 Contributing
 
-Contributions are welcome! Please feel free to submit issues or pull requests.
+Issues and pull requests are welcome: new tools, better error handling, performance, docs, tests and bug fixes.
 
-Areas for improvement:
-- Additional tools/features
-- Better error handling
-- Performance optimizations
-- Documentation improvements
-- Test coverage
-- Bug fixes
+## 📚 Learn more
+
+- [Proxmox VE API](https://pve.proxmox.com/wiki/Proxmox_VE_API) · [API viewer](https://pve.proxmox.com/pve-docs/api-viewer/) · [Admin guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html)
+- [Model Context Protocol](https://modelcontextprotocol.io/) · [MCP servers](https://github.com/modelcontextprotocol/servers) · [uv](https://github.com/astral-sh/uv)
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-## Related Projects
-
-- [Model Context Protocol](https://modelcontextprotocol.io/)
-- [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment)
-- [uv - Python Package Manager](https://github.com/astral-sh/uv)
-- [MCP Servers Collection](https://github.com/modelcontextprotocol/servers)
-
-## Support
-
-If you encounter issues:
-
-1. Check the documentation files:
-   - [QUICKSTART.md](QUICKSTART.md) - Quick setup
-   - [SETUP.md](SETUP.md) - Detailed setup with security
-   - [USAGE.md](USAGE.md) - Usage examples
-
-2. Test your connection with `./test-connection.sh`
-
-3. Check Claude Desktop logs for errors
-
-4. Verify Proxmox server logs: `/var/log/pve/`
-
-5. Review Proxmox API documentation
-
-## Acknowledgments
-
-This project uses:
-- The Model Context Protocol by Anthropic
-- Proxmox VE API
-- Python httpx for HTTP requests
-- uv for fast Python package management
-
----
-
-**Ready to get started?** → See [QUICKSTART.md](QUICKSTART.md)
-
-**Need detailed setup?** → See [SETUP.md](SETUP.md)
-
-**Want examples?** → Check [USAGE.md](USAGE.md)
 
 <!-- org-footer -->
 ---
