@@ -14,6 +14,11 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    ignore:
+      # mcp 2.x removed the @app.list_tools()/@app.call_tool() decorators server.py uses.
+      # Moving to 2.x is a code change, not a version bump (see #28, which broke startup).
+      - dependency-name: "mcp"
+        update-types: ["version-update:semver-major"]
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
