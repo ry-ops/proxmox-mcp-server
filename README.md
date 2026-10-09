@@ -4,19 +4,19 @@
 
 <p align="center">
   <a href="https://github.com/ry-ops/proxmox-mcp-server/releases"><img src="https://img.shields.io/github/v/release/ry-ops/proxmox-mcp-server?color=ff8a1f&label=release" alt="Release"></a>
-  <img src="https://img.shields.io/badge/tools-339-ff8a1f" alt="339 tools">
+  <img src="https://img.shields.io/badge/tools-340-ff8a1f" alt="340 tools">
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-3ec7ff" alt="Python 3.10+"></a>
   <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-1.x-b58cff" alt="MCP"></a>
   <a href="https://github.com/ry-ops/proxmox-mcp-server/pkgs/container/proxmox-mcp-server"><img src="https://img.shields.io/badge/docker-ghcr.io-3ddc84" alt="Docker image on ghcr.io"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
 </p>
 
-<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 339 tools across VMs, containers, storage, clustering, Ceph, SDN and more.</p>
+<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 340 tools across VMs, containers, storage, clustering, Ceph, SDN and more.</p>
 
 <p align="center">
   <a href="#talk">Talk to it</a> ·
   <a href="#how">How it works</a> ·
-  <a href="#tools">339 tools</a> ·
+  <a href="#tools">340 tools</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#read-only">Read-only mode</a> ·
   <a href="#a2a">A2A</a> ·
@@ -27,13 +27,13 @@
 
 ## ✨ Highlights
 
-- 🧰 **The whole API, not a demo.** 339 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
+- 🧰 **The whole API, not a demo.** 340 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
 - 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and 149 read-only tools keep working.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
 - 🐳 **Runs anywhere.** Use `uv` from a clone, or the multi-arch image on `ghcr.io`.
 - 🤝 **A2A-ready.** `agent-card.json` lists every tool in 14 skill categories, for agent-to-agent discovery.
-- 🛡️ **Appliances.** `deploy_fortigate_vm` builds a FortiGate-VM from Fortinet's KVM image, with WAN/LAN NICs on the bridges and VLANs you choose.
+- 🛡️ **Appliances.** `deploy_fortigate_vm` builds a FortiGate-VM from Fortinet's KVM image, with WAN/LAN NICs on the bridges and VLANs you choose. `deploy_cloud_vms` builds cluster-ready VMs from a cloud image, with your SSH key and a static IP each, ready for k3s-mcp-server's `create_cluster`.
 
 <a id="talk"></a>
 
@@ -69,10 +69,10 @@ There are more worked examples in [USAGE.md](USAGE.md).
 
 <a id="tools"></a>
 
-## 🧰 339 tools, 14 areas
+## 🧰 340 tools, 14 areas
 
 <p align="center">
-  <img src="docs/tools.svg" width="100%" alt="A tile map of the 339 tools by API area: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 1.">
+  <img src="docs/tools.svg" width="100%" alt="A tile map of the 340 tools by API area: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 2.">
 </p>
 
 | Area | Tools | Highlights |
@@ -90,7 +90,7 @@ There are more worked examples in [USAGE.md](USAGE.md).
 | SDN | 16 | Zones, VNets, subnets, apply |
 | Notifications | 23 | Gotify, sendmail, SMTP and webhook endpoints, matchers |
 | Pools | 5 | Resource pool CRUD |
-| Appliances | 1 | `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license |
+| Appliances | 2 | `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license. `deploy_cloud_vms`: VMs from a cloud image (e.g. Ubuntu's) with cloud-init user, SSH key and a static IP or DHCP each, disk grown and started |
 
 Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`. Each area is one module in [`proxmox_mcp/tools/`](proxmox_mcp/tools/). Your MCP client shows every tool with its full input schema, or you can list them all locally:
 
@@ -236,7 +236,7 @@ Use the **absolute** path to your clone.
 
 ## 🔒 Read-only mode and security
 
-**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **149 of the 339 tools are read-only and keep working.** Three read-style tools send POST requests, so they're blocked too:
+**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **149 of the 340 tools are read-only and keep working.** Three read-style tools send POST requests, so they're blocked too:
 - `vm_agent_ping`;
 - `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets.
 
@@ -252,7 +252,7 @@ The rest of the security picture:
 
 ## 🤝 Agent-to-agent (A2A)
 
-[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It's generated from the tool registry, and lists **all 339 tools in 14 skill categories**, each with its name, description and inputs. It also covers authentication requirements and MCP protocol details.
+[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It's generated from the tool registry, and lists **all 340 tools in 14 skill categories**, each with its name, description and inputs. It also covers authentication requirements and MCP protocol details.
 
 | Category | Tools | Category | Tools |
 |---|--:|---|--:|
@@ -262,7 +262,7 @@ The rest of the security picture:
 | `storage_management` | 14 | `sdn_management` | 16 |
 | `cluster_management` | 37 | `notification_management` | 23 |
 | `access_control` | 33 | `pool_management` | 5 |
-| `firewall_management` | 31 | `appliances` | 1 |
+| `firewall_management` | 31 | `appliances` | 2 |
 
 <details>
 <summary><b>Discover the agent's skills</b></summary>
