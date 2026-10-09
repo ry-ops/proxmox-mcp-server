@@ -1,12 +1,13 @@
-"""Appliance deployment: FortiGate-VM (KVM image) as a ready-to-boot QEMU VM."""
+"""Appliance deployment: FortiGate-VM (KVM image) and cloud-image VMs ready for a cluster."""
 
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import os
 import re
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 from ..client import ProxmoxClient
 
@@ -62,6 +63,45 @@ TOOLS = [
             "required": ["node"],
         },
     },
+    {
+        "name": "deploy_cloud_vms",
+        "description": (
+            "Create one or more VMs from a cloud image (for example Ubuntu's noble-server-cloudimg qcow2 in "
+            "local:import) with cloud-init: user, SSH public key, and a static IP per VM (or DHCP). Imports "
+            "the disk, grows it, starts each VM and waits for the start task. Returns VMIDs, names, MACs and "
+            "the IPs given. It does not wait for SSH: check reachability from the machine that will connect "
+            "(for example k3s-mcp-server's plan_cluster). Refuses a name or VMID that already exists."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "names": {"type": "array", "items": {"type": "string"},
+                          "description": "One VM name per VM, e.g. ['k3s-test-1', 'k3s-test-2', 'k3s-test-3']"},
+                "image": OPT_STR("Cloud image import volume, e.g. local:import/noble-server-cloudimg-amd64.qcow2"),
+                "ip_addresses": {"type": "array", "items": {"type": "string"},
+                                 "description": "Static address per VM in CIDR form, e.g. ['10.0.0.21/24', ...], "
+                                                "in the same order as names. Omit for DHCP."},
+                "gateway": OPT_STR("Default gateway for the static addresses"),
+                "nameserver": OPT_STR("DNS server(s), space-separated (default: the node's)"),
+                "searchdomain": OPT_STR("DNS search domain"),
+                "ssh_public_keys": OPT_STR("Public key(s) for the cloud-init user, one per line (required)"),
+                "ciuser": OPT_STR("Cloud-init user (default ubuntu)"),
+                "bridge": OPT_STR("Bridge for net0 (default vmbr0)"),
+                "vlan": OPT_INT("VLAN tag for net0"),
+                "first_vmid": OPT_INT("VMID for the first VM; the rest count up from it (default: next free)"),
+                "cores": OPT_INT("vCPUs per VM (default 2)"),
+                "memory": OPT_INT("RAM per VM in MB (default 2048)"),
+                "disk_gb": OPT_INT("Grow the boot disk to this size in GB (default 20)"),
+                "disk_storage": OPT_STR("Storage for disks and the cloud-init drive (default local-lvm)"),
+                "start": OPT_BOOL("Start the VMs (default true)"),
+                "onboot": OPT_BOOL("Start with the host (default false)"),
+                "tags": OPT_STR("Tags, ';'-separated (default cloud)"),
+                "description": OPT_STR("VM description"),
+            },
+            "required": ["node", "names", "image", "ssh_public_keys"],
+        },
+    },
 ]
 
 
@@ -95,6 +135,8 @@ def _filename(url: str) -> str:
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
+    if name == "deploy_cloud_vms":
+        return await deploy_cloud_vms(args, client)
     if name != "deploy_fortigate_vm":
         raise ValueError(f"Unknown tool: {name}")
 
@@ -193,4 +235,107 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
     }
     if warnings:
         out["warnings"] = warnings
+    return out
+
+
+def _mac(net: str) -> str | None:
+    found = re.search(r"=((?:[0-9A-F]{2}:){5}[0-9A-F]{2})", net, re.I)
+    return found.group(1).lower() if found else None
+
+
+async def _maybe_wait(client: ProxmoxClient, node: str, response: Any, timeout: float) -> None:
+    """Wait for a task when the API returned one (some calls are synchronous)."""
+    upid = (response or {}).get("data")
+    if isinstance(upid, str) and upid.startswith("UPID:"):
+        await wait_task(client, node, upid, timeout=timeout)
+
+
+async def deploy_cloud_vms(args: dict[str, Any], client: ProxmoxClient) -> dict[str, Any]:
+    node = args["node"]
+    names = list(args.get("names") or [])
+    if not names:
+        raise ValueError("names must list at least one VM name")
+    if len(set(names)) != len(names):
+        raise ValueError("names must be unique")
+    keys = (args.get("ssh_public_keys") or "").strip()
+    if not keys:
+        raise ValueError("ssh_public_keys is required: cloud images have no password login")
+
+    ips = list(args.get("ip_addresses") or [])
+    if ips and len(ips) != len(names):
+        raise ValueError(f"ip_addresses has {len(ips)} entries for {len(names)} names")
+    for ip in ips:
+        iface = ipaddress.ip_interface(ip)  # raises on a bad address
+        if iface.network.prefixlen == iface.max_prefixlen:
+            raise ValueError(f"{ip} needs a prefix length, e.g. {iface.ip}/24")
+    gateway = args.get("gateway")
+    if gateway:
+        ipaddress.ip_address(gateway)
+
+    existing = (await client.get("/cluster/resources", {"type": "vm"})).get("data") or []
+    taken_names = {vm.get("name") for vm in existing}
+    taken_ids = {int(vm["vmid"]) for vm in existing if "vmid" in vm}
+    clash = [n for n in names if n in taken_names]
+    if clash:
+        raise ValueError(f"VMs already named {', '.join(clash)}; pick other names")
+
+    first = args.get("first_vmid") or int((await client.get("/cluster/nextid")).get("data"))
+    vmids = list(range(int(first), int(first) + len(names)))
+    used = [v for v in vmids if v in taken_ids]
+    if used:
+        raise ValueError(f"VMIDs {', '.join(map(str, used))} are in use; choose another first_vmid")
+
+    storage = args.get("disk_storage", "local-lvm")
+    nic = _nic(args.get("bridge", "vmbr0"), args.get("vlan"))
+    disk_gb = int(args.get("disk_gb", 20))
+    vms = []
+    for i, (vm_name, vmid) in enumerate(zip(names, vmids, strict=True)):
+        ipconfig = f"ip={ips[i]}" + (f",gw={gateway}" if gateway else "") if ips else "ip=dhcp"
+        config: dict[str, Any] = {
+            "vmid": vmid,
+            "name": vm_name,
+            "ostype": "l26",
+            "cpu": "host",
+            "cores": int(args.get("cores", 2)),
+            "memory": int(args.get("memory", 2048)),
+            "scsihw": "virtio-scsi-pci",
+            "scsi0": f"{storage}:0,import-from={args['image']},discard=on",
+            "ide2": f"{storage}:cloudinit",
+            "boot": "order=scsi0",
+            "serial0": "socket",
+            "vga": "serial0",
+            "agent": "enabled=1",
+            "net0": nic,
+            "ciuser": args.get("ciuser", "ubuntu"),
+            # Proxmox wants the keys URL-encoded, spaces and newlines included
+            "sshkeys": quote(keys, safe=""),
+            "ipconfig0": ipconfig,
+            "onboot": 1 if args.get("onboot") else 0,
+            "tags": args.get("tags", "cloud"),
+        }
+        for key in ("nameserver", "searchdomain", "description"):
+            if args.get(key):
+                config[key] = args[key]
+
+        await _maybe_wait(client, node, await client.post(f"/nodes/{node}/qemu", config), timeout=900)
+        await _maybe_wait(client, node, await client.put(f"/nodes/{node}/qemu/{vmid}/resize",
+                                                         {"disk": "scsi0", "size": f"{disk_gb}G"}), timeout=300)
+        steps = [f"created from {args['image']}", f"disk grown to {disk_gb}G"]
+        if args.get("start", True):
+            await _maybe_wait(client, node, await client.post(f"/nodes/{node}/qemu/{vmid}/status/start"), timeout=120)
+            steps.append("started")
+
+        cfg = (await client.get(f"/nodes/{node}/qemu/{vmid}/config")).get("data") or {}
+        vms.append({
+            "vmid": vmid,
+            "name": vm_name,
+            "ip": str(ipaddress.ip_interface(ips[i]).ip) if ips else None,
+            "mac": _mac(cfg.get("net0", "")),
+            "steps": steps,
+        })
+
+    out: dict[str, Any] = {"node": node, "network": nic.removeprefix("virtio,"), "vms": vms}
+    if not ips:
+        out["note"] = ("DHCP: the addresses aren't known yet. Read them from your DHCP server by MAC, or with "
+                       "vm_agent_get_network_interfaces once a guest agent runs in the VMs.")
     return out

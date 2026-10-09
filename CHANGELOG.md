@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `deploy_cloud_vms`: create one or more VMs from a cloud image (for example Ubuntu's
+  `noble-server-cloudimg` in `local:import`) with cloud-init: user, SSH public key, and a static
+  IP per VM or DHCP, on a chosen bridge and VLAN. Imports the disk, grows it, starts each VM and
+  returns VMIDs, names, MACs and IPs. Refuses names or VMIDs already in use, and validates
+  addresses before calling the API. Built to hand nodes to k3s-mcp-server's `create_cluster`.
+
 ## [2.3.0] - 2026-10-03
 
 ### Added

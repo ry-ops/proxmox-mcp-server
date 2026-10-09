@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 339 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 340 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.3.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -3342,7 +3342,7 @@
     },
     {
       "category": "appliances",
-      "description": "Deploy network appliances as ready-to-boot VMs (FortiGate-VM)",
+      "description": "Deploy network appliances and cloud-image VMs as ready-to-boot VMs (FortiGate-VM, cluster nodes)",
       "capabilities": [
         {
           "name": "deploy_fortigate_vm",
@@ -3363,6 +3363,32 @@
             "cores (optional)",
             "memory (optional)",
             "log_disk_gb (optional)",
+            "start (optional)",
+            "onboot (optional)",
+            "tags (optional)",
+            "description (optional)"
+          ]
+        },
+        {
+          "name": "deploy_cloud_vms",
+          "description": "Create one or more VMs from a cloud image (for example Ubuntu's noble-server-cloudimg qcow2 in local:import) with cloud-init: user, SSH public key, and a static IP per VM (or DHCP). Imports the disk, grows it, starts each VM and waits for the start task. Returns VMIDs, names, MACs and the IPs given. It does not wait for SSH: check reachability from the machine that will connect (for example k3s-mcp-server's plan_cluster). Refuses a name or VMID that already exists.",
+          "inputs": [
+            "node",
+            "names",
+            "image",
+            "ip_addresses (optional)",
+            "gateway (optional)",
+            "nameserver (optional)",
+            "searchdomain (optional)",
+            "ssh_public_keys",
+            "ciuser (optional)",
+            "bridge (optional)",
+            "vlan (optional)",
+            "first_vmid (optional)",
+            "cores (optional)",
+            "memory (optional)",
+            "disk_gb (optional)",
+            "disk_storage (optional)",
             "start (optional)",
             "onboot (optional)",
             "tags (optional)",

@@ -33,9 +33,9 @@
 
   <rect width="960" height="420" rx="20" fill="#0f1420"/>
   <text x="40" y="66" font-size="44" font-weight="800" style="fill:url(#title)">Proxmox MCP Server</text>
-  <text x="42" y="98" font-size="17" class="muted">Talk to your Proxmox cluster. <tspan style="fill:#e6ebf5" font-weight="700">339 tools</tspan>, one conversation.</text>
+  <text x="42" y="98" font-size="17" class="muted">Talk to your Proxmox cluster. <tspan style="fill:#e6ebf5" font-weight="700">340 tools</tspan>, one conversation.</text>
   <g font-size="12" font-weight="700">
-    <rect x="604" y="40" width="88" height="24" rx="12" fill="#2d1f10" stroke="#ff8a1f"/><text x="648" y="56" text-anchor="middle" style="fill:#ffc48a">339 tools</text>
+    <rect x="604" y="40" width="88" height="24" rx="12" fill="#2d1f10" stroke="#ff8a1f"/><text x="648" y="56" text-anchor="middle" style="fill:#ffc48a">340 tools</text>
     <rect x="700" y="40" width="88" height="24" rx="12" fill="#221a33" stroke="#b58cff"/><text x="744" y="56" text-anchor="middle" style="fill:#d9c6ff">14 areas</text>
     <rect x="796" y="40" width="128" height="24" rx="12" fill="#10283a" stroke="#3ec7ff"/><text x="860" y="56" text-anchor="middle" style="fill:#a8e4ff">read-only mode</text>
   </g>
@@ -65,7 +65,7 @@
   <rect class="core" x="480" y="208" width="104" height="90" rx="16" fill="#1d2536" stroke="#ff8a1f" stroke-width="2.5"/>
   <text x="532" y="246" text-anchor="middle" font-size="13" font-weight="800">proxmox</text>
   <text x="532" y="263" text-anchor="middle" font-size="13" font-weight="800">mcp-server</text>
-  <text x="532" y="283" text-anchor="middle" font-size="11" class="muted">339 tools</text>
+  <text x="532" y="283" text-anchor="middle" font-size="11" class="muted">340 tools</text>
 
   <!-- Cluster -->
   <text x="700" y="132" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">PROXMOX VE CLUSTER</text>

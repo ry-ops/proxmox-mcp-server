@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="960" height="480" role="img" aria-labelledby="t d">
-  <title id="t">339 tools across 14 areas of the Proxmox VE API</title>
-  <desc id="d">A tile map of the server's tools by API area, bigger tiles for more tools: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC containers 28, notifications 23, disks 17, ACME and certificates 17, SDN 16, storage and backup 14, pools 5, appliances 1.</desc>
+  <title id="t">340 tools across 14 areas of the Proxmox VE API</title>
+  <desc id="d">A tile map of the server's tools by API area, bigger tiles for more tools: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC containers 28, notifications 23, disks 17, ACME and certificates 17, SDN 16, storage and backup 14, pools 5, appliances 2.</desc>
   <defs>
     <linearGradient id="shine" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   </defs>
@@ -30,7 +30,7 @@
   <rect width="960" height="480" rx="20" fill="#0f1420"/>
   <text x="30" y="56" font-size="28" font-weight="800">The whole Proxmox VE API</text>
   <text x="30" y="84" font-size="15" class="muted">One module per area, every tool with a full input schema. Bigger tile, more tools.</text>
-  <text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">339</text>
+  <text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">340</text>
   <text x="930" y="84" text-anchor="end" font-size="13" class="muted">tools · 14 areas</text>
   <g class="t0">
     <rect x="30" y="112" width="338" height="104" rx="12" fill="#ff8a1f" fill-opacity=".12" stroke="#ff8a1f" stroke-opacity=".7"/>
@@ -113,8 +113,8 @@
   <g class="t13">
     <rect x="664" y="404" width="266" height="64" rx="12" fill="#ff5c8a" fill-opacity=".12" stroke="#ff5c8a" stroke-opacity=".7"/>
     <text x="678" y="430" font-size="15" font-weight="700">Appliances</text>
-    <text x="918" y="431" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff5c8a">1</text>
-    <text x="678" y="456" font-size="11" class="mono" style="fill:#ff5c8a" opacity=".85">deploy_fortigate_vm</text>
+    <text x="918" y="431" text-anchor="end" font-size="20" font-weight="800" style="fill:#ff5c8a">2</text>
+    <text x="678" y="456" font-size="11" class="mono" style="fill:#ff5c8a" opacity=".85">deploy_fortigate_vm · deploy_cloud_vms</text>
   </g>
   <rect class="sweep" x="0" y="112" width="240" height="356" fill="url(#shine)"/>
 </svg>
