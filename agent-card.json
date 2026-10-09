@@ -1,7 +1,7 @@
 {
   "name": "proxmox-mcp-server",
   "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 340 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
     "type": "MCP",

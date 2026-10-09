@@ -6,12 +6,21 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-10-08
+
 ### Added
 - `deploy_cloud_vms`: create one or more VMs from a cloud image (for example Ubuntu's
   `noble-server-cloudimg` in `local:import`) with cloud-init: user, SSH public key, and a static
   IP per VM or DHCP, on a chosen bridge and VLAN. Imports the disk, grows it, starts each VM and
   returns VMIDs, names, MACs and IPs. Refuses names or VMIDs already in use, and validates
   addresses before calling the API. Built to hand nodes to k3s-mcp-server's `create_cluster`.
+
+### Fixed
+- The server starts again after a fresh `uv run`. Dependabot's #28 raised the requirement to
+  `mcp>=2.2.0,<3`, but mcp 2.x removed the `@app.list_tools()`/`@app.call_tool()` decorators
+  the server uses, so re-resolving installed 2.3.0 and the server exited with
+  `AttributeError: 'Server' object has no attribute 'list_tools'`. mcp is capped below 2 again,
+  and Dependabot now skips mcp major versions.
 
 ## [2.3.0] - 2026-10-03
 
@@ -103,6 +112,7 @@ released on its own.
 
 Initial release.
 
+[2.4.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v1.0.0.1...v2.1.0

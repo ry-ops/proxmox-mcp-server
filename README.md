@@ -144,7 +144,7 @@ A `.env` file in the project directory is loaded automatically; see [`.env.examp
 A multi-arch image is published to GitHub Container Registry on every push to `main` and for each release tag:
 
 ```bash
-docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. :2.3.0
+docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. :2.4.0
 docker run -i --rm --env-file .env ghcr.io/ry-ops/proxmox-mcp-server:latest
 ```
 
