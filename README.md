@@ -52,6 +52,7 @@ Once it's connected, just ask:
 > *"List all running tasks in the cluster."*
 > *"Clone VM 9000 to a new VM called web-02 and start it."*
 > *"Run `df -h` inside VM 120 using the guest agent and show me the output."*
+> *"Make three Ubuntu VMs on pve1 at 192.168.1.181–183 with my SSH key, ready for a K3s cluster."*
 
 There are more worked examples in [USAGE.md](USAGE.md).
 
@@ -109,6 +110,7 @@ uv run python -c "from proxmox_mcp.server import ALL_TOOLS; print('\n'.join(sort
 | Monitoring | `get_node_status`, `get_vm_status`, `get_vm_rrddata`, `get_node_storage_status` |
 | Tasks | `list_cluster_tasks`, `list_node_tasks`, `get_task_status`, `get_task_log` |
 | Guest agent | `vm_agent_exec` (returns a PID), then `vm_agent_exec_status` for the exit code and output |
+| Cluster nodes | `download_url_to_storage` for a cloud image with `content=import`, then `deploy_cloud_vms`; hand the IPs to [k3s-mcp-server](https://github.com/ry-ops/k3s-mcp-server)'s `create_cluster` |
 
 <a id="quick-start"></a>
 
