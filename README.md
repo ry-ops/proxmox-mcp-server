@@ -151,6 +151,16 @@ docker run -i --rm --env-file .env ghcr.io/ry-ops/proxmox-mcp-server:latest
 ```
 
 MCP clients talk over stdio, so run the container interactively (`-i`). `docker-compose.yaml` does the same using your `.env`.
+
+To run it as a network service instead, opt in to streamable HTTP. Binding beyond loopback requires a bearer token:
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env \
+  -e MCP_TRANSPORT=http -e MCP_HOST=0.0.0.0 -e MCP_AUTH_TOKEN="$(openssl rand -hex 32)" \
+  ghcr.io/ry-ops/proxmox-mcp-server:latest
+```
+
+Clients send `Authorization: Bearer <token>` to `http://<host>:8080/`; `GET /health` is unauthenticated for probes.
 </details>
 
 **3. Connect your MCP client.** For Claude Desktop, edit `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or `%APPDATA%/Claude/claude_desktop_config.json` on Windows:
@@ -402,7 +412,6 @@ QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
 
 ## 🗺️ Roadmap
 
-- Streamable-HTTP transport, to run the server as a network service ([#24](https://github.com/ry-ops/proxmox-mcp-server/pull/24), [#29](https://github.com/ry-ops/proxmox-mcp-server/pull/29))
 - Support for `mcp` 2.x
 - Automatic ticket refresh for long-running password-authenticated sessions
 - A broader automated test suite

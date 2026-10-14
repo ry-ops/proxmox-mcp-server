@@ -11,12 +11,21 @@ Configuration (environment variables):
     PROXMOX_PASSWORD    Password (alternative to token auth)
     PROXMOX_VERIFY_SSL  Verify SSL certs (default: false)
     PROXMOX_READ_ONLY   Block all writes (POST/PUT/DELETE); GET only (default: false)
+
+Transport (environment variables):
+    MCP_TRANSPORT       "stdio" (default) or "http" (streamable-HTTP for remote clients)
+    MCP_HOST            HTTP bind host (default: 127.0.0.1)  [http only]
+    MCP_PORT            HTTP bind port (default: 8080)       [http only]
+    MCP_AUTH_TOKEN      If set, require "Authorization: Bearer <token>" [http only].
+                        Required when MCP_HOST is not a loopback address.
 """
 
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
+import os
 import sys
 from typing import Any
 
@@ -41,6 +50,11 @@ from .tools import (
     sdn,
     storage,
 )
+
+MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "stdio").lower()
+MCP_HOST = os.getenv("MCP_HOST", "127.0.0.1")
+MCP_PORT = int(os.getenv("MCP_PORT", "8080"))
+MCP_AUTH_TOKEN = os.getenv("MCP_AUTH_TOKEN", "")
 
 # --- Build unified tool registry ---
 
@@ -98,11 +112,83 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         return [TextContent(type="text", text=json.dumps(error, indent=2))]
 
 
+def _authorized(headers: list[tuple[bytes, bytes]]) -> bool:
+    if not MCP_AUTH_TOKEN:
+        return True
+    auth = dict(headers).get(b"authorization", b"").decode()
+    return auth == f"Bearer {MCP_AUTH_TOKEN}"
+
+
+def _is_loopback(host: str) -> bool:
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def _check_http_config() -> None:
+    """Refuse to expose an unauthenticated server beyond loopback."""
+    if not MCP_AUTH_TOKEN and not _is_loopback(MCP_HOST):
+        raise ValueError(
+            f"MCP_HOST={MCP_HOST} is not a loopback address; set MCP_AUTH_TOKEN "
+            "or bind to 127.0.0.1"
+        )
+
+
+async def _serve_stdio() -> None:
+    async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
+        await app.run(
+            read_stream,
+            write_stream,
+            app.create_initialization_options(),
+        )
+
+
+async def _serve_http() -> None:
+    import contextlib
+
+    import uvicorn
+    from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+    from starlette.applications import Starlette
+    from starlette.responses import PlainTextResponse
+    from starlette.routing import Mount, Route
+
+    session_manager = StreamableHTTPSessionManager(app=app, stateless=True)
+
+    async def handle_mcp(scope: Any, receive: Any, send: Any) -> None:
+        if not _authorized(scope.get("headers") or []):
+            await PlainTextResponse("Unauthorized", status_code=401)(scope, receive, send)
+            return
+        await session_manager.handle_request(scope, receive, send)
+
+    async def health(_request):
+        return PlainTextResponse("ok")
+
+    @contextlib.asynccontextmanager
+    async def lifespan(_app: Starlette):
+        async with session_manager.run():
+            yield
+
+    star = Starlette(
+        routes=[Route("/health", health), Mount("/", app=handle_mcp)],
+        lifespan=lifespan,
+    )
+    auth_state = "on" if MCP_AUTH_TOKEN else "off"
+    print(f"✓ HTTP on {MCP_HOST}:{MCP_PORT}/ — auth: {auth_state}", file=sys.stderr)
+    config = uvicorn.Config(star, host=MCP_HOST, port=MCP_PORT, log_level="info")
+    await uvicorn.Server(config).serve()
+
+
 async def main() -> None:
     _validate_config()
+    if MCP_TRANSPORT == "http":
+        _check_http_config()
 
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server", file=sys.stderr)
+    print(f"Transport: {MCP_TRANSPORT}", file=sys.stderr)
     print(f"Tools: {len(ALL_TOOLS)}", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
 
@@ -113,12 +199,10 @@ async def main() -> None:
         print(f"✓ Ready — {len(ALL_TOOLS)} tools available", file=sys.stderr)
         print("=" * 60, file=sys.stderr)
 
-        async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-            await app.run(
-                read_stream,
-                write_stream,
-                app.create_initialization_options(),
-            )
+        if MCP_TRANSPORT == "http":
+            await _serve_http()
+        else:
+            await _serve_stdio()
     finally:
         await proxmox.close()
 
