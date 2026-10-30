@@ -529,7 +529,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get("/cluster/ceph/flags")
 
     elif name == "set_cluster_ceph_flags":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.put("/cluster/ceph/flags", data)
 
     raise ValueError(f"Unknown tool: {name}")

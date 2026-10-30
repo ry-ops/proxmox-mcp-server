@@ -480,7 +480,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get("/cluster/options")
 
     elif name == "set_cluster_options":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.put("/cluster/options", data)
 
     elif name == "get_cluster_log":
@@ -513,7 +513,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/cluster/ha/resources/{args['sid']}")
 
     elif name == "add_ha_resource":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/ha/resources", data)
 
     elif name == "update_ha_resource":
@@ -538,7 +538,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/cluster/replication/{args['id']}")
 
     elif name == "create_replication_job":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/replication", data)
 
     elif name == "update_replication_job":
@@ -557,7 +557,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/cluster/backup/{args['id']}")
 
     elif name == "create_backup_job":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/backup", data)
 
     elif name == "update_backup_job":
@@ -569,7 +569,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.delete(f"/cluster/backup/{args['id']}")
 
     elif name == "bulk_start_guests":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/bulk-action/guest/start", data or None)
 
     elif name == "bulk_shutdown_guests":
@@ -605,7 +605,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get("/cluster/jobs/realm-sync")
 
     elif name == "analyze_schedule":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/jobs/schedule-analyze", data)
 
     raise ValueError(f"Unknown tool: {name}")
