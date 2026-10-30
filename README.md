@@ -6,7 +6,7 @@
   <a href="https://github.com/ry-ops/proxmox-mcp-server/releases"><img src="https://img.shields.io/github/v/release/ry-ops/proxmox-mcp-server?color=ff8a1f&label=release" alt="Release"></a>
   <img src="https://img.shields.io/badge/tools-341-ff8a1f" alt="341 tools">
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-3ec7ff" alt="Python 3.10+"></a>
-  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-1.x-b58cff" alt="MCP"></a>
+  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-2.x-b58cff" alt="MCP SDK 2.x"></a>
   <a href="https://github.com/ry-ops/proxmox-mcp-server/pkgs/container/proxmox-mcp-server"><img src="https://img.shields.io/badge/docker-ghcr.io-3ddc84" alt="Docker image on ghcr.io"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
 </p>
@@ -39,6 +39,7 @@
 - ⏳ **Waits for the slow stuff.** Clone, migrate, backup and restore take `wait: true`, and `wait_for_task` follows any task to the end, with the log when it fails.
 - 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 341 to 127, and the context it costs by more than half. Results come back as compact JSON.
 - 🚦 **Labelled for safe approval.** Every tool carries MCP `readOnlyHint` and `destructiveHint` annotations, so clients can auto-approve reads and ask before a delete, stop or rollback.
+- 🆕 **Current protocol, old clients welcome.** Built on MCP SDK 2: clients on the stateless 2026-07-28 protocol and on every handshake version back to 2024-11-05 connect. Failed calls are flagged as errors, so clients show them as failures.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
 - 🌐 **Local or on the network.** Clients spawn it over stdio, or `proxmox-mcp-server-http` serves it over streamable HTTP. Give each client its own token and a role: `read`, `operator` or `admin`.
 - 📜 **Every change on the record.** `PROXMOX_AUDIT_LOG` writes one JSON line per write call: who, what, the outcome and the task, with secrets redacted.
@@ -620,14 +621,15 @@ QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
 ```
 
 **Dependencies:**
-- **`mcp`** (>=1.30.0, <2): 2.x changed the server API and isn't supported yet.
+- **`mcp`** (>=2.3, <3): the MCP SDK. It serves both the handshake protocol (2024-11-05 to 2025-11-25) and the stateless 2026-07-28 protocol, so older and newer clients both connect.
 - **`httpx`**: the async HTTP client.
 - **`python-dotenv`**: loads `.env`.
 - **`starlette`** and **`uvicorn`**: serve the HTTP entrypoint. `mcp` already depends on both.
 
 ## 🗺️ Roadmap
 
-- Support for `mcp` 2.x
+- Several Proxmox clusters from one server, chosen per call
+- Progress notifications while waiting for long tasks
 
 What has shipped is in [CHANGELOG.md](CHANGELOG.md).
 

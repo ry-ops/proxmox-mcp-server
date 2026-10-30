@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- Moved to MCP SDK 2 (`mcp>=2.3,<3`). The server now also speaks the stateless 2026-07-28
+  protocol, and still serves clients on the handshake protocol (2024-11-05 to 2025-11-25).
+  Verified with SDK 1.30 and SDK 2.3 clients over stdio and HTTP, including per-token roles.
+- Failed or refused tool calls set the protocol's `isError` flag, so clients show them as errors
+  instead of ordinary results. The JSON error body is unchanged.
+- The server reports its package version to clients.
+
+### Added
+- CI builds the Docker image and imports both entrypoints inside it on every PR.
+- Protocol-level tests that drive every handler in-process with the SDK client, in both the
+  modern and legacy modes.
+
 ## [2.8.0] - 2026-10-30
 
 ### Added

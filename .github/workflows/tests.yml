@@ -32,3 +32,15 @@ jobs:
           python-version: "3.12"
       - name: Ruff
         run: uv run --locked ruff check .
+
+  image-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Build the image
+        run: docker build -t proxmox-mcp-server:ci .
+      - name: Import both entrypoints inside it
+        run: |
+          docker run --rm -e PROXMOX_HOST=pve.invalid -e PROXMOX_USER=ci@pve \
+            -e PROXMOX_TOKEN_NAME=ci -e PROXMOX_TOKEN_VALUE=ci proxmox-mcp-server:ci \
+            python -c "import importlib.metadata as m, proxmox_mcp.server as s, proxmox_mcp.server_http; print('mcp', m.version('mcp'), 'tools', len(s.ALL_TOOLS))"
