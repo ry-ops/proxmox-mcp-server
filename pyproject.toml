@@ -39,7 +39,7 @@ dependencies = [
     "httpx>=0.28.1",
     "python-dotenv>=1.2.4",
     # For the streamable-HTTP entrypoint; mcp already depends on both.
-    "starlette>=0.37.0",
+    "starlette>=1.7.0",
     "uvicorn>=0.30.0",
 ]
 
