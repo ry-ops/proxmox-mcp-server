@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `PROXMOX_TOOLSETS`: load only the API areas you need, e.g. `nodes,qemu,lxc,storage`.
+  All 340 tool schemas cost a client roughly 40k tokens of context on every turn; that
+  set is 126 tools and about 18k. `vms` and `containers` are aliases for `qemu` and `lxc`,
+  and an unknown name stops the server at startup with the valid list.
+- MCP tool annotations on every tool: `readOnlyHint` on the 149 that only read, and
+  `destructiveHint` on the 73 that delete, stop, wipe, roll back, restore over or run guest
+  commands. Clients can use them to auto-approve reads and confirm destructive calls.
+- A test that runs every tool against a recording client and checks its read-only label
+  against the HTTP methods it sends, plus schema checks for all 340 tools.
+- CI runs the test suite on Python 3.10 to 3.13 for every push and pull request.
+
+### Changed
+- `PROXMOX_READ_ONLY=true` now advertises only the 149 read tools instead of all 340.
+  The write tools were already refused, so clients no longer see tools they cannot use.
+- Calling a tool that is not loaded returns an error that names `PROXMOX_TOOLSETS` and
+  `PROXMOX_READ_ONLY` as the likely cause.
+
 ## [2.4.0] - 2026-10-08
 
 ### Added

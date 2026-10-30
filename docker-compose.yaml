@@ -15,6 +15,8 @@ services:
       - PROXMOX_TOKEN_NAME=${PROXMOX_TOKEN_NAME}
       - PROXMOX_TOKEN_VALUE=${PROXMOX_TOKEN_VALUE}
       - PROXMOX_VERIFY_SSL=${PROXMOX_VERIFY_SSL:-false}
+      - PROXMOX_READ_ONLY=${PROXMOX_READ_ONLY:-false}
+      - PROXMOX_TOOLSETS=${PROXMOX_TOOLSETS:-all}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     # MCP servers communicate via stdio, not network ports
     stdin_open: true

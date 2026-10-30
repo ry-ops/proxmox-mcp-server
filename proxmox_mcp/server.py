@@ -11,68 +11,33 @@ Configuration (environment variables):
     PROXMOX_PASSWORD    Password (alternative to token auth)
     PROXMOX_VERIFY_SSL  Verify SSL certs (default: false)
     PROXMOX_READ_ONLY   Block all writes (POST/PUT/DELETE); GET only (default: false)
+    PROXMOX_TOOLSETS    Comma-separated API areas to load, e.g. nodes,qemu,lxc (default: all)
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 from typing import Any
 
+import mcp.server.stdio
 from mcp.server import Server
 from mcp.types import TextContent, Tool
-import mcp.server.stdio
 
-from .client import ProxmoxClient, _validate_config
-from .tools import (
-    acme,
-    access,
-    appliances,
-    ceph,
-    cluster,
-    disks,
-    firewall,
-    lxc,
-    nodes,
-    notifications,
-    pools,
-    qemu,
-    sdn,
-    storage,
-)
+from . import registry
+from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config
 
-# --- Build unified tool registry ---
+# --- Build the tool registry ---
 
-MODULES = [
-    nodes,
-    qemu,
-    lxc,
-    storage,
-    cluster,
-    access,
-    firewall,
-    disks,
-    ceph,
-    acme,
-    sdn,
-    notifications,
-    pools,
-    appliances,
-]
+try:
+    TOOLSETS = registry.parse_toolsets(os.getenv("PROXMOX_TOOLSETS"))
+except ValueError as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
 
-ALL_TOOLS: list[Tool] = []
-TOOL_MODULE: dict[str, Any] = {}
-
-for mod in MODULES:
-    for tool_def in mod.TOOLS:
-        t = Tool(
-            name=tool_def["name"],
-            description=tool_def["description"],
-            inputSchema=tool_def["inputSchema"],
-        )
-        ALL_TOOLS.append(t)
-        TOOL_MODULE[tool_def["name"]] = mod
+ALL_TOOLS, TOOL_MODULE = registry.build(TOOLSETS, read_only=PROXMOX_READ_ONLY)
 
 # --- MCP server setup ---
 
@@ -90,7 +55,10 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
     try:
         mod = TOOL_MODULE.get(name)
         if mod is None:
-            raise ValueError(f"Unknown tool: {name}")
+            raise ValueError(
+                f"Unknown or disabled tool: {name} "
+                "(check PROXMOX_TOOLSETS, and PROXMOX_READ_ONLY hides write tools)"
+            )
         result = await mod.handle(name, arguments or {}, proxmox)
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
     except Exception as e:
@@ -103,7 +71,9 @@ async def main() -> None:
 
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server", file=sys.stderr)
-    print(f"Tools: {len(ALL_TOOLS)}", file=sys.stderr)
+    scope = "all toolsets" if len(TOOLSETS) == len(registry.TOOLSETS) else ", ".join(TOOLSETS)
+    mode = ", read-only" if PROXMOX_READ_ONLY else ""
+    print(f"Tools: {len(ALL_TOOLS)} ({scope}{mode})", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
 
     # Close the HTTP client in this event loop: its connections are bound to it.
