@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-10-30
+
 ### Added
 - Per-client tokens with roles for the HTTP entrypoint. `MCP_AUTH_TOKENS`
   (`name:role:token,…`) or `MCP_AUTH_TOKENS_FILE` (one `name role token` per line) give each
@@ -202,6 +204,7 @@ released on its own.
 
 Initial release.
 
+[2.8.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.4.0...v2.5.0
