@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="960" height="480" role="img" aria-labelledby="t d">
-  <title id="t">340 tools in 14 toolsets across the Proxmox VE API</title>
-  <desc id="d">A tile map of the server's tools by API area, bigger tiles for more tools: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC containers 28, notifications 23, disks 17, ACME and certificates 17, SDN 16, storage and backup 14, pools 5, appliances 2. Each tile names its toolset. Then everything but nodes, qemu, lxc and storage dims, and the count drops to 126: what PROXMOX_TOOLSETS=nodes,qemu,lxc,storage loads.</desc>
+  <title id="t">341 tools in 14 toolsets across the Proxmox VE API</title>
+  <desc id="d">A tile map of the server's tools by API area, bigger tiles for more tools: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC containers 28, notifications 23, disks 17, ACME and certificates 17, SDN 16, storage and backup 14, pools 5, appliances 2, plus wait_for_task, which every toolset loads: 341 in all. Each tile names its toolset. Then everything but nodes, qemu, lxc and storage dims, and the count drops to 127: what PROXMOX_TOOLSETS=nodes,qemu,lxc,storage loads.</desc>
   <defs>
     <linearGradient id="shine" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   </defs>
@@ -37,11 +37,11 @@
   <rect width="960" height="480" rx="20" fill="#0f1420"/>
   <text x="30" y="56" font-size="28" font-weight="800">The whole Proxmox VE API</text>
   <g class="sa"><text x="30" y="84" font-size="15" class="muted">Each area is a toolset. Bigger tile, more tools. Load only what you need.</text></g>
-  <g class="sb alt"><text x="30" y="84" font-size="14" class="mono"><tspan style="fill:#ffc48a">PROXMOX_TOOLSETS=nodes,qemu,lxc,storage</tspan><tspan class="muted"> → 126 tools</tspan></text></g>
-  <g class="sa"><text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">340</text>
-  <text x="930" y="84" text-anchor="end" font-size="13" class="muted">tools · 14 toolsets</text></g>
-  <g class="sb alt"><text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">126</text>
-  <text x="930" y="84" text-anchor="end" font-size="13" class="muted">tools · 4 toolsets</text></g>
+  <g class="sb alt"><text x="30" y="84" font-size="14" class="mono"><tspan style="fill:#ffc48a">PROXMOX_TOOLSETS=nodes,qemu,lxc,storage</tspan><tspan class="muted"> → 127 tools</tspan></text></g>
+  <g class="sa"><text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">341</text>
+  <text x="930" y="84" text-anchor="end" font-size="13" class="muted">tools · 14 toolsets + wait_for_task</text></g>
+  <g class="sb alt"><text x="930" y="62" text-anchor="end" font-size="44" font-weight="800" style="fill:#ff8a1f">127</text>
+  <text x="930" y="84" text-anchor="end" font-size="13" class="muted">tools · 4 toolsets + wait_for_task</text></g>
   <g class="t0">
     <rect x="30" y="112" width="338" height="104" rx="12" fill="#ff8a1f" fill-opacity=".12" stroke="#ff8a1f" stroke-opacity=".7"/>
     <text x="44" y="138" font-size="15" font-weight="700">QEMU VMs</text>

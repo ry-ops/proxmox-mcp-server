@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" role="img" aria-labelledby="t d">
   <title id="t">How Proxmox MCP Server works, and read-only mode</title>
-  <desc id="d">Any MCP client, such as Claude Desktop or Claude Code, talks to proxmox-mcp-server over stdio, or over streamable HTTP with a bearer token. PROXMOX_TOOLSETS chooses which API areas load. The server calls the Proxmox VE REST API over HTTPS on port 8006 with an API token or a password. With PROXMOX_READ_ONLY set to true, only the 149 read tools are listed; GET requests still reach Proxmox, while POST, PUT and DELETE are refused inside the server before they reach the network.</desc>
+  <desc id="d">Any MCP client, such as Claude Desktop or Claude Code, talks to proxmox-mcp-server over stdio, or over streamable HTTP with a bearer token. PROXMOX_TOOLSETS chooses which API areas load. The server calls the Proxmox VE REST API over HTTPS on port 8006 with an API token or a password. With PROXMOX_READ_ONLY set to true, only the 150 read tools are listed; GET requests still reach Proxmox, while POST, PUT and DELETE are refused inside the server before they reach the network. PROXMOX_NO_DESTRUCTIVE hides destructive tools, and PROXMOX_PROTECTED_VMIDS refuses changes to listed guests.</desc>
   <style>
     text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
     .muted { fill: #8b96ad; }
@@ -36,7 +36,7 @@
   <!-- Clients -->
   <text x="40" y="122" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">MCP CLIENTS</text>
   <rect x="40" y="134" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="159" font-size="14" font-weight="600">Claude Desktop</text><rect x="40" y="184" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="209" font-size="14" font-weight="600">Claude Code</text><rect x="40" y="234" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="259" font-size="14" font-weight="600">Any MCP client</text><rect x="40" y="284" width="200" height="40" rx="10" fill="#161d2b" stroke="#2c3750"/><text x="58" y="309" font-size="14" font-weight="600">A2A agents</text>
-  <text x="58" y="345" font-size="11" class="muted mono">agent-card.json: 340 tools</text>
+  <text x="58" y="345" font-size="11" class="muted mono">agent-card.json: 341 tools</text>
   <path d="M244 246 H330" stroke="#ff8a1f" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round"/>
   <text x="252" y="236" font-size="11" class="muted mono">stdio</text>
   <text x="252" y="266" font-size="11" class="muted mono">or HTTP</text>
@@ -54,7 +54,7 @@
     <g class="knob"><circle cx="14" cy="14" r="11" fill="#e6ebf5"/></g>
   </g>
   <g class="offlab"><text x="420" y="306" font-size="13" font-weight="800" class="muted">false</text></g>
-  <g class="onlab"><text x="420" y="306" font-size="13" font-weight="800" style="fill:#3ec7ff">true · only 149 read tools</text></g>
+  <g class="onlab"><text x="420" y="306" font-size="13" font-weight="800" style="fill:#3ec7ff">true · only 150 read tools</text></g>
 
   <text x="356" y="338" font-size="11" class="mono muted">PROXMOX_TOOLSETS=qemu,lxc,…</text>
 
@@ -72,6 +72,6 @@
   <rect x="880" y="134" width="56" height="214" rx="14" fill="#2d1f10" stroke="#ff8a1f" stroke-width="2"/>
   <text x="908" y="241" text-anchor="middle" font-size="12" font-weight="800" transform="rotate(-90 908 241)" style="fill:#ffc48a">PROXMOX VE · :8006</text>
 
-  <text x="40" y="392" font-size="13">Read-only mode lists only read tools and refuses every POST, PUT and DELETE <tspan font-weight="700">inside the server</tspan>.</text>
+  <text x="40" y="392" font-size="13">Read-only lists only reads. No-destructive hides deletes and stops. Protected guests are refused. <tspan font-weight="700">All inside the server.</tspan></text>
   <text x="40" y="414" font-size="13" class="muted">Pair it with a <tspan class="mono">PVEAuditor</tspan> token and Proxmox enforces the same limit on its side.</text>
 </svg>

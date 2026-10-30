@@ -8,6 +8,8 @@ from proxmox_mcp import registry
 
 ALL, HANDLERS = registry.build(list(registry.TOOLSETS), read_only=False)
 DUMMY = {"string": "x", "integer": 1, "number": 1, "boolean": True, "array": [], "object": {}}
+# Arguments that must look real for the tool to reach the API.
+REAL_ARGS = {"upid": "UPID:pve:0003A1B2:01C9D3E4:6720F0A1:qmstart:100:root@pam:"}
 
 
 class RecordingClient:
@@ -18,6 +20,8 @@ class RecordingClient:
 
     async def request(self, method, path, data=None):
         self.methods.add(method)
+        if "/tasks/" in path and path.endswith("/status"):
+            return {"data": {"status": "stopped", "exitstatus": "OK"}}
         return {"data": []}
 
     async def get(self, path, params=None):
@@ -52,7 +56,10 @@ def test_schema_is_well_formed(tool):
 async def test_read_only_label_matches_http_methods(tool):
     """A tool labelled read-only must only GET; any other tool must send a write."""
     props = tool.inputSchema.get("properties", {})
-    args = {k: DUMMY[props[k].get("type", "string")] for k in tool.inputSchema.get("required", [])}
+    args = {
+        k: REAL_ARGS.get(k, DUMMY[props[k].get("type", "string")])
+        for k in tool.inputSchema.get("required", [])
+    }
     client = RecordingClient()
     try:
         await asyncio.wait_for(HANDLERS[tool.name].handle(tool.name, args, client), 2)
@@ -91,7 +98,8 @@ def test_unknown_toolset_is_an_error():
 
 def test_toolsets_limit_tools():
     tools, handlers = registry.build(["pools"], read_only=False)
-    assert {t.name for t in tools} == {d["name"] for d in registry.TOOLSETS["pools"].TOOLS}
+    core = {d["name"] for m in registry.CORE for d in m.TOOLS}
+    assert {t.name for t in tools} == {d["name"] for d in registry.TOOLSETS["pools"].TOOLS} | core
     assert set(handlers) == {t.name for t in tools}
 
 
@@ -118,3 +126,16 @@ def test_agent_card_matches_registry():
         assert caps[t.name]["destructive"] == t.annotations.destructiveHint, t.name
     version = re.search(r'^version = "(.+)"', (root / "pyproject.toml").read_text(), re.M)[1]
     assert card["version"] == version
+
+
+def test_no_destructive_hides_only_destructive_tools():
+    tools, handlers = registry.build(list(registry.TOOLSETS), read_only=False, no_destructive=True)
+    assert not any(t.annotations.destructiveHint for t in tools)
+    assert {"start_vm", "create_vm_snapshot", "list_vms"} <= set(handlers)
+    assert not {"delete_vm", "stop_vm", "rollback_vm_snapshot"} & set(handlers)
+    assert len(tools) == len(ALL) - sum(bool(t.annotations.destructiveHint) for t in ALL)
+
+
+def test_wait_property_only_on_waitable_tools():
+    for t in ALL:
+        assert ("wait" in t.inputSchema["properties"]) == (t.name in registry.WAITABLE), t.name

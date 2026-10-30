@@ -12,6 +12,9 @@ Configuration (environment variables):
     PROXMOX_VERIFY_SSL  Verify SSL certs (default: false)
     PROXMOX_READ_ONLY   Block all writes (POST/PUT/DELETE); GET only (default: false)
     PROXMOX_TOOLSETS    Comma-separated API areas to load, e.g. nodes,qemu,lxc (default: all)
+    PROXMOX_NO_DESTRUCTIVE   Hide tools that delete, stop, wipe or roll back (default: false)
+    PROXMOX_PROTECTED_VMIDS  Guest IDs/ranges no tool may change, e.g. 100,9000-9010
+    PROXMOX_WAIT_TIMEOUT     Seconds a `wait` lasts before returning (default: 900)
 """
 
 from __future__ import annotations
@@ -26,18 +29,40 @@ import mcp.server.stdio
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
-from . import registry
+from . import guards, registry, tasks
 from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config
 
 # --- Build the tool registry ---
 
+NO_DESTRUCTIVE = os.getenv("PROXMOX_NO_DESTRUCTIVE", "false").lower() == "true"
+
 try:
     TOOLSETS = registry.parse_toolsets(os.getenv("PROXMOX_TOOLSETS"))
+    PROTECTED = guards.parse_protected(os.getenv("PROXMOX_PROTECTED_VMIDS"))
 except ValueError as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.exit(1)
 
-ALL_TOOLS, TOOL_MODULE = registry.build(TOOLSETS, read_only=PROXMOX_READ_ONLY)
+ALL_TOOLS, TOOL_MODULE = registry.build(
+    TOOLSETS, read_only=PROXMOX_READ_ONLY, no_destructive=NO_DESTRUCTIVE
+)
+
+
+def startup_summary() -> str:
+    """One line on what this server exposes, for the startup banner."""
+    scope = "all toolsets" if len(TOOLSETS) == len(registry.TOOLSETS) else ", ".join(TOOLSETS)
+    if PROXMOX_READ_ONLY:
+        scope += ", read-only"
+    elif NO_DESTRUCTIVE:
+        scope += ", no destructive tools"
+    if PROTECTED:
+        scope += f", {len(PROTECTED)} protected guests"
+    return f"Tools: {len(ALL_TOOLS)} ({scope})"
+
+
+def _dump(value: Any) -> str:
+    # Compact JSON: indentation costs the client tokens on every large result.
+    return json.dumps(value, separators=(",", ":"), ensure_ascii=False, default=str)
 
 # --- MCP server setup ---
 
@@ -56,14 +81,21 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         mod = TOOL_MODULE.get(name)
         if mod is None:
             raise ValueError(
-                f"Unknown or disabled tool: {name} "
-                "(check PROXMOX_TOOLSETS, and PROXMOX_READ_ONLY hides write tools)"
+                f"Unknown or disabled tool: {name} (check PROXMOX_TOOLSETS; "
+                "PROXMOX_READ_ONLY and PROXMOX_NO_DESTRUCTIVE hide tools)"
             )
-        result = await mod.handle(name, arguments or {}, proxmox)
-        return [TextContent(type="text", text=json.dumps(result, indent=2))]
+        args = dict(arguments or {})
+        wait = bool(args.pop("wait", False)) and name in registry.WAITABLE
+        if not registry.is_read_only(name):
+            guards.check(name, args, PROTECTED)
+        result = await mod.handle(name, args, proxmox)
+        if wait:
+            upid = result.get("data") if isinstance(result, dict) else None
+            if tasks.is_upid(upid):
+                result = {**result, "task": await tasks.wait(proxmox, upid)}
+        return [TextContent(type="text", text=_dump(result))]
     except Exception as e:
-        error = {"error": str(e), "tool": name}
-        return [TextContent(type="text", text=json.dumps(error, indent=2))]
+        return [TextContent(type="text", text=_dump({"error": str(e), "tool": name}))]
 
 
 async def main() -> None:
@@ -71,9 +103,7 @@ async def main() -> None:
 
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server", file=sys.stderr)
-    scope = "all toolsets" if len(TOOLSETS) == len(registry.TOOLSETS) else ", ".join(TOOLSETS)
-    mode = ", read-only" if PROXMOX_READ_ONLY else ""
-    print(f"Tools: {len(ALL_TOOLS)} ({scope}{mode})", file=sys.stderr)
+    print(startup_summary(), file=sys.stderr)
     print("=" * 60, file=sys.stderr)
 
     # Close the HTTP client in this event loop: its connections are bound to it.
