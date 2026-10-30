@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-10-30
+
 ### Added
 - `wait_for_task`: wait for any Proxmox task (UPID) to finish. It returns `status`,
   `exitstatus` and `ok`, plus the last 20 log lines when the task failed. If the task is still
@@ -177,6 +179,7 @@ released on its own.
 
 Initial release.
 
+[2.7.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.3.0...v2.4.0
