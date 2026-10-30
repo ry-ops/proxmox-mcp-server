@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-10-30
+
 ### Added
 - `PROXMOX_TOOLSETS`: load only the API areas you need, e.g. `nodes,qemu,lxc,storage`.
   All 340 tool schemas cost a client roughly 40k tokens of context on every turn; that
@@ -17,6 +19,8 @@ All notable changes to this project are documented here. The format is based on
 - A test that runs every tool against a recording client and checks its read-only label
   against the HTTP methods it sends, plus schema checks for all 340 tools.
 - CI runs the test suite on Python 3.10 to 3.13 for every push and pull request.
+- `agent-card.json` marks each capability `read_only` and `destructive`, matching the
+  tool annotations.
 
 ### Fixed
 - Password auth keeps working past two hours. Proxmox tickets expire after 2 hours and the
@@ -140,6 +144,7 @@ released on its own.
 
 Initial release.
 
+[2.5.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.1.0...v2.2.0
