@@ -101,3 +101,20 @@ def test_read_only_mode_hides_writes():
     assert all(t.annotations.readOnlyHint for t in tools)
     assert "list_vms" in handlers and "delete_vm" not in handlers
     assert len(tools) == sum(registry.is_read_only(t.name) for t in ALL)
+
+
+def test_agent_card_matches_registry():
+    """agent-card.json lists every tool once, with the same labels, and the package version."""
+    import json
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).parent.parent
+    card = json.loads((root / "agent-card.json").read_text())
+    caps = {c["name"]: c for s in card["skills"] for c in s["capabilities"]}
+    assert set(caps) == {t.name for t in ALL}
+    for t in ALL:
+        assert caps[t.name]["read_only"] == t.annotations.readOnlyHint, t.name
+        assert caps[t.name]["destructive"] == t.annotations.destructiveHint, t.name
+    version = re.search(r'^version = "(.+)"', (root / "pyproject.toml").read_text(), re.M)[1]
+    assert card["version"] == version

@@ -1,7 +1,7 @@
 {
   "name": "proxmox-mcp-server",
   "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 340 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
     "type": "MCP",
@@ -51,35 +51,45 @@
         {
           "name": "list_nodes",
           "description": "List all nodes in the Proxmox cluster with status and resource usage.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_status",
           "description": "Get detailed status and resource usage for a specific node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_config",
           "description": "Get node configuration (wake-on-LAN MAC, etc.).",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_version",
           "description": "Get Proxmox VE version information for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_time",
           "description": "Get current time and timezone for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_node_time",
@@ -87,14 +97,18 @@
           "inputs": [
             "node",
             "timezone"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_node_dns",
           "description": "Get DNS configuration for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_node_dns",
@@ -105,14 +119,18 @@
             "dns1 (optional)",
             "dns2 (optional)",
             "dns3 (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_node_hosts",
           "description": "Get /etc/hosts content for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_node_hosts",
@@ -121,7 +139,9 @@
             "node",
             "data",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_node_network",
@@ -129,7 +149,9 @@
           "inputs": [
             "node",
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_network_interface",
@@ -137,35 +159,45 @@
           "inputs": [
             "node",
             "iface"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "apply_node_network",
           "description": "Apply pending network configuration changes on a node (reload interfaces).",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "revert_node_network",
           "description": "Revert pending network configuration changes on a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_node_netstat",
           "description": "Get network statistics for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_node_services",
           "description": "List all systemd services on a node with their state.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_service_state",
@@ -173,7 +205,9 @@
           "inputs": [
             "node",
             "service"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "start_node_service",
@@ -181,7 +215,9 @@
           "inputs": [
             "node",
             "service"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "stop_node_service",
@@ -189,7 +225,9 @@
           "inputs": [
             "node",
             "service"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "restart_node_service",
@@ -197,7 +235,9 @@
           "inputs": [
             "node",
             "service"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "reload_node_service",
@@ -205,7 +245,9 @@
           "inputs": [
             "node",
             "service"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_node_syslog",
@@ -217,7 +259,9 @@
             "since (optional)",
             "until (optional)",
             "service (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_journal",
@@ -230,28 +274,36 @@
             "since (optional)",
             "until (optional)",
             "lastentries (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_report",
           "description": "Get a full diagnostic report for a node (OS, hardware, config).",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_subscription",
           "description": "Get Proxmox subscription info for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_apt_update",
           "description": "List available APT package updates on a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_apt_changelog",
@@ -260,14 +312,18 @@
             "node",
             "name",
             "version (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_hardware",
           "description": "List PCI devices and hardware info for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_rrd",
@@ -277,7 +333,9 @@
             "ds",
             "timeframe",
             "cf (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_rrddata",
@@ -286,7 +344,9 @@
             "node",
             "timeframe",
             "cf (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "node_shutdown",
@@ -294,7 +354,9 @@
           "inputs": [
             "node",
             "command"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "node_startall",
@@ -303,7 +365,9 @@
             "node",
             "vms (optional)",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "node_stopall",
@@ -312,7 +376,9 @@
             "node",
             "vms (optional)",
             "force_stop (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "node_migrateall",
@@ -323,21 +389,27 @@
             "maxworkers (optional)",
             "vms (optional)",
             "with_local_disks (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_node_aplinfo",
           "description": "Get available LXC appliance/template info for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_capabilities_qemu",
           "description": "Get QEMU capabilities for a node (CPU types, machine types, migration options).",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_node_scan",
@@ -345,14 +417,18 @@
           "inputs": [
             "node",
             "type"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "wakeonlan",
           "description": "Wake a node via Wake-on-LAN.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         }
       ]
     },
@@ -365,7 +441,9 @@
           "description": "List all QEMU VMs on a node or cluster-wide.",
           "inputs": [
             "node (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_vm_status",
@@ -373,7 +451,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_vm_config",
@@ -383,7 +463,9 @@
             "vmid",
             "current (optional)",
             "snapshot (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_vm_config",
@@ -409,7 +491,9 @@
             "tags (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_pending",
@@ -417,7 +501,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "start_vm",
@@ -427,7 +513,9 @@
             "vmid",
             "skiplock (optional)",
             "timeout (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "stop_vm",
@@ -438,7 +526,9 @@
             "timeout (optional)",
             "skiplock (optional)",
             "keepActive (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "shutdown_vm",
@@ -449,7 +539,9 @@
             "timeout (optional)",
             "forceStop (optional)",
             "skiplock (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "reboot_vm",
@@ -458,7 +550,9 @@
             "node",
             "vmid",
             "timeout (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "reset_vm",
@@ -467,7 +561,9 @@
             "node",
             "vmid",
             "skiplock (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "suspend_vm",
@@ -478,7 +574,9 @@
             "skiplock (optional)",
             "todisk (optional)",
             "statestorage (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "resume_vm",
@@ -488,7 +586,9 @@
             "vmid",
             "skiplock (optional)",
             "nocheck (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "create_vm",
@@ -521,7 +621,9 @@
             "start (optional)",
             "template (optional)",
             "extra_config (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "clone_vm",
@@ -538,7 +640,9 @@
             "target (optional)",
             "snapname (optional)",
             "format (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_vm",
@@ -549,7 +653,9 @@
             "destroy-unreferenced-disks (optional)",
             "purge (optional)",
             "skiplock (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "convert_vm_to_template",
@@ -558,7 +664,9 @@
             "node",
             "vmid",
             "disk (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_vm_snapshots",
@@ -566,7 +674,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_vm_snapshot",
@@ -577,7 +687,9 @@
             "snapname",
             "description (optional)",
             "vmstate (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_snapshot_config",
@@ -586,7 +698,9 @@
             "node",
             "vmid",
             "snapname"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "rollback_vm_snapshot",
@@ -596,7 +710,9 @@
             "vmid",
             "snapname",
             "start (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "delete_vm_snapshot",
@@ -606,7 +722,9 @@
             "vmid",
             "snapname",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "migrate_vm",
@@ -622,7 +740,9 @@
             "force (optional)",
             "migration_type (optional)",
             "migration_network (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_migrate_preconditions",
@@ -631,7 +751,9 @@
             "node",
             "vmid",
             "target"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "resize_vm_disk",
@@ -643,7 +765,9 @@
             "size",
             "skiplock (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "move_vm_disk",
@@ -659,7 +783,9 @@
             "bwlimit (optional)",
             "target-vmid (optional)",
             "target-disk (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "unlink_vm_disk",
@@ -669,7 +795,9 @@
             "vmid",
             "idlist",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "import_vm_disk",
@@ -682,7 +810,9 @@
             "disk (optional)",
             "format (optional)",
             "options (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_firewall_rules",
@@ -690,7 +820,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_vm_firewall_rule",
@@ -708,7 +840,9 @@
             "comment (optional)",
             "enable (optional)",
             "pos (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_vm_firewall_rule",
@@ -718,7 +852,9 @@
             "vmid",
             "pos",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_vm_firewall_options",
@@ -726,7 +862,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_vm_firewall_options",
@@ -742,7 +880,9 @@
             "ipfilter (optional)",
             "log_level_in (optional)",
             "log_level_out (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_firewall_log",
@@ -752,7 +892,9 @@
             "vmid",
             "limit (optional)",
             "start (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_vm_rrddata",
@@ -762,7 +904,9 @@
             "vmid",
             "timeframe",
             "cf (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "vm_agent_exec",
@@ -773,7 +917,9 @@
             "command",
             "args (optional)",
             "input-data (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "vm_agent_exec_status",
@@ -782,7 +928,9 @@
             "node",
             "vmid",
             "pid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "vm_agent_get_fsinfo",
@@ -790,7 +938,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "vm_agent_get_network_interfaces",
@@ -798,7 +948,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "vm_agent_get_osinfo",
@@ -806,7 +958,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "vm_agent_ping",
@@ -814,7 +968,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "vm_agent_set_user_password",
@@ -825,7 +981,9 @@
             "username",
             "password",
             "crypted (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_vm_feature",
@@ -835,7 +993,9 @@
             "vmid",
             "feature",
             "snapname (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_vm_vnc_proxy",
@@ -845,7 +1005,9 @@
             "vmid",
             "websocket (optional)",
             "generate-password (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_spice_proxy",
@@ -854,7 +1016,9 @@
             "node",
             "vmid",
             "proxy (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_vm_cloudinit",
@@ -863,7 +1027,9 @@
             "node",
             "vmid",
             "type"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "regenerate_vm_cloudinit",
@@ -871,7 +1037,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         }
       ]
     },
@@ -884,7 +1052,9 @@
           "description": "List all LXC containers on a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_container_status",
@@ -892,7 +1062,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_container_config",
@@ -902,7 +1074,9 @@
             "vmid",
             "current (optional)",
             "snapshot (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_container_config",
@@ -927,7 +1101,9 @@
             "delete (optional)",
             "digest (optional)",
             "unprivileged (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_container_pending",
@@ -935,7 +1111,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "start_container",
@@ -945,7 +1123,9 @@
             "vmid",
             "skiplock (optional)",
             "debug (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "stop_container",
@@ -955,7 +1135,9 @@
             "vmid",
             "skiplock (optional)",
             "overrule-shutdown (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "shutdown_container",
@@ -966,7 +1148,9 @@
             "timeout (optional)",
             "forceStop (optional)",
             "skiplock (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "reboot_container",
@@ -975,7 +1159,9 @@
             "node",
             "vmid",
             "timeout (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "suspend_container",
@@ -983,7 +1169,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "resume_container",
@@ -991,7 +1179,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "create_container",
@@ -1016,7 +1206,9 @@
             "storage (optional)",
             "start (optional)",
             "description (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "clone_container",
@@ -1032,7 +1224,9 @@
             "pool (optional)",
             "target (optional)",
             "snapname (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_container",
@@ -1043,7 +1237,9 @@
             "purge (optional)",
             "destroy-unreferenced-disks (optional)",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "resize_container_disk",
@@ -1054,7 +1250,9 @@
             "disk",
             "size",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "move_container_disk",
@@ -1069,7 +1267,9 @@
             "bwlimit (optional)",
             "target-vmid (optional)",
             "target-disk (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "migrate_container",
@@ -1083,7 +1283,9 @@
             "timeout (optional)",
             "bwlimit (optional)",
             "targetstorage (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_container_snapshots",
@@ -1091,7 +1293,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_container_snapshot",
@@ -1101,7 +1305,9 @@
             "vmid",
             "snapname",
             "description (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "rollback_container_snapshot",
@@ -1111,7 +1317,9 @@
             "vmid",
             "snapname",
             "start (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "delete_container_snapshot",
@@ -1121,7 +1329,9 @@
             "vmid",
             "snapname",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_container_firewall_rules",
@@ -1129,7 +1339,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_container_firewall_rule",
@@ -1147,7 +1359,9 @@
             "comment (optional)",
             "enable (optional)",
             "pos (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_container_firewall_rule",
@@ -1157,7 +1371,9 @@
             "vmid",
             "pos",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_container_firewall_options",
@@ -1165,7 +1381,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_container_firewall_options",
@@ -1181,7 +1399,9 @@
             "ipfilter (optional)",
             "log_level_in (optional)",
             "log_level_out (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_container_rrddata",
@@ -1191,7 +1411,9 @@
             "vmid",
             "timeframe",
             "cf (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "convert_container_to_template",
@@ -1199,7 +1421,9 @@
           "inputs": [
             "node",
             "vmid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         }
       ]
     },
@@ -1214,14 +1438,18 @@
             "node (optional)",
             "type (optional)",
             "enabled (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_storage_config",
           "description": "Get configuration for a specific storage.",
           "inputs": [
             "storage"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_storage",
@@ -1243,7 +1471,9 @@
             "shared (optional)",
             "disable (optional)",
             "maxfiles (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_storage",
@@ -1257,14 +1487,18 @@
             "maxfiles (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_storage",
           "description": "Delete a storage configuration.",
           "inputs": [
             "storage"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_node_storage_status",
@@ -1272,7 +1506,9 @@
           "inputs": [
             "node",
             "storage"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_storage_content",
@@ -1282,7 +1518,9 @@
             "storage",
             "content (optional)",
             "vmid (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_storage_volume_info",
@@ -1291,7 +1529,9 @@
             "node",
             "storage",
             "volume"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "delete_storage_volume",
@@ -1301,7 +1541,9 @@
             "storage",
             "volume",
             "delay (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "copy_storage_volume",
@@ -1312,7 +1554,9 @@
             "volume",
             "target",
             "target_node (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "download_url_to_storage",
@@ -1326,7 +1570,9 @@
             "checksum (optional)",
             "checksum_algorithm (optional)",
             "verify_certificates (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "backup_vm",
@@ -1348,7 +1594,9 @@
             "pigz (optional)",
             "remove (optional)",
             "all (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "restore_vm_backup",
@@ -1365,7 +1613,9 @@
             "bwlimit (optional)",
             "pool (optional)",
             "live-restore (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "restore_container_backup",
@@ -1382,7 +1632,9 @@
             "bwlimit (optional)",
             "pool (optional)",
             "unprivileged (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         }
       ]
     },
@@ -1393,31 +1645,41 @@
         {
           "name": "get_cluster_status",
           "description": "Get overall cluster status (nodes, quorum).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_resources",
           "description": "Get all cluster resources (nodes, VMs, containers, storage, pools) with usage stats.",
           "inputs": [
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_version",
           "description": "Get Proxmox VE API version.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_nextid",
           "description": "Get the next available VM/CT ID in the cluster.",
           "inputs": [
             "vmid (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_options",
           "description": "Get cluster-wide configuration options.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_cluster_options",
@@ -1434,19 +1696,25 @@
             "registered-tags (optional)",
             "tag-style (optional)",
             "delete (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_cluster_log",
           "description": "Get cluster-wide log entries.",
           "inputs": [
             "max (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_cluster_tasks",
           "description": "List recent cluster-wide tasks.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_node_tasks",
@@ -1462,7 +1730,9 @@
             "vmid (optional)",
             "since (optional)",
             "until (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_task_status",
@@ -1470,7 +1740,9 @@
           "inputs": [
             "node",
             "upid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_task_log",
@@ -1481,7 +1753,9 @@
             "limit (optional)",
             "start (optional)",
             "download (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "stop_task",
@@ -1489,21 +1763,27 @@
           "inputs": [
             "node",
             "upid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_ha_resources",
           "description": "List all HA-managed resources.",
           "inputs": [
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ha_resource",
           "description": "Get HA configuration for a specific resource.",
           "inputs": [
             "sid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_ha_resource",
@@ -1515,7 +1795,9 @@
             "max_restart (optional)",
             "max_relocate (optional)",
             "comment (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_ha_resource",
@@ -1529,38 +1811,50 @@
             "comment (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_ha_resource",
           "description": "Remove a resource from HA management.",
           "inputs": [
             "sid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_ha_groups",
           "description": "List all HA groups.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ha_status",
           "description": "Get HA manager status.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_replication_jobs",
           "description": "List all replication jobs.",
           "inputs": [
             "guest (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_replication_job",
           "description": "Get configuration of a replication job.",
           "inputs": [
             "id"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_replication_job",
@@ -1573,7 +1867,9 @@
             "rate (optional)",
             "comment (optional)",
             "disable (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_replication_job",
@@ -1586,7 +1882,9 @@
             "disable (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_replication_job",
@@ -1595,19 +1893,25 @@
             "id",
             "force (optional)",
             "keep (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_backup_jobs",
           "description": "List all scheduled backup jobs.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_backup_job",
           "description": "Get a scheduled backup job configuration.",
           "inputs": [
             "id"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_backup_job",
@@ -1630,7 +1934,9 @@
             "protected (optional)",
             "pool (optional)",
             "comment (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_backup_job",
@@ -1644,14 +1950,18 @@
             "prune-backups (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_backup_job",
           "description": "Delete a scheduled backup job.",
           "inputs": [
             "id"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "bulk_start_guests",
@@ -1659,7 +1969,9 @@
           "inputs": [
             "vms (optional)",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "bulk_shutdown_guests",
@@ -1667,7 +1979,9 @@
           "inputs": [
             "vms (optional)",
             "force_stop (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "bulk_migrate_guests",
@@ -1677,12 +1991,16 @@
             "vms (optional)",
             "maxworkers (optional)",
             "with_local_disks (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_metrics_servers",
           "description": "List configured external metrics servers (InfluxDB, Graphite).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_metrics_server",
@@ -1703,19 +2021,25 @@
             "api-path-prefix (optional)",
             "max-body-size (optional)",
             "verify-certificate (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_metrics_server",
           "description": "Remove an external metrics server.",
           "inputs": [
             "id"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_realm_sync_jobs",
           "description": "List realm sync jobs.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "analyze_schedule",
@@ -1724,7 +2048,9 @@
             "schedule",
             "iterations (optional)",
             "starttime (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         }
       ]
     },
@@ -1738,14 +2064,18 @@
           "inputs": [
             "enabled (optional)",
             "full (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_user",
           "description": "Get a specific user's configuration.",
           "inputs": [
             "userid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_user",
@@ -1761,7 +2091,9 @@
             "enable (optional)",
             "expire (optional)",
             "keys (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_user",
@@ -1778,14 +2110,18 @@
             "keys (optional)",
             "append (optional)",
             "delete (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_user",
           "description": "Delete a Proxmox user.",
           "inputs": [
             "userid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "change_user_password",
@@ -1794,14 +2130,18 @@
             "userid",
             "password",
             "confirmation-password (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_user_tokens",
           "description": "List API tokens for a user.",
           "inputs": [
             "userid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_user_token",
@@ -1809,7 +2149,9 @@
           "inputs": [
             "userid",
             "tokenid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_user_token",
@@ -1820,7 +2162,9 @@
             "comment (optional)",
             "expire (optional)",
             "privsep (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_user_token",
@@ -1832,7 +2176,9 @@
             "expire (optional)",
             "privsep (optional)",
             "delete (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_user_token",
@@ -1840,19 +2186,25 @@
           "inputs": [
             "userid",
             "tokenid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_groups",
           "description": "List all groups.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_group",
           "description": "Get a group's configuration and members.",
           "inputs": [
             "groupid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_group",
@@ -1860,7 +2212,9 @@
           "inputs": [
             "groupid",
             "comment (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_group",
@@ -1868,26 +2222,34 @@
           "inputs": [
             "groupid",
             "comment (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_group",
           "description": "Delete a group.",
           "inputs": [
             "groupid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_roles",
           "description": "List all roles and their privileges.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_role",
           "description": "Get a role's privileges.",
           "inputs": [
             "roleid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_role",
@@ -1895,7 +2257,9 @@
           "inputs": [
             "roleid",
             "privs (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_role",
@@ -1904,19 +2268,25 @@
             "roleid",
             "privs (optional)",
             "append (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_role",
           "description": "Delete a custom role.",
           "inputs": [
             "roleid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_acl",
           "description": "Get the access control list (permissions tree).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "update_acl",
@@ -1929,19 +2299,25 @@
             "tokens (optional)",
             "propagate (optional)",
             "delete (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_auth_domains",
           "description": "List all authentication domains/realms.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_auth_domain",
           "description": "Get configuration for an authentication domain.",
           "inputs": [
             "realm"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_auth_domain",
@@ -1965,7 +2341,9 @@
             "client-id (optional)",
             "client-key (optional)",
             "username-claim (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_auth_domain",
@@ -1976,14 +2354,18 @@
             "default (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_auth_domain",
           "description": "Delete an authentication domain.",
           "inputs": [
             "realm"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "sync_auth_domain",
@@ -1996,21 +2378,27 @@
             "purge (optional)",
             "scope (optional)",
             "remove-vanished (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_tfa",
           "description": "List TFA configurations for all users.",
           "inputs": [
             "userid (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_user_tfa",
           "description": "Get TFA configuration for a specific user.",
           "inputs": [
             "userid"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_tfa",
@@ -2023,7 +2411,9 @@
             "value (optional)",
             "challenge (optional)",
             "password (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_tfa",
@@ -2032,7 +2422,9 @@
             "userid",
             "id",
             "password (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         }
       ]
     },
@@ -2043,7 +2435,9 @@
         {
           "name": "list_cluster_firewall_rules",
           "description": "List all cluster-level firewall rules.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_cluster_firewall_rule",
@@ -2060,7 +2454,9 @@
             "comment (optional)",
             "enable (optional)",
             "pos (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_cluster_firewall_rule",
@@ -2078,7 +2474,9 @@
             "digest (optional)",
             "moveto (optional)",
             "delete (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_cluster_firewall_rule",
@@ -2086,12 +2484,16 @@
           "inputs": [
             "pos",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_cluster_firewall_options",
           "description": "Get cluster firewall options.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_cluster_firewall_options",
@@ -2104,12 +2506,16 @@
             "ebtables (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_firewall_groups",
           "description": "List all firewall security groups.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_firewall_group",
@@ -2119,21 +2525,27 @@
             "comment (optional)",
             "rename (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_firewall_group",
           "description": "Delete a firewall security group.",
           "inputs": [
             "group"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_firewall_group_rules",
           "description": "List rules inside a firewall security group.",
           "inputs": [
             "group"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_firewall_group_rule",
@@ -2149,7 +2561,9 @@
             "comment (optional)",
             "enable (optional)",
             "pos (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_firewall_group_rule",
@@ -2158,12 +2572,16 @@
             "group",
             "pos",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_firewall_aliases",
           "description": "List all firewall aliases (named IPs/CIDRs).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_firewall_alias",
@@ -2172,7 +2590,9 @@
             "name",
             "cidr",
             "comment (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_firewall_alias",
@@ -2183,7 +2603,9 @@
             "comment (optional)",
             "rename (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_firewall_alias",
@@ -2191,12 +2613,16 @@
           "inputs": [
             "name",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_firewall_ipsets",
           "description": "List all firewall IPsets.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_firewall_ipset",
@@ -2206,7 +2632,9 @@
             "comment (optional)",
             "rename (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_firewall_ipset",
@@ -2214,14 +2642,18 @@
           "inputs": [
             "name",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_firewall_ipset_entries",
           "description": "List IPs in a firewall IPset.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_firewall_ipset_entry",
@@ -2231,7 +2663,9 @@
             "cidr",
             "comment (optional)",
             "nomatch (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_firewall_ipset_entry",
@@ -2240,14 +2674,18 @@
             "name",
             "cidr",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_node_firewall_rules",
           "description": "List firewall rules for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "add_node_firewall_rule",
@@ -2263,7 +2701,9 @@
             "comment (optional)",
             "enable (optional)",
             "pos (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_node_firewall_rule",
@@ -2272,14 +2712,18 @@
             "node",
             "pos",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_node_firewall_options",
           "description": "Get firewall options for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_node_firewall_options",
@@ -2297,7 +2741,9 @@
             "nf_conntrack_tcp_timeout_established (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_node_firewall_log",
@@ -2308,7 +2754,9 @@
             "start (optional)",
             "since (optional)",
             "until (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_firewall_log",
@@ -2318,19 +2766,25 @@
             "start (optional)",
             "since (optional)",
             "until (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_firewall_macros",
           "description": "List available firewall macros (e.g. SSH, HTTP, Ping).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_firewall_refs",
           "description": "List firewall rule references (aliases and IPsets).",
           "inputs": [
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         }
       ]
     },
@@ -2346,7 +2800,9 @@
             "include-partitions (optional)",
             "skipsmart (optional)",
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_disk_smart",
@@ -2355,7 +2811,9 @@
             "node",
             "disk",
             "healthonly (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "wipe_disk",
@@ -2363,7 +2821,9 @@
           "inputs": [
             "node",
             "disk"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "init_disk_gpt",
@@ -2372,14 +2832,18 @@
             "node",
             "disk",
             "uuid (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_lvm_groups",
           "description": "List LVM volume groups on a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_lvm_group",
@@ -2389,7 +2853,9 @@
             "name",
             "device",
             "add_storage (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_lvm_group",
@@ -2399,7 +2865,9 @@
             "name",
             "cleanup-config (optional)",
             "cleanup-disks (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_lvmthin_pools",
@@ -2407,7 +2875,9 @@
           "inputs": [
             "node",
             "vg (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_lvmthin_pool",
@@ -2417,7 +2887,9 @@
             "name",
             "device",
             "add_storage (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_lvmthin_pool",
@@ -2428,14 +2900,18 @@
             "volume-group",
             "cleanup-config (optional)",
             "cleanup-disks (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_zfs_pools",
           "description": "List ZFS pools on a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_zfs_pool",
@@ -2443,7 +2919,9 @@
           "inputs": [
             "node",
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_zfs_pool",
@@ -2456,7 +2934,9 @@
             "ashift (optional)",
             "compression (optional)",
             "add_storage (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_zfs_pool",
@@ -2467,14 +2947,18 @@
             "cleanup-config (optional)",
             "cleanup-disks (optional)",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_directory_storage",
           "description": "List directory-based storages on a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_directory_storage",
@@ -2486,7 +2970,9 @@
             "device (optional)",
             "filesystem (optional)",
             "add_storage (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_directory_storage",
@@ -2496,7 +2982,9 @@
             "name",
             "cleanup-config (optional)",
             "cleanup-disks (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         }
       ]
     },
@@ -2509,19 +2997,25 @@
           "description": "Get Ceph cluster status from a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_ceph_status",
           "description": "Get Ceph cluster status from cluster level.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ceph_crush",
           "description": "Get the CRUSH map for the Ceph cluster.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ceph_log",
@@ -2529,28 +3023,36 @@
           "inputs": [
             "node",
             "limit (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ceph_config",
           "description": "Get raw Ceph configuration.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ceph_config_db",
           "description": "Get Ceph config-key database.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_ceph_osds",
           "description": "List all Ceph OSDs.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_ceph_osd",
@@ -2562,7 +3064,9 @@
             "wal_dev (optional)",
             "encrypted (optional)",
             "crush-device-class (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_ceph_osd",
@@ -2572,7 +3076,9 @@
             "osdid",
             "cleanup (optional)",
             "destroy (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "set_ceph_osd_in",
@@ -2580,7 +3086,9 @@
           "inputs": [
             "node",
             "osdid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "set_ceph_osd_out",
@@ -2588,14 +3096,18 @@
           "inputs": [
             "node",
             "osdid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_ceph_mons",
           "description": "List Ceph monitor daemons.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_ceph_mon",
@@ -2604,7 +3116,9 @@
             "node",
             "monid (optional)",
             "mon-address (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_ceph_mon",
@@ -2612,14 +3126,18 @@
           "inputs": [
             "node",
             "monid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_ceph_mgrs",
           "description": "List Ceph manager daemons.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_ceph_mgr",
@@ -2627,7 +3145,9 @@
           "inputs": [
             "node",
             "id (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_ceph_mgr",
@@ -2635,14 +3155,18 @@
           "inputs": [
             "node",
             "id"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_ceph_mds",
           "description": "List Ceph MDS (metadata server) daemons.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_ceph_mds",
@@ -2651,7 +3175,9 @@
             "node",
             "name (optional)",
             "hotstandby (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_ceph_mds",
@@ -2659,14 +3185,18 @@
           "inputs": [
             "node",
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_ceph_pools",
           "description": "List Ceph storage pools.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_ceph_pool",
@@ -2674,7 +3204,9 @@
           "inputs": [
             "node",
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_ceph_pool",
@@ -2689,7 +3221,9 @@
             "crush_rule (optional)",
             "application (optional)",
             "add_storages (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_ceph_pool",
@@ -2703,7 +3237,9 @@
             "pg_autoscale_mode (optional)",
             "crush_rule (optional)",
             "application (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_ceph_pool",
@@ -2714,14 +3250,18 @@
             "force (optional)",
             "remove_storages (optional)",
             "remove_ecprofile (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_ceph_fs",
           "description": "List CephFS filesystems.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_ceph_fs",
@@ -2731,7 +3271,9 @@
             "name (optional)",
             "add-storage (optional)",
             "pg_num (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "start_ceph",
@@ -2739,7 +3281,9 @@
           "inputs": [
             "node",
             "service (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "stop_ceph",
@@ -2747,7 +3291,9 @@
           "inputs": [
             "node",
             "service (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "restart_ceph",
@@ -2755,19 +3301,25 @@
           "inputs": [
             "node",
             "service (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "get_cluster_ceph_metadata",
           "description": "Get Ceph daemon metadata (versions, host info).",
           "inputs": [
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_cluster_ceph_flags",
           "description": "Get Ceph cluster flags (e.g. noout, norebalance, noscrub).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "set_cluster_ceph_flags",
@@ -2783,7 +3335,9 @@
             "pause (optional)",
             "noup (optional)",
             "nodown (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         }
       ]
     },
@@ -2794,14 +3348,18 @@
         {
           "name": "list_acme_accounts",
           "description": "List registered ACME accounts.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_acme_account",
           "description": "Get details of an ACME account.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "register_acme_account",
@@ -2811,28 +3369,36 @@
             "contact",
             "directory (optional)",
             "tos_url (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "deregister_acme_account",
           "description": "Deregister an ACME account.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_acme_plugins",
           "description": "List ACME challenge plugins.",
           "inputs": [
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_acme_plugin",
           "description": "Get an ACME plugin configuration.",
           "inputs": [
             "id"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_acme_plugin",
@@ -2844,7 +3410,9 @@
             "data (optional)",
             "disable (optional)",
             "validation-delay (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_acme_plugin",
@@ -2855,21 +3423,27 @@
             "disable (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_acme_plugin",
           "description": "Delete an ACME plugin.",
           "inputs": [
             "id"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "get_node_certificates",
           "description": "Get certificate info for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "order_node_acme_cert",
@@ -2877,14 +3451,18 @@
           "inputs": [
             "node",
             "force (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "revoke_node_acme_cert",
           "description": "Revoke the ACME certificate for a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "upload_node_custom_cert",
@@ -2895,7 +3473,9 @@
             "key (optional)",
             "force (optional)",
             "restart (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_node_custom_cert",
@@ -2903,24 +3483,32 @@
           "inputs": [
             "node",
             "restart (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_acme_directories",
           "description": "List available ACME directory URLs (Let's Encrypt, staging, etc.).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_acme_tos",
           "description": "Get the Terms of Service URL for an ACME directory.",
           "inputs": [
             "directory (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_acme_challenge_schemas",
           "description": "List available ACME DNS challenge schemas (supported DNS providers).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         }
       ]
     },
@@ -2931,7 +3519,9 @@
         {
           "name": "apply_sdn",
           "description": "Apply pending SDN configuration changes cluster-wide.",
-          "inputs": []
+          "inputs": [],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "list_sdn_zones",
@@ -2940,7 +3530,9 @@
             "pending (optional)",
             "running (optional)",
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_sdn_zone",
@@ -2949,7 +3541,9 @@
             "zone",
             "pending (optional)",
             "running (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_sdn_zone",
@@ -2970,7 +3564,9 @@
             "dns (optional)",
             "reversedns (optional)",
             "dnszone (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_sdn_zone",
@@ -2982,14 +3578,18 @@
             "ipam (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_sdn_zone",
           "description": "Delete an SDN zone.",
           "inputs": [
             "zone"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_sdn_vnets",
@@ -2997,7 +3597,9 @@
           "inputs": [
             "pending (optional)",
             "running (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_sdn_vnet",
@@ -3006,7 +3608,9 @@
             "vnet",
             "pending (optional)",
             "running (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_sdn_vnet",
@@ -3017,7 +3621,9 @@
             "tag (optional)",
             "alias (optional)",
             "vlanaware (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_sdn_vnet",
@@ -3029,14 +3635,18 @@
             "vlanaware (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_sdn_vnet",
           "description": "Delete an SDN VNet.",
           "inputs": [
             "vnet"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_sdn_subnets",
@@ -3045,7 +3655,9 @@
             "vnet",
             "pending (optional)",
             "running (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_sdn_subnet",
@@ -3059,7 +3671,9 @@
             "dhcp-range (optional)",
             "dhcp-dns-server (optional)",
             "dnszoneprefix (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_sdn_subnet",
@@ -3067,21 +3681,27 @@
           "inputs": [
             "vnet",
             "subnet"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_node_sdn_zones",
           "description": "List SDN zones visible from a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_node_sdn_vnets",
           "description": "List SDN VNets visible from a node.",
           "inputs": [
             "node"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         }
       ]
     },
@@ -3092,19 +3712,25 @@
         {
           "name": "list_notification_targets",
           "description": "List all notification targets (combined view of all endpoint types).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "list_gotify_endpoints",
           "description": "List Gotify notification endpoints.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_gotify_endpoint",
           "description": "Get a Gotify endpoint configuration.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_gotify_endpoint",
@@ -3115,7 +3741,9 @@
             "token",
             "comment (optional)",
             "disable (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_gotify_endpoint",
@@ -3128,26 +3756,34 @@
             "disable (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_gotify_endpoint",
           "description": "Delete a Gotify endpoint.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_sendmail_endpoints",
           "description": "List sendmail notification endpoints.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_sendmail_endpoint",
           "description": "Get a sendmail endpoint configuration.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_sendmail_endpoint",
@@ -3160,7 +3796,9 @@
             "author (optional)",
             "comment (optional)",
             "disable (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_sendmail_endpoint",
@@ -3175,19 +3813,25 @@
             "disable (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_sendmail_endpoint",
           "description": "Delete a sendmail endpoint.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_smtp_endpoints",
           "description": "List SMTP notification endpoints.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_smtp_endpoint",
@@ -3205,19 +3849,25 @@
             "password (optional)",
             "comment (optional)",
             "disable (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_smtp_endpoint",
           "description": "Delete an SMTP endpoint.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_webhook_endpoints",
           "description": "List webhook notification endpoints.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_webhook_endpoint",
@@ -3231,26 +3881,34 @@
             "body (optional)",
             "comment (optional)",
             "disable (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_webhook_endpoint",
           "description": "Delete a webhook endpoint.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_notification_matchers",
           "description": "List notification matchers (routing rules).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_notification_matcher",
           "description": "Get a notification matcher configuration.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_notification_matcher",
@@ -3265,7 +3923,9 @@
             "comment (optional)",
             "disable (optional)",
             "mode (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_notification_matcher",
@@ -3278,19 +3938,25 @@
             "disable (optional)",
             "delete (optional)",
             "digest (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_notification_matcher",
           "description": "Delete a notification matcher.",
           "inputs": [
             "name"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         },
         {
           "name": "list_notification_matcher_fields",
           "description": "List available notification matcher field names (e.g. type, hostname, job-id).",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         }
       ]
     },
@@ -3301,7 +3967,9 @@
         {
           "name": "list_pools",
           "description": "List all resource pools.",
-          "inputs": []
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "get_pool",
@@ -3309,7 +3977,9 @@
           "inputs": [
             "poolid",
             "type (optional)"
-          ]
+          ],
+          "read_only": true,
+          "destructive": false
         },
         {
           "name": "create_pool",
@@ -3317,7 +3987,9 @@
           "inputs": [
             "poolid",
             "comment (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "update_pool",
@@ -3329,14 +4001,18 @@
             "storage (optional)",
             "delete (optional)",
             "allow-move (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "delete_pool",
           "description": "Delete a resource pool.",
           "inputs": [
             "poolid"
-          ]
+          ],
+          "read_only": false,
+          "destructive": true
         }
       ]
     },
@@ -3367,7 +4043,9 @@
             "onboot (optional)",
             "tags (optional)",
             "description (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "deploy_cloud_vms",
@@ -3393,7 +4071,9 @@
             "onboot (optional)",
             "tags (optional)",
             "description (optional)"
-          ]
+          ],
+          "read_only": false,
+          "destructive": false
         }
       ]
     }
