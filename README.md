@@ -72,6 +72,10 @@ There are more worked examples in [USAGE.md](USAGE.md).
 
 ### 🧭 Built-in prompts and resources
 
+<p align="center">
+  <img src="docs/prompts.svg" width="100%" alt="Typing /mcp__proxmox__ in the client lists five prompts. Choosing cluster_health_check runs five read-only tools and the assistant reports one critical item, one warning and what is OK. Resources such as proxmox://cluster/resources attach live state without a tool call.">
+</p>
+
 The server ships **MCP prompts**, ready-made workflows your client lists by name. In Claude Code, type `/` to see them, for example `/mcp__proxmox__cluster_health_check`.
 
 | Prompt | What it does |
@@ -370,6 +374,10 @@ claude mcp add --transport http proxmox http://pve-mcp.lan:8811/mcp \
 
 #### 🎭 One token per client, each with a role
 
+<p align="center">
+  <img src="docs/http-roles.svg" width="100%" alt="Four clients call the HTTP server: ops with the admin role sees 341 tools, ci with the operator role sees 268, grafana with the read role sees 150, and a client with no token gets 401. The audit log records ci's clone as ok and grafana's stop_vm as refused.">
+</p>
+
 Give every client its own token, so you can tell them apart in the [audit log](#audit) and revoke one without the others. Each token carries a role:
 
 | Role | Can use |
@@ -390,6 +398,10 @@ Each client sees only the tools its role allows, and a call outside its role is 
 
 ### ⏳ Waiting for long tasks
 
+<p align="center">
+  <img src="docs/wait.svg" width="100%" alt="clone_vm with wait: true returns the finished task's outcome in one call. A backup outlasts the timeout and returns status running; wait_for_task then follows it to OK.">
+</p>
+
 Clone, migrate, backup, restore, disk moves, snapshots and power actions start a Proxmox task and return its ID, a UPID. Pass `wait: true` to any of these 30 tools and the result also carries the task's outcome:
 
 ```json
@@ -401,6 +413,10 @@ Clone, migrate, backup, restore, disk moves, snapshots and power actions start a
 <a id="read-only"></a>
 
 ## 🔒 Safety: read-only mode, destructive tools and protected guests
+
+<p align="center">
+  <img src="docs/safety.svg" width="100%" alt="Bars show 341 tools by default, 268 with PROXMOX_NO_DESTRUCTIVE and 150 with PROXMOX_READ_ONLY. Guests 100 and 101 are protected: stop_vm on 120 succeeds, delete_vm on 100 and node_stopall without a list are refused, and each call lands in the audit log.">
+</p>
 
 **`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **The client sees only the 150 read-only tools**, so it never plans around a tool that would be refused. Three read-style tools send POST requests, so they're hidden too:
 - `vm_agent_ping`;
@@ -597,7 +613,7 @@ proxmox_mcp/
                      nodes, qemu, lxc, storage, cluster, access, firewall,
                      disks, ceph, acme, sdn, notifications, pools, appliances
 tests/               pytest suite, run in CI on Python 3.10–3.13
-docs/                the animations on this page
+docs/                the animations on this page; docs/gen/build.py regenerates four of them
 agent-card.json      A2A agent card
 Dockerfile, docker-compose.yaml, setup.sh, test-connection.sh
 QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
