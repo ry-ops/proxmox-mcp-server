@@ -30,9 +30,11 @@ from typing import Any
 
 import mcp.server.stdio
 from mcp.server import Server
-from mcp.types import TextContent, Tool
+from mcp.server.lowlevel.helper_types import ReadResourceContents
+from mcp.types import GetPromptResult, Prompt, Resource, ResourceTemplate, TextContent, Tool
+from pydantic import AnyUrl
 
-from . import audit, auth, guards, registry, tasks
+from . import audit, auth, guards, prompts, registry, resources, tasks
 from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config
 
 # --- Build the tool registry ---
@@ -93,6 +95,48 @@ async def list_tools() -> list[Tool]:
     if role == "admin":
         return ALL_TOOLS
     return [t for t in ALL_TOOLS if auth.allows(role, t.name)]
+
+
+@app.list_prompts()
+async def list_prompts() -> list[Prompt]:
+    return prompts.list_prompts()
+
+
+@app.get_prompt()
+async def get_prompt(name: str, arguments: dict[str, str] | None) -> GetPromptResult:
+    return prompts.get_prompt(name, arguments)
+
+
+@app.list_resources()
+async def list_resources() -> list[Resource]:
+    return resources.list_resources()
+
+
+@app.list_resource_templates()
+async def list_resource_templates() -> list[ResourceTemplate]:
+    return resources.list_templates()
+
+
+@app.read_resource()
+async def read_resource(uri: AnyUrl) -> list[ReadResourceContents]:
+    who = current_principal()
+    started = time.monotonic()
+    entry: dict[str, Any] = {
+        "who": who.name,
+        "via": "stdio" if who is auth.STDIO else "http",
+        "resource": str(uri),
+    }
+    try:
+        text = await resources.read(proxmox, str(uri))
+        entry["outcome"] = "ok"
+    except Exception as e:
+        entry.update(outcome="error", error=str(e))
+        raise
+    finally:
+        if audit.enabled() and audit.AUDIT_READS:
+            entry["ms"] = round((time.monotonic() - started) * 1000)
+            audit.record(entry)
+    return [ReadResourceContents(content=text, mime_type=resources.MIME)]
 
 
 @app.call_tool()

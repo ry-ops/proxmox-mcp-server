@@ -11,8 +11,8 @@
     "streaming": false,
     "tasks": true,
     "tools": true,
-    "prompts": false,
-    "resources": false
+    "prompts": true,
+    "resources": true
   },
   "authentication": {
     "required": true,

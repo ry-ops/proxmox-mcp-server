@@ -17,6 +17,7 @@
   <a href="#talk">Talk to it</a> ·
   <a href="#how">How it works</a> ·
   <a href="#tools">341 tools</a> ·
+  <a href="#prompts">Prompts</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#toolsets">Toolsets</a> ·
   <a href="#http">HTTP</a> ·
@@ -31,6 +32,7 @@
 ## ✨ Highlights
 
 - 🧰 **The whole API, not a demo.** 341 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
+- 🧭 **Workflows built in.** Five MCP prompts, such as a cluster health check and a snapshot-change-verify routine, plus live cluster state as MCP resources.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
 - 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 150 read-only tools.
 - 🧯 **Safe writes, protected guests.** `PROXMOX_NO_DESTRUCTIVE=true` hides the 73 tools that delete, stop, wipe or roll back. `PROXMOX_PROTECTED_VMIDS` names guests no tool may change.
@@ -65,6 +67,36 @@ Once it's connected, just ask:
 > *"Make three Ubuntu VMs on pve1 at 192.168.1.181–183 with my SSH key, ready for a K3s cluster."*
 
 There are more worked examples in [USAGE.md](USAGE.md).
+
+<a id="prompts"></a>
+
+### 🧭 Built-in prompts and resources
+
+The server ships **MCP prompts**, ready-made workflows your client lists by name. In Claude Code, type `/` to see them, for example `/mcp__proxmox__cluster_health_check`.
+
+| Prompt | What it does |
+|---|---|
+| `cluster_health_check` | Read-only check of quorum, nodes, guests, failed tasks, HA and Ceph, reported by severity |
+| `capacity_report` | Read-only storage, CPU and memory report with the biggest consumers; takes `threshold_percent` |
+| `safe_change` | Snapshot a guest, make your change after your go-ahead, verify it, and offer a rollback; takes `vmid` and `change` |
+| `investigate_failed_tasks` | Read-only: failed tasks, their logs, grouped by cause with fixes; takes `hours` |
+| `decommission_guest` | Back up, stop and delete a guest, asking before every change; takes `vmid` |
+
+Prompts only guide the model. Every step is still an ordinary tool call, so roles, read-only mode and protected guests apply as usual.
+
+**MCP resources** let a client attach live cluster state as context without spending tool calls:
+
+| Resource | Contents |
+|---|---|
+| `proxmox://cluster/status` | Quorum and node membership |
+| `proxmox://cluster/resources` | Every node, VM, container and storage with live usage |
+| `proxmox://cluster/tasks` | Recent tasks, with status |
+| `proxmox://nodes` | Nodes with CPU, memory and uptime |
+| `proxmox://storage` | Storage definitions |
+| `proxmox://nodes/{node}/status` | One node in detail |
+| `proxmox://vms/{node}/{vmid}/config`, `proxmox://cts/{node}/{vmid}/config` | One guest's configuration |
+
+Each resource is a single read, so resources work in read-only mode and for every role.
 
 <a id="how"></a>
 
@@ -558,6 +590,8 @@ proxmox_mcp/
 ├── audit.py         JSON-lines audit log
 ├── guards.py        protected guests
 ├── tasks.py         waiting for Proxmox tasks
+├── prompts.py       MCP prompts: built-in workflows
+├── resources.py     MCP resources: read-only cluster views
 ├── client.py        Proxmox API client: token/password auth, ticket renewal, read-only guard
 └── tools/           one module per API area:
                      nodes, qemu, lxc, storage, cluster, access, firewall,
