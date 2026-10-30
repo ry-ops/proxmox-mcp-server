@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-10-30
+
 ### Changed
 - Moved to MCP SDK 2 (`mcp>=2.3,<3`). The server now also speaks the stateless 2026-07-28
   protocol, and still serves clients on the handshake protocol (2024-11-05 to 2025-11-25).
@@ -217,6 +219,7 @@ released on its own.
 
 Initial release.
 
+[2.9.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.5.0...v2.6.0
