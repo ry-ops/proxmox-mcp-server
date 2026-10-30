@@ -285,7 +285,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{base}/endpoints/gotify/{args['name']}")
 
     elif name == "create_gotify_endpoint":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post(f"{base}/endpoints/gotify", data)
 
     elif name == "update_gotify_endpoint":
@@ -303,7 +303,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{base}/endpoints/sendmail/{args['name']}")
 
     elif name == "create_sendmail_endpoint":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post(f"{base}/endpoints/sendmail", data)
 
     elif name == "update_sendmail_endpoint":
@@ -318,7 +318,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{base}/endpoints/smtp")
 
     elif name == "create_smtp_endpoint":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post(f"{base}/endpoints/smtp", data)
 
     elif name == "delete_smtp_endpoint":
@@ -328,7 +328,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{base}/endpoints/webhook")
 
     elif name == "create_webhook_endpoint":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post(f"{base}/endpoints/webhook", data)
 
     elif name == "delete_webhook_endpoint":
@@ -341,7 +341,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{base}/matchers/{args['name']}")
 
     elif name == "create_notification_matcher":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post(f"{base}/matchers", data)
 
     elif name == "update_notification_matcher":

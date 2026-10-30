@@ -243,7 +243,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/cluster/sdn/zones/{args['zone']}", params or None)
 
     elif name == "create_sdn_zone":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/sdn/zones", data)
 
     elif name == "update_sdn_zone":
@@ -263,7 +263,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/cluster/sdn/vnets/{args['vnet']}", params or None)
 
     elif name == "create_sdn_vnet":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/cluster/sdn/vnets", data)
 
     elif name == "update_sdn_vnet":

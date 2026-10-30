@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- Per-client tokens with roles for the HTTP entrypoint. `MCP_AUTH_TOKENS`
+  (`name:role:token,…`) or `MCP_AUTH_TOKENS_FILE` (one `name role token` per line) give each
+  client its own token, with role `read`, `operator` (everything but destructive tools) or
+  `admin`. Each client lists only the tools its role allows, and other calls are refused before
+  reaching Proxmox. Roles narrow the server's own settings; they never widen them.
+  `MCP_AUTH_TOKEN` still works as an admin token named `default`.
+- `PROXMOX_AUDIT_LOG`: a JSON-lines log of every write call (file or `stderr`), with time, caller,
+  transport, tool, arguments with secrets redacted, outcome, error, task UPID and result, and
+  duration. Refused calls are logged too. `PROXMOX_AUDIT_READS=true` adds reads.
+
+### Changed
+- CI runs Ruff, and the 29 remaining lint warnings in the tool modules are fixed.
+
 ## [2.7.0] - 2026-10-30
 
 ### Added

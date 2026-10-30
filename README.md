@@ -38,7 +38,8 @@
 - 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 341 to 127, and the context it costs by more than half. Results come back as compact JSON.
 - 🚦 **Labelled for safe approval.** Every tool carries MCP `readOnlyHint` and `destructiveHint` annotations, so clients can auto-approve reads and ask before a delete, stop or rollback.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
-- 🌐 **Local or on the network.** Clients spawn it over stdio, or `proxmox-mcp-server-http` serves it over streamable HTTP with a bearer token.
+- 🌐 **Local or on the network.** Clients spawn it over stdio, or `proxmox-mcp-server-http` serves it over streamable HTTP. Give each client its own token and a role: `read`, `operator` or `admin`.
+- 📜 **Every change on the record.** `PROXMOX_AUDIT_LOG` writes one JSON line per write call: who, what, the outcome and the task, with secrets redacted.
 - 🐳 **Runs anywhere.** Use `uv` from a clone, or the multi-arch image on `ghcr.io`.
 - ♻️ **Long sessions just work.** Password logins renew their Proxmox ticket before it expires.
 - 🤝 **A2A-ready.** `agent-card.json` lists every tool in 14 skill categories, for agent-to-agent discovery.
@@ -263,7 +264,11 @@ Add `-e PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` to keep the tool list small. Fo
 | `PROXMOX_WAIT_TIMEOUT` | | `900` | Seconds a `wait` lasts before it returns with the task still running |
 | `MCP_HTTP_HOST` | | `127.0.0.1` | HTTP entrypoint only: bind address |
 | `MCP_HTTP_PORT` | | `8811` | HTTP entrypoint only: port |
-| `MCP_AUTH_TOKEN` | | | HTTP entrypoint only: bearer token clients must send; required off loopback |
+| `MCP_AUTH_TOKEN` | | | HTTP entrypoint only: one admin bearer token; a token is required off loopback |
+| `MCP_AUTH_TOKENS` | | | HTTP entrypoint only: several tokens with roles, `name:role:token,…`; see [Roles](#roles) |
+| `MCP_AUTH_TOKENS_FILE` | | | HTTP entrypoint only: the same, one `name role token` per line |
+| `PROXMOX_AUDIT_LOG` | | | File, or `stderr`, for a JSON-lines log of every write call; see [Audit log](#audit) |
+| `PROXMOX_AUDIT_READS` | | `false` | Log read calls too |
 | `MCP_HTTP_ALLOW_NO_AUTH` | | `false` | HTTP entrypoint only: allow a non-loopback address with no token |
 
 <a id="toolsets"></a>
@@ -327,7 +332,27 @@ claude mcp add --transport http proxmox http://pve-mcp.lan:8811/mcp \
   --header "Authorization: Bearer $MCP_AUTH_TOKEN"
 ```
 
-**Anyone who can reach this endpoint can use every loaded tool with your Proxmox credentials.** So the server binds to `127.0.0.1` by default. It refuses any other address unless `MCP_AUTH_TOKEN` is set, or you opt out with `MCP_HTTP_ALLOW_NO_AUTH=true` because a proxy in front of it authenticates clients. The token check runs in constant time. On loopback, DNS-rebinding protection rejects requests whose Host header isn't a local address. Put TLS in front of it, for example with a reverse proxy, when the token crosses a network.
+**Anyone who can reach this endpoint can use every loaded tool with your Proxmox credentials.** So the server binds to `127.0.0.1` by default. It refuses any other address unless a token is set, or you opt out with `MCP_HTTP_ALLOW_NO_AUTH=true` because a proxy in front of it authenticates clients. The token check runs in constant time. On loopback, DNS-rebinding protection rejects requests whose Host header isn't a local address. Put TLS in front of it, for example with a reverse proxy, when the token crosses a network.
+
+<a id="roles"></a>
+
+#### 🎭 One token per client, each with a role
+
+Give every client its own token, so you can tell them apart in the [audit log](#audit) and revoke one without the others. Each token carries a role:
+
+| Role | Can use |
+|---|---|
+| `read` | only tools that read, like a dashboard or a monitoring agent |
+| `operator` | everything except destructive tools: start, create, clone, snapshot, migrate |
+| `admin` | everything the server loads |
+
+```bash
+MCP_AUTH_TOKENS="ops:admin:$(openssl rand -hex 32),grafana:read:$(openssl rand -hex 32)"
+# or a file with one "name role token" per line, comments with #:
+MCP_AUTH_TOKENS_FILE=/run/secrets/proxmox-mcp-tokens
+```
+
+Each client sees only the tools its role allows, and a call outside its role is refused before anything reaches Proxmox. Roles only narrow what the server already allows: `PROXMOX_READ_ONLY`, `PROXMOX_NO_DESTRUCTIVE`, toolsets and protected guests still apply to everyone. Tokens must be at least 16 characters, and names and tokens must be unique. `MCP_AUTH_TOKEN` still works, as an admin token named `default`.
 
 <a id="wait"></a>
 
@@ -352,6 +377,17 @@ Clone, migrate, backup, restore, disk moves, snapshots and power actions start a
 **`PROXMOX_NO_DESTRUCTIVE=true`** is the middle ground. It hides the 73 tools labelled destructive: deleting, stopping, wiping, rolling back, restoring over a guest, and running commands inside one. Safe writes such as start, create, clone, snapshot and config changes stay available, so 268 tools remain.
 
 **`PROXMOX_PROTECTED_VMIDS=100,101,9000-9010`** names guests no tool may change, such as your router, DNS or backup server. The server checks every write before sending it: power actions, config changes, snapshots, migration, disk moves, deletion, guest-agent commands, HA changes, and deleting the guest's volumes or backups. Reads always work. Cloning from a protected template, backing it up and opening its console stay allowed, because they leave it as it is. Node-wide and bulk start, stop and migrate actions need an explicit `vms` list while any guest is protected, since they would otherwise include it. Whole-node shutdown and reboot are not covered.
+
+<a id="audit"></a>
+
+**`PROXMOX_AUDIT_LOG=/var/log/proxmox-mcp/audit.jsonl`** records every write call as one JSON line, whether it succeeded, failed or was refused. Set it to `stderr` to send the lines to your container logs instead. `PROXMOX_AUDIT_READS=true` logs reads too.
+
+```json
+{"ts":"2026-10-30T21:04:12.418+00:00","who":"ci","via":"http","tool":"clone_vm","args":{"node":"pve2","vmid":9000,"newid":123},"outcome":"ok","upid":"UPID:pve2:…","task_ok":true,"ms":41873}
+{"ts":"2026-10-30T21:05:02.007+00:00","who":"grafana","via":"http","tool":"stop_vm","args":{"node":"pve1","vmid":120},"outcome":"refused","error":"stop_vm is not allowed for grafana (role: read)","ms":0}
+```
+
+Arguments whose names look secret, such as passwords, tokens, private keys and cloud-init passwords, are written as `***`. A failure to write the log is reported on stderr and never fails the tool call.
 
 The rest of the security picture:
 
@@ -487,9 +523,10 @@ The user or token needs privileges for each operation. Common ones: `VM.Monitor`
 <details>
 <summary><b>HTTP: 401, 421, or the server won't start</b></summary>
 
-- **401 Unauthorized**: the client must send `Authorization: Bearer <MCP_AUTH_TOKEN>`.
+- **401 Unauthorized**: the client must send `Authorization: Bearer <token>` with one of the configured tokens.
+- **"… is not allowed for NAME (role: read)"**: that client's token has a role that excludes the tool. Use a token with a wider role.
 - **421 Misdirected Request**: on `127.0.0.1` the server only accepts local Host headers. Connect to `127.0.0.1` or `localhost`, or bind to another address with a token.
-- **"Refusing to serve on 0.0.0.0 without authentication"**: set `MCP_AUTH_TOKEN`, or `MCP_HTTP_ALLOW_NO_AUTH=true` if a proxy in front authenticates clients.
+- **"Refusing to serve on 0.0.0.0 without authentication"**: set `MCP_AUTH_TOKEN` or `MCP_AUTH_TOKENS`, or `MCP_HTTP_ALLOW_NO_AUTH=true` if a proxy in front authenticates clients.
 </details>
 
 <details>
@@ -514,9 +551,13 @@ uv run ruff check . && uv run black .
 
 ```
 proxmox_mcp/
-├── server.py        stdio entrypoint
-├── server_http.py   streamable-HTTP entrypoint: bearer auth, loopback default
-├── registry.py      toolsets, read-only filtering, tool annotations
+├── server.py        stdio entrypoint: tool calls, roles, guards, waits, audit
+├── server_http.py   streamable-HTTP entrypoint: bearer tokens, loopback default
+├── registry.py      toolsets, read-only and no-destructive filtering, annotations
+├── auth.py          HTTP tokens and roles
+├── audit.py         JSON-lines audit log
+├── guards.py        protected guests
+├── tasks.py         waiting for Proxmox tasks
 ├── client.py        Proxmox API client: token/password auth, ticket renewal, read-only guard
 └── tools/           one module per API area:
                      nodes, qemu, lxc, storage, cluster, access, firewall,

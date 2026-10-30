@@ -447,7 +447,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/access/users/{args['userid']}")
 
     elif name == "create_user":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/access/users", data)
 
     elif name == "update_user":
@@ -459,7 +459,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.delete(f"/access/users/{args['userid']}")
 
     elif name == "change_user_password":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.put("/access/password", data)
 
     elif name == "list_user_tokens":
@@ -490,7 +490,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/access/groups/{args['groupid']}")
 
     elif name == "create_group":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/access/groups", data)
 
     elif name == "update_group":
@@ -508,7 +508,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/access/roles/{args['roleid']}")
 
     elif name == "create_role":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/access/roles", data)
 
     elif name == "update_role":
@@ -523,7 +523,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get("/access/acl")
 
     elif name == "update_acl":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.put("/access/acl", data)
 
     elif name == "list_auth_domains":
@@ -533,7 +533,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/access/domains/{args['realm']}")
 
     elif name == "create_auth_domain":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/access/domains", data)
 
     elif name == "update_auth_domain":

@@ -79,7 +79,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/pools/{args['poolid']}", params or None)
 
     elif name == "create_pool":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/pools", data)
 
     elif name == "update_pool":

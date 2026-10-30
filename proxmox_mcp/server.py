@@ -15,6 +15,8 @@ Configuration (environment variables):
     PROXMOX_NO_DESTRUCTIVE   Hide tools that delete, stop, wipe or roll back (default: false)
     PROXMOX_PROTECTED_VMIDS  Guest IDs/ranges no tool may change, e.g. 100,9000-9010
     PROXMOX_WAIT_TIMEOUT     Seconds a `wait` lasts before returning (default: 900)
+    PROXMOX_AUDIT_LOG        File (or "stderr") for a JSON-lines log of every write call
+    PROXMOX_AUDIT_READS      Log read calls too (default: false)
 """
 
 from __future__ import annotations
@@ -23,13 +25,14 @@ import asyncio
 import json
 import os
 import sys
+import time
 from typing import Any
 
 import mcp.server.stdio
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
-from . import guards, registry, tasks
+from . import audit, auth, guards, registry, tasks
 from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config
 
 # --- Build the tool registry ---
@@ -57,7 +60,21 @@ def startup_summary() -> str:
         scope += ", no destructive tools"
     if PROTECTED:
         scope += f", {len(PROTECTED)} protected guests"
+    if audit.enabled():
+        scope += f", audit log: {audit.AUDIT_LOG}"
     return f"Tools: {len(ALL_TOOLS)} ({scope})"
+
+
+def current_principal() -> auth.Principal:
+    """Who sent the request being handled: stdio, or the HTTP token's principal."""
+    try:
+        request = app.request_context.request
+    except LookupError:
+        return auth.STDIO
+    if request is None:
+        return auth.STDIO
+    state = getattr(request, "scope", {}).get("state") or {}
+    return state.get("principal") or auth.ANONYMOUS
 
 
 def _dump(value: Any) -> str:
@@ -72,11 +89,23 @@ app = Server("proxmox-mcp-server")
 
 @app.list_tools()
 async def list_tools() -> list[Tool]:
-    return ALL_TOOLS
+    role = current_principal().role
+    if role == "admin":
+        return ALL_TOOLS
+    return [t for t in ALL_TOOLS if auth.allows(role, t.name)]
 
 
 @app.call_tool()
 async def call_tool(name: str, arguments: Any) -> list[TextContent]:
+    who = current_principal()
+    started = time.monotonic()
+    args = dict(arguments or {})
+    entry: dict[str, Any] = {
+        "who": who.name,
+        "via": "stdio" if who is auth.STDIO else "http",
+        "tool": name,
+        "args": audit.redact(args),
+    }
     try:
         mod = TOOL_MODULE.get(name)
         if mod is None:
@@ -84,7 +113,8 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
                 f"Unknown or disabled tool: {name} (check PROXMOX_TOOLSETS; "
                 "PROXMOX_READ_ONLY and PROXMOX_NO_DESTRUCTIVE hide tools)"
             )
-        args = dict(arguments or {})
+        if not auth.allows(who.role, name):
+            raise PermissionError(f"{name} is not allowed for {who.name} (role: {who.role})")
         wait = bool(args.pop("wait", False)) and name in registry.WAITABLE
         if not registry.is_read_only(name):
             guards.check(name, args, PROTECTED)
@@ -93,9 +123,21 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
             upid = result.get("data") if isinstance(result, dict) else None
             if tasks.is_upid(upid):
                 result = {**result, "task": await tasks.wait(proxmox, upid)}
-        return [TextContent(type="text", text=_dump(result))]
+        entry["outcome"] = "ok"
+        if isinstance(result, dict):
+            if tasks.is_upid(result.get("data")):
+                entry["upid"] = result["data"]
+            if isinstance(result.get("task"), dict):
+                entry["task_ok"] = result["task"].get("ok")
+        text = _dump(result)
     except Exception as e:
-        return [TextContent(type="text", text=_dump({"error": str(e), "tool": name}))]
+        entry["outcome"] = "refused" if isinstance(e, PermissionError) else "error"
+        entry["error"] = str(e)
+        text = _dump({"error": str(e), "tool": name})
+    if audit.enabled() and (audit.AUDIT_READS or not registry.is_read_only(name)):
+        entry["ms"] = round((time.monotonic() - started) * 1000)
+        audit.record(entry)
+    return [TextContent(type="text", text=text)]
 
 
 async def main() -> None:

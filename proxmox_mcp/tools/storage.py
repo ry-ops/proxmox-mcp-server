@@ -269,7 +269,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/storage/{args['storage']}")
 
     elif name == "create_storage":
-        data = {k: v for k, v in args.items()}
+        data = dict(args.items())
         return await client.post("/storage", data)
 
     elif name == "update_storage":
