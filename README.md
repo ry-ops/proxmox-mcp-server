@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/hero.svg" width="100%" alt="You ask your assistant to clone VM 9000 to web-02 and start it; clone_vm and start_vm flow through proxmox-mcp-server to the Proxmox cluster, and the new VM lights up on pve2.">
+  <img src="docs/hero.svg" width="100%" alt="You ask your assistant to clone VM 9000 to web-02 and start it; clone_vm and start_vm flow over MCP, by stdio or HTTP, through proxmox-mcp-server to the Proxmox cluster, and the new VM lights up on pve2.">
 </p>
 
 <p align="center">
@@ -18,6 +18,8 @@
   <a href="#how">How it works</a> ·
   <a href="#tools">340 tools</a> ·
   <a href="#quick-start">Quick start</a> ·
+  <a href="#toolsets">Toolsets</a> ·
+  <a href="#http">HTTP</a> ·
   <a href="#read-only">Read-only mode</a> ·
   <a href="#a2a">A2A</a> ·
   <a href="#troubleshooting">Troubleshooting</a>
@@ -33,7 +35,9 @@
 - 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 340 to 126, and the context it costs by more than half.
 - 🚦 **Labelled for safe approval.** Every tool carries MCP `readOnlyHint` and `destructiveHint` annotations, so clients can auto-approve reads and ask before a delete, stop or rollback.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
+- 🌐 **Local or on the network.** Clients spawn it over stdio, or `proxmox-mcp-server-http` serves it over streamable HTTP with a bearer token.
 - 🐳 **Runs anywhere.** Use `uv` from a clone, or the multi-arch image on `ghcr.io`.
+- ♻️ **Long sessions just work.** Password logins renew their Proxmox ticket before it expires.
 - 🤝 **A2A-ready.** `agent-card.json` lists every tool in 14 skill categories, for agent-to-agent discovery.
 - 🛡️ **Appliances.** `deploy_fortigate_vm` builds a FortiGate-VM from Fortinet's KVM image, with WAN/LAN NICs on the bridges and VLANs you choose. `deploy_cloud_vms` builds cluster-ready VMs from a cloud image, with your SSH key and a static IP each, ready for k3s-mcp-server's `create_cluster`.
 
@@ -42,7 +46,7 @@
 ## 💬 Talk to your cluster
 
 <p align="center">
-  <img src="docs/chat.svg" width="100%" alt="A chat runs df -h inside VM 120 via the QEMU guest agent and shows the disk usage; a side panel cycles through more questions and the tools that answer them.">
+  <img src="docs/chat.svg" width="100%" alt="A chat runs df -h inside VM 120 via the QEMU guest agent, with vm_agent_exec labelled destructive and vm_agent_exec_status labelled read-only, and shows the disk usage; a side panel cycles through more questions and the tools that answer them.">
 </p>
 
 Once it's connected, just ask:
@@ -63,19 +67,20 @@ There are more worked examples in [USAGE.md](USAGE.md).
 ## ⚙️ How it works
 
 <p align="center">
-  <img src="docs/how-it-works.svg" width="100%" alt="MCP clients talk to proxmox-mcp-server over stdio; the server calls the Proxmox VE API over HTTPS on port 8006. With read-only mode on, GET requests pass and POST, PUT and DELETE are refused inside the server.">
+  <img src="docs/how-it-works.svg" width="100%" alt="MCP clients talk to proxmox-mcp-server over stdio or HTTP; the server calls the Proxmox VE API over HTTPS on port 8006. With read-only mode on, only the 149 read tools are listed, GET requests pass, and POST, PUT and DELETE are refused inside the server.">
 </p>
 
-- **Your MCP client** (Claude Desktop, Claude Code, or anything that speaks MCP) starts the server and talks to it over **stdio**.
+- **Your MCP client** (Claude Desktop, Claude Code, or anything that speaks MCP) starts the server and talks to it over **stdio**. Or you run it as a service and clients connect over **[streamable HTTP](#http)**.
+- **`PROXMOX_TOOLSETS`** decides which API areas the server loads, and so which tools the client sees. Each tool is labelled read-only or destructive.
 - **The server** (Python, `httpx`, the MCP SDK) turns each tool call into a request to the **Proxmox VE REST API** over HTTPS on port **8006**, authenticated with an **API token** or a **password**.
-- **Read-only mode** is checked in the server's HTTP client, so a refused write never leaves your machine.
+- **Read-only mode** hides the write tools and is also checked in the server's HTTP client, so a refused write never leaves your machine.
 
 <a id="tools"></a>
 
 ## 🧰 340 tools, 14 areas
 
 <p align="center">
-  <img src="docs/tools.svg" width="100%" alt="A tile map of the 340 tools by API area: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 2.">
+  <img src="docs/tools.svg" width="100%" alt="A tile map of the 340 tools by toolset: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 2. Then all but nodes, qemu, lxc and storage dim, and the count drops to 126.">
 </p>
 
 | Area | Tools | Highlights |
@@ -152,7 +157,7 @@ docker pull ghcr.io/ry-ops/proxmox-mcp-server:latest   # or a version tag, e.g. 
 docker run -i --rm --env-file .env ghcr.io/ry-ops/proxmox-mcp-server:latest
 ```
 
-MCP clients talk over stdio, so run the container interactively (`-i`). `docker-compose.yaml` does the same using your `.env`.
+MCP clients talk over stdio, so run the container interactively (`-i`). `docker-compose.yaml` does the same using your `.env`. To serve it over HTTP instead, see [Run it over HTTP](#http).
 </details>
 
 **3. Connect your MCP client.** For Claude Desktop, edit `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or `%APPDATA%/Claude/claude_desktop_config.json` on Windows:
@@ -220,6 +225,18 @@ Use the **absolute** path to your clone.
   }
 }
 ```
+</details>
+
+<details>
+<summary><b>Claude Code</b></summary>
+
+```bash
+claude mcp add proxmox \
+  -e PROXMOX_HOST=192.168.1.100 -e PROXMOX_USER=root@pam \
+  -e PROXMOX_TOKEN_NAME=automation -e PROXMOX_TOKEN_VALUE=your-token-value-here \
+  -- uv --directory /absolute/path/to/proxmox-mcp-server run proxmox-mcp-server
+```
+Add `-e PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` to keep the tool list small. For a server you run over HTTP, see [Run it over HTTP](#http).
 </details>
 
 **4. Restart your client completely** (quit it, don't just close the window), and ask it to list your VMs. More detail in [QUICKSTART.md](QUICKSTART.md) and [SETUP.md](SETUP.md).
@@ -321,7 +338,7 @@ The rest of the security picture:
 
 ## 🤝 Agent-to-agent (A2A)
 
-[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It's generated from the tool registry, and lists **all 340 tools in 14 skill categories**, each with its name, description and inputs. It also covers authentication requirements and MCP protocol details.
+[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It lists **all 340 tools in 14 skill categories**, each with its name, description, inputs, and `read_only` and `destructive` flags. A test fails if it drifts from the tool registry. It also covers authentication requirements and MCP protocol details.
 
 | Category | Tools | Category | Tools |
 |---|--:|---|--:|
@@ -431,6 +448,22 @@ The user or token needs privileges for each operation. Common ones: `VM.Monitor`
 </details>
 
 <details>
+<summary><b>A tool is missing, or "Unknown or disabled tool"</b></summary>
+
+- `PROXMOX_TOOLSETS` loads only the areas it names. Add the area, or remove the variable to load all of them.
+- `PROXMOX_READ_ONLY=true` hides every write tool. Set it to `false` to create, change or delete.
+- The server logs how many tools it loaded, and from which toolsets, to stderr at startup.
+</details>
+
+<details>
+<summary><b>HTTP: 401, 421, or the server won't start</b></summary>
+
+- **401 Unauthorized**: the client must send `Authorization: Bearer <MCP_AUTH_TOKEN>`.
+- **421 Misdirected Request**: on `127.0.0.1` the server only accepts local Host headers. Connect to `127.0.0.1` or `localhost`, or bind to another address with a token.
+- **"Refusing to serve on 0.0.0.0 without authentication"**: set `MCP_AUTH_TOKEN`, or `MCP_HTTP_ALLOW_NO_AUTH=true` if a proxy in front authenticates clients.
+</details>
+
+<details>
 <summary><b>Check the connection before involving Claude</b></summary>
 
 ```bash
@@ -444,18 +477,22 @@ It checks the connection, the API, authentication, permission to list nodes, and
 
 ```bash
 uv sync                          # dependencies, including dev tools
-uv run proxmox-mcp-server        # run the server directly
+uv run proxmox-mcp-server        # run the server directly (stdio)
+uv run proxmox-mcp-server-http   # or over streamable HTTP
 uv run pytest                    # tests
 uv run ruff check . && uv run black .
 ```
 
 ```
 proxmox_mcp/
-├── server.py        MCP server entrypoint and tool registry
-├── client.py        Proxmox API client: token/password auth, read-only guard
+├── server.py        stdio entrypoint
+├── server_http.py   streamable-HTTP entrypoint: bearer auth, loopback default
+├── registry.py      toolsets, read-only filtering, tool annotations
+├── client.py        Proxmox API client: token/password auth, ticket renewal, read-only guard
 └── tools/           one module per API area:
                      nodes, qemu, lxc, storage, cluster, access, firewall,
                      disks, ceph, acme, sdn, notifications, pools, appliances
+tests/               pytest suite, run in CI on Python 3.10–3.13
 docs/                the animations on this page
 agent-card.json      A2A agent card
 Dockerfile, docker-compose.yaml, setup.sh, test-connection.sh
@@ -463,9 +500,10 @@ QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
 ```
 
 **Dependencies:**
-- **`mcp`** (>=1.0.0, <2): 2.x changed the server API and isn't supported yet.
+- **`mcp`** (>=1.30.0, <2): 2.x changed the server API and isn't supported yet.
 - **`httpx`**: the async HTTP client.
 - **`python-dotenv`**: loads `.env`.
+- **`starlette`** and **`uvicorn`**: serve the HTTP entrypoint. `mcp` already depends on both.
 
 ## 🗺️ Roadmap
 

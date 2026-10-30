@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" role="img" aria-labelledby="t d">
   <title id="t">Proxmox MCP Server: talk to your Proxmox cluster</title>
-  <desc id="d">You ask your AI assistant to clone VM 9000 to web-02 and start it. The request travels over MCP to proxmox-mcp-server, which calls clone_vm and start_vm on the Proxmox VE API. A new VM appears on node pve2 and turns green: running.</desc>
+  <desc id="d">You ask your AI assistant to clone VM 9000 to web-02 and start it. The request travels over MCP, by stdio or HTTP, to proxmox-mcp-server, which calls clone_vm and start_vm on the Proxmox VE API. A new VM appears on node pve2 and turns green: running.</desc>
   <defs>
     <linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#ff8a1f"/><stop offset=".55" stop-color="#ff5c8a"/><stop offset="1" stop-color="#b58cff"/></linearGradient>
     <clipPath id="typeclip"><rect class="typing" x="58" y="128" width="300" height="30"/></clipPath>
@@ -61,6 +61,7 @@
   <g class="p1"><circle cx="392" cy="253" r="7" fill="#ff8a1f"/></g>
   <g class="p2"><circle cx="392" cy="253" r="7" fill="#ff8a1f"/></g>
   <text x="398" y="240" font-size="11" class="muted mono">MCP · stdio</text>
+  <text x="398" y="274" font-size="11" class="muted mono">or HTTP</text>
   <text x="600" y="240" font-size="11" class="muted mono">HTTPS :8006</text>
   <rect class="core" x="480" y="208" width="104" height="90" rx="16" fill="#1d2536" stroke="#ff8a1f" stroke-width="2.5"/>
   <text x="532" y="246" text-anchor="middle" font-size="13" font-weight="800">proxmox</text>
