@@ -4,23 +4,24 @@
 
 <p align="center">
   <a href="https://github.com/ry-ops/proxmox-mcp-server/releases"><img src="https://img.shields.io/github/v/release/ry-ops/proxmox-mcp-server?color=ff8a1f&label=release" alt="Release"></a>
-  <img src="https://img.shields.io/badge/tools-340-ff8a1f" alt="340 tools">
+  <img src="https://img.shields.io/badge/tools-341-ff8a1f" alt="341 tools">
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-3ec7ff" alt="Python 3.10+"></a>
   <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-1.x-b58cff" alt="MCP"></a>
   <a href="https://github.com/ry-ops/proxmox-mcp-server/pkgs/container/proxmox-mcp-server"><img src="https://img.shields.io/badge/docker-ghcr.io-3ddc84" alt="Docker image on ghcr.io"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
 </p>
 
-<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 340 tools across VMs, containers, storage, clustering, Ceph, SDN and more.</p>
+<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 341 tools across VMs, containers, storage, clustering, Ceph, SDN and more.</p>
 
 <p align="center">
   <a href="#talk">Talk to it</a> ·
   <a href="#how">How it works</a> ·
-  <a href="#tools">340 tools</a> ·
+  <a href="#tools">341 tools</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#toolsets">Toolsets</a> ·
   <a href="#http">HTTP</a> ·
-  <a href="#read-only">Read-only mode</a> ·
+  <a href="#read-only">Safety</a> ·
+  <a href="#wait">Waiting</a> ·
   <a href="#a2a">A2A</a> ·
   <a href="#troubleshooting">Troubleshooting</a>
 </p>
@@ -29,10 +30,12 @@
 
 ## ✨ Highlights
 
-- 🧰 **The whole API, not a demo.** 340 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
+- 🧰 **The whole API, not a demo.** 341 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
-- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 149 read-only tools.
-- 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 340 to 126, and the context it costs by more than half.
+- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 150 read-only tools.
+- 🧯 **Safe writes, protected guests.** `PROXMOX_NO_DESTRUCTIVE=true` hides the 73 tools that delete, stop, wipe or roll back. `PROXMOX_PROTECTED_VMIDS` names guests no tool may change.
+- ⏳ **Waits for the slow stuff.** Clone, migrate, backup and restore take `wait: true`, and `wait_for_task` follows any task to the end, with the log when it fails.
+- 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 341 to 127, and the context it costs by more than half. Results come back as compact JSON.
 - 🚦 **Labelled for safe approval.** Every tool carries MCP `readOnlyHint` and `destructiveHint` annotations, so clients can auto-approve reads and ask before a delete, stop or rollback.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
 - 🌐 **Local or on the network.** Clients spawn it over stdio, or `proxmox-mcp-server-http` serves it over streamable HTTP with a bearer token.
@@ -67,7 +70,7 @@ There are more worked examples in [USAGE.md](USAGE.md).
 ## ⚙️ How it works
 
 <p align="center">
-  <img src="docs/how-it-works.svg" width="100%" alt="MCP clients talk to proxmox-mcp-server over stdio or HTTP; the server calls the Proxmox VE API over HTTPS on port 8006. With read-only mode on, only the 149 read tools are listed, GET requests pass, and POST, PUT and DELETE are refused inside the server.">
+  <img src="docs/how-it-works.svg" width="100%" alt="MCP clients talk to proxmox-mcp-server over stdio or HTTP; the server calls the Proxmox VE API over HTTPS on port 8006. With read-only mode on, only the 150 read tools are listed, GET requests pass, and POST, PUT and DELETE are refused inside the server.">
 </p>
 
 - **Your MCP client** (Claude Desktop, Claude Code, or anything that speaks MCP) starts the server and talks to it over **stdio**. Or you run it as a service and clients connect over **[streamable HTTP](#http)**.
@@ -77,10 +80,10 @@ There are more worked examples in [USAGE.md](USAGE.md).
 
 <a id="tools"></a>
 
-## 🧰 340 tools, 14 areas
+## 🧰 341 tools, 14 areas
 
 <p align="center">
-  <img src="docs/tools.svg" width="100%" alt="A tile map of the 340 tools by toolset: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 2. Then all but nodes, qemu, lxc and storage dim, and the count drops to 126.">
+  <img src="docs/tools.svg" width="100%" alt="A tile map of the 341 tools by toolset: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 2, plus wait_for_task, which every toolset loads. Then all but nodes, qemu, lxc and storage dim, and the count drops to 127.">
 </p>
 
 | Area | Tools | Highlights |
@@ -99,6 +102,8 @@ There are more worked examples in [USAGE.md](USAGE.md).
 | Notifications | 23 | Gotify, sendmail, SMTP and webhook endpoints, matchers |
 | Pools | 5 | Resource pool CRUD |
 | Appliances | 2 | `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license. `deploy_cloud_vms`: VMs from a cloud image (e.g. Ubuntu's) with cloud-init user, SSH key and a static IP or DHCP each, disk grown and started |
+
+One more tool, `wait_for_task`, is loaded with every toolset. It waits for any Proxmox task to finish; see [Waiting for long tasks](#wait).
 
 Tool names follow the Proxmox API: `list_*`, `get_*`, `create_*`, `update_*`/`set_*`, `delete_*`, plus actions such as `start_vm`, `migrate_container` or `apply_sdn`. Each area is one module in [`proxmox_mcp/tools/`](proxmox_mcp/tools/). Your MCP client shows every tool with its full input schema, or you can list them all locally:
 
@@ -253,6 +258,9 @@ Add `-e PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` to keep the tool list small. Fo
 | `PROXMOX_VERIFY_SSL` | | `false` | Verify the server's TLS certificate |
 | `PROXMOX_READ_ONLY` | | `false` | Refuse every write and advertise only read tools; see below |
 | `PROXMOX_TOOLSETS` | | all | Comma-separated API areas to load; see below |
+| `PROXMOX_NO_DESTRUCTIVE` | | `false` | Hide the 73 tools that delete, stop, wipe or roll back; see [Safety](#read-only) |
+| `PROXMOX_PROTECTED_VMIDS` | | | Guest IDs and ranges no tool may change, e.g. `100,101,9000-9010` |
+| `PROXMOX_WAIT_TIMEOUT` | | `900` | Seconds a `wait` lasts before it returns with the task still running |
 | `MCP_HTTP_HOST` | | `127.0.0.1` | HTTP entrypoint only: bind address |
 | `MCP_HTTP_PORT` | | `8811` | HTTP entrypoint only: port |
 | `MCP_AUTH_TOKEN` | | | HTTP entrypoint only: bearer token clients must send; required off loopback |
@@ -262,7 +270,7 @@ Add `-e PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` to keep the tool list small. Fo
 
 ### 🎯 Toolsets: load only what you use
 
-Every tool the server advertises sits in the client's context on every turn, and all 340 schemas come to roughly 40k tokens. Set `PROXMOX_TOOLSETS` to the areas you need:
+Every tool the server advertises sits in the client's context on every turn, and all 341 schemas come to roughly 44k tokens. Set `PROXMOX_TOOLSETS` to the areas you need:
 
 ```bash
 PROXMOX_TOOLSETS=nodes,qemu,lxc,storage
@@ -270,11 +278,14 @@ PROXMOX_TOOLSETS=nodes,qemu,lxc,storage
 
 | Setting | Tools | Approx. tokens |
 |---|--:|--:|
-| all (default) | 340 | 42k |
-| `nodes,qemu,lxc,storage,cluster` | 163 | 22k |
-| `nodes,qemu,lxc,storage` | 126 | 18k |
-| `PROXMOX_READ_ONLY=true` | 149 | 12k |
-| `qemu` | 46 | 7k |
+| all (default) | 341 | 44k |
+| `PROXMOX_NO_DESTRUCTIVE=true` | 268 | 35k |
+| `nodes,qemu,lxc,storage,cluster` | 164 | 23k |
+| `nodes,qemu,lxc,storage` | 127 | 19k |
+| `PROXMOX_READ_ONLY=true` | 150 | 13k |
+| `qemu` | 47 | 8k |
+
+Every count includes `wait_for_task`, which loads with any selection.
 
 The names are `nodes`, `qemu`, `lxc`, `storage`, `cluster`, `access`, `firewall`, `disks`, `ceph`, `acme`, `sdn`, `notifications`, `pools` and `appliances`. `vms` and `containers` work as aliases for `qemu` and `lxc`. A misspelt name stops the server at startup with the list of valid ones. Toolsets combine with read-only mode.
 
@@ -282,7 +293,7 @@ The names are `nodes`, `qemu`, `lxc`, `storage`, `cluster`, `access`, `firewall`
 
 Each tool tells the client what it does, through standard MCP annotations:
 
-- **`readOnlyHint: true`** on the 149 tools that only read.
+- **`readOnlyHint: true`** on the 150 tools that only read.
 - **`destructiveHint: true`** on the 73 that delete, stop, wipe, roll back, restore over, or run commands in a guest.
 - **`destructiveHint: false`** on the other writes, such as create, start or update.
 
@@ -318,13 +329,29 @@ claude mcp add --transport http proxmox http://pve-mcp.lan:8811/mcp \
 
 **Anyone who can reach this endpoint can use every loaded tool with your Proxmox credentials.** So the server binds to `127.0.0.1` by default. It refuses any other address unless `MCP_AUTH_TOKEN` is set, or you opt out with `MCP_HTTP_ALLOW_NO_AUTH=true` because a proxy in front of it authenticates clients. The token check runs in constant time. On loopback, DNS-rebinding protection rejects requests whose Host header isn't a local address. Put TLS in front of it, for example with a reverse proxy, when the token crosses a network.
 
+<a id="wait"></a>
+
+### ⏳ Waiting for long tasks
+
+Clone, migrate, backup, restore, disk moves, snapshots and power actions start a Proxmox task and return its ID, a UPID. Pass `wait: true` to any of these 30 tools and the result also carries the task's outcome:
+
+```json
+{"data":"UPID:pve2:0003A1B2:…:qmclone:9000:root@pam:","task":{"status":"stopped","exitstatus":"OK","ok":true}}
+```
+
+`wait_for_task` does the same for any UPID, including ones from the cluster task list. A failed task includes the last 20 lines of its log. A wait never fails just because a task is slow. After `PROXMOX_WAIT_TIMEOUT` seconds, 900 by default, it returns `status: "running"`, and calling `wait_for_task` again keeps waiting.
+
 <a id="read-only"></a>
 
-## 🔒 Read-only mode and security
+## 🔒 Safety: read-only mode, destructive tools and protected guests
 
-**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **The client sees only the 149 read-only tools**, so it never plans around a tool that would be refused. Three read-style tools send POST requests, so they're hidden too:
+**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **The client sees only the 150 read-only tools**, so it never plans around a tool that would be refused. Three read-style tools send POST requests, so they're hidden too:
 - `vm_agent_ping`;
 - `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets.
+
+**`PROXMOX_NO_DESTRUCTIVE=true`** is the middle ground. It hides the 73 tools labelled destructive: deleting, stopping, wiping, rolling back, restoring over a guest, and running commands inside one. Safe writes such as start, create, clone, snapshot and config changes stay available, so 268 tools remain.
+
+**`PROXMOX_PROTECTED_VMIDS=100,101,9000-9010`** names guests no tool may change, such as your router, DNS or backup server. The server checks every write before sending it: power actions, config changes, snapshots, migration, disk moves, deletion, guest-agent commands, HA changes, and deleting the guest's volumes or backups. Reads always work. Cloning from a protected template, backing it up and opening its console stay allowed, because they leave it as it is. Node-wide and bulk start, stop and migrate actions need an explicit `vms` list while any guest is protected, since they would otherwise include it. Whole-node shutdown and reboot are not covered.
 
 The rest of the security picture:
 
@@ -338,7 +365,7 @@ The rest of the security picture:
 
 ## 🤝 Agent-to-agent (A2A)
 
-[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It lists **all 340 tools in 14 skill categories**, each with its name, description, inputs, and `read_only` and `destructive` flags. A test fails if it drifts from the tool registry. It also covers authentication requirements and MCP protocol details.
+[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It lists **all 341 tools in 14 skill categories**, each with its name, description, inputs, and `read_only` and `destructive` flags. A test fails if it drifts from the tool registry. It also covers authentication requirements and MCP protocol details.
 
 | Category | Tools | Category | Tools |
 |---|--:|---|--:|
@@ -346,7 +373,7 @@ The rest of the security picture:
 | `virtual_machine_management` | 46 | `ceph_management` | 33 |
 | `container_management` | 28 | `certificate_management` | 17 |
 | `storage_management` | 14 | `sdn_management` | 16 |
-| `cluster_management` | 37 | `notification_management` | 23 |
+| `cluster_management` | 38 | `notification_management` | 23 |
 | `access_control` | 33 | `pool_management` | 5 |
 | `firewall_management` | 31 | `appliances` | 2 |
 
@@ -452,6 +479,8 @@ The user or token needs privileges for each operation. Common ones: `VM.Monitor`
 
 - `PROXMOX_TOOLSETS` loads only the areas it names. Add the area, or remove the variable to load all of them.
 - `PROXMOX_READ_ONLY=true` hides every write tool. Set it to `false` to create, change or delete.
+- `PROXMOX_NO_DESTRUCTIVE=true` hides the delete, stop, wipe and rollback tools.
+- "guest … is protected" means `PROXMOX_PROTECTED_VMIDS` covers that guest.
 - The server logs how many tools it loaded, and from which toolsets, to stderr at startup.
 </details>
 

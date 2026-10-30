@@ -6,6 +6,26 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `wait_for_task`: wait for any Proxmox task (UPID) to finish. It returns `status`,
+  `exitstatus` and `ok`, plus the last 20 log lines when the task failed. If the task is still
+  running after `PROXMOX_WAIT_TIMEOUT` seconds (default 900) it returns `status: "running"`
+  instead of failing. It loads with every toolset selection.
+- `wait: true` on 30 long-running tools (power actions, create, clone, delete, migrate, disk
+  moves, snapshots, backup, restore, URL downloads) returns the task's outcome with the result.
+- `PROXMOX_NO_DESTRUCTIVE=true` hides the 73 tools labelled destructive and keeps safe writes
+  such as start, create, clone and snapshot: 268 tools instead of 341.
+- `PROXMOX_PROTECTED_VMIDS` (IDs and ranges, e.g. `100,9000-9010`) refuses any write aimed
+  at those guests before a request is sent: power, config, snapshots, migration, disk moves,
+  deletion, guest-agent commands, HA changes, and deleting their volumes or backups. Cloning
+  from them, backing them up and opening a console stay allowed. Node-wide and bulk power or
+  migrate actions need an explicit `vms` list while any guest is protected.
+
+### Changed
+- Tool results are compact JSON instead of indented, which cut a sample 60-guest cluster listing
+  by about a third.
+- The startup banner says which safety settings are active.
+
 ## [2.6.0] - 2026-10-30
 
 ### Added

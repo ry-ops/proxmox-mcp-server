@@ -1,7 +1,7 @@
 """Tool registry: which tools load, and how each one is labelled for MCP clients.
 
 Two levers keep the tool list small, because every advertised tool's schema sits in the
-client's context on every turn (all 340 cost about 37k tokens):
+client's context on every turn (all 341 cost about 44k tokens):
 
 * PROXMOX_TOOLSETS picks the API areas to load, e.g. "nodes,qemu,lxc,storage".
 * Read-only mode advertises only the tools that read; the others would be refused anyway.
@@ -32,6 +32,7 @@ from .tools import (
     qemu,
     sdn,
     storage,
+    tasks,
 )
 
 # Toolset name -> module. The order here is the order tools are advertised in.
@@ -52,12 +53,33 @@ TOOLSETS: dict[str, ModuleType] = {
     "appliances": appliances,
 }
 
+# Loaded with every toolset selection: tools any of them may need.
+CORE = [tasks]
+
+# Long-running tools that return a task ID (UPID). They accept `wait: true` to return only
+# once the task has finished.
+WAITABLE = {
+    "start_vm", "stop_vm", "shutdown_vm", "reboot_vm",
+    "start_container", "stop_container", "shutdown_container", "reboot_container",
+    "create_vm", "clone_vm", "delete_vm", "migrate_vm", "move_vm_disk",
+    "create_container", "clone_container", "delete_container", "migrate_container",
+    "move_container_disk",
+    "create_vm_snapshot", "rollback_vm_snapshot", "delete_vm_snapshot",
+    "create_container_snapshot", "rollback_container_snapshot", "delete_container_snapshot",
+    "backup_vm", "restore_vm_backup", "restore_container_backup",
+    "download_url_to_storage",
+}
+WAIT_PROPERTY = {
+    "type": "boolean",
+    "description": "Wait for the task to finish and return its outcome (default false)",
+}
+
 # Friendlier names people reach for first.
 ALIASES = {"vms": "qemu", "vm": "qemu", "containers": "lxc", "ct": "lxc"}
 
 # Tools whose name does not say what they do to the cluster.
 # These only GET, though their names do not start with get_/list_:
-_READS = {"vm_agent_exec_status"}
+_READS = {"vm_agent_exec_status", "wait_for_task"}
 # These POST (they open a console ticket), though their names start with get_:
 _WRITES = {"get_vm_vnc_proxy", "get_vm_spice_proxy"}
 
@@ -123,22 +145,31 @@ def parse_toolsets(value: str | None) -> list[str]:
     return [n for n in TOOLSETS if n in chosen]
 
 
-def build(toolsets: list[str], read_only: bool) -> tuple[list[Tool], dict[str, ModuleType]]:
-    """The tools to advertise, and the module that handles each one."""
+def build(
+    toolsets: list[str], read_only: bool, no_destructive: bool = False
+) -> tuple[list[Tool], dict[str, ModuleType]]:
+    """The tools to advertise, and the module that handles each one.
+
+    read_only drops every write tool; no_destructive drops only the destructive ones.
+    """
     tools: list[Tool] = []
     handlers: dict[str, Any] = {}
-    for ts in toolsets:
-        mod = TOOLSETS[ts]
+    for mod in [TOOLSETS[ts] for ts in toolsets] + CORE:
         for d in mod.TOOLS:
             name = d["name"]
             ro = is_read_only(name)
             if read_only and not ro:
                 continue
+            if no_destructive and is_destructive(name):
+                continue
+            schema = d["inputSchema"]
+            if name in WAITABLE:
+                schema = {**schema, "properties": {**schema.get("properties", {}), "wait": WAIT_PROPERTY}}
             tools.append(
                 Tool(
                     name=name,
                     description=d["description"],
-                    inputSchema=d["inputSchema"],
+                    inputSchema=schema,
                     annotations=ToolAnnotations(
                         readOnlyHint=ro,
                         destructiveHint=False if ro else is_destructive(name),

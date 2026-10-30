@@ -62,8 +62,8 @@
   </g>
   <g class="q2">
     <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>
-    <text x="676" y="220" font-size="14" font-weight="600">“Move container 210 to pve3”</text>
-    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ migrate_container</text>
+    <text x="676" y="220" font-size="14" font-weight="600">“Move CT 210 to pve3 and wait”</text>
+    <text x="676" y="246" font-size="12" class="mono" style="fill:#ffc48a">→ migrate_container wait:true</text>
   </g>
   <g class="q3">
     <rect x="660" y="190" width="270" height="74" rx="14" fill="#2a3550"/>

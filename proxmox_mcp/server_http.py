@@ -35,9 +35,8 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from .client import PROXMOX_READ_ONLY, _validate_config
-from .registry import TOOLSETS as ALL_TOOLSETS
-from .server import ALL_TOOLS, TOOLSETS, app, proxmox
+from .client import _validate_config
+from .server import app, proxmox, startup_summary
 
 # Clients reach a loopback-bound server under these Host/Origin values.
 _LOOPBACK_HOSTS = ["127.0.0.1:*", "localhost:*", "[::1]:*"]
@@ -145,12 +144,10 @@ def run() -> None:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    scope = "all toolsets" if len(TOOLSETS) == len(ALL_TOOLSETS) else ", ".join(TOOLSETS)
-    mode = ", read-only" if PROXMOX_READ_ONLY else ""
     auth = "bearer token" if token else "NO AUTH"
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server (streamable HTTP)", file=sys.stderr)
-    print(f"Tools: {len(ALL_TOOLS)} ({scope}{mode})", file=sys.stderr)
+    print(startup_summary(), file=sys.stderr)
     print(f"Listening on http://{host}:{port}/mcp ({auth})", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
     uvicorn.run(build_asgi_app(host, token), host=host, port=port)
