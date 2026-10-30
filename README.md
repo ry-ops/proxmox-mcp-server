@@ -236,6 +236,10 @@ Use the **absolute** path to your clone.
 | `PROXMOX_VERIFY_SSL` | | `false` | Verify the server's TLS certificate |
 | `PROXMOX_READ_ONLY` | | `false` | Refuse every write and advertise only read tools; see below |
 | `PROXMOX_TOOLSETS` | | all | Comma-separated API areas to load; see below |
+| `MCP_HTTP_HOST` | | `127.0.0.1` | HTTP entrypoint only: bind address |
+| `MCP_HTTP_PORT` | | `8811` | HTTP entrypoint only: port |
+| `MCP_AUTH_TOKEN` | | | HTTP entrypoint only: bearer token clients must send; required off loopback |
+| `MCP_HTTP_ALLOW_NO_AUTH` | | `false` | HTTP entrypoint only: allow a non-loopback address with no token |
 
 <a id="toolsets"></a>
 
@@ -266,6 +270,36 @@ Each tool tells the client what it does, through standard MCP annotations:
 - **`destructiveHint: false`** on the other writes, such as create, start or update.
 
 A test sends every tool through a recording client and checks its read-only label against the HTTP methods it sends, so the labels can't drift from the code.
+
+<a id="http"></a>
+
+### 🌐 Run it over HTTP
+
+`proxmox-mcp-server-http` serves the same tools over MCP streamable HTTP at `/mcp`, so the server can run as a network service instead of a process each client spawns. `PROXMOX_TOOLSETS` and `PROXMOX_READ_ONLY` apply as usual, and `/healthz` answers without auth for container health checks.
+
+```bash
+# Local only, no token needed:
+uv run proxmox-mcp-server-http                       # http://127.0.0.1:8811/mcp
+
+# On the network, a token is required:
+MCP_HTTP_HOST=0.0.0.0 MCP_AUTH_TOKEN="$(openssl rand -hex 32)" uv run proxmox-mcp-server-http
+```
+
+The same image runs it in Docker:
+
+```bash
+docker run -p 8811:8811 --env-file .env -e MCP_HTTP_HOST=0.0.0.0 -e MCP_AUTH_TOKEN \
+  ghcr.io/ry-ops/proxmox-mcp-server:latest proxmox-mcp-server-http
+```
+
+Clients send `Authorization: Bearer <token>`. For Claude Code:
+
+```bash
+claude mcp add --transport http proxmox http://pve-mcp.lan:8811/mcp \
+  --header "Authorization: Bearer $MCP_AUTH_TOKEN"
+```
+
+**Anyone who can reach this endpoint can use every loaded tool with your Proxmox credentials.** So the server binds to `127.0.0.1` by default. It refuses any other address unless `MCP_AUTH_TOKEN` is set, or you opt out with `MCP_HTTP_ALLOW_NO_AUTH=true` because a proxy in front of it authenticates clients. The token check runs in constant time. On loopback, DNS-rebinding protection rejects requests whose Host header isn't a local address. Put TLS in front of it, for example with a reverse proxy, when the token crosses a network.
 
 <a id="read-only"></a>
 
@@ -435,10 +469,7 @@ QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
 
 ## 🗺️ Roadmap
 
-- Streamable-HTTP transport, to run the server as a network service ([#24](https://github.com/ry-ops/proxmox-mcp-server/pull/24), [#29](https://github.com/ry-ops/proxmox-mcp-server/pull/29))
 - Support for `mcp` 2.x
-- Automatic ticket refresh for long-running password-authenticated sessions
-- A broader automated test suite
 
 What has shipped is in [CHANGELOG.md](CHANGELOG.md).
 
