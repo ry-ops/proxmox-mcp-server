@@ -29,7 +29,9 @@
 
 - 🧰 **The whole API, not a demo.** 340 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
-- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and 149 read-only tools keep working.
+- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 149 read-only tools.
+- 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 340 to 126, and the context it costs by more than half.
+- 🚦 **Labelled for safe approval.** Every tool carries MCP `readOnlyHint` and `destructiveHint` annotations, so clients can auto-approve reads and ask before a delete, stop or rollback.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
 - 🐳 **Runs anywhere.** Use `uv` from a clone, or the multi-arch image on `ghcr.io`.
 - 🤝 **A2A-ready.** `agent-card.json` lists every tool in 14 skill categories, for agent-to-agent discovery.
@@ -232,13 +234,44 @@ Use the **absolute** path to your clone.
 | `PROXMOX_PASSWORD` | one of | | Password auth |
 | `PROXMOX_PORT` | | `8006` | API port |
 | `PROXMOX_VERIFY_SSL` | | `false` | Verify the server's TLS certificate |
-| `PROXMOX_READ_ONLY` | | `false` | Refuse every write; see below |
+| `PROXMOX_READ_ONLY` | | `false` | Refuse every write and advertise only read tools; see below |
+| `PROXMOX_TOOLSETS` | | all | Comma-separated API areas to load; see below |
+
+<a id="toolsets"></a>
+
+### 🎯 Toolsets: load only what you use
+
+Every tool the server advertises sits in the client's context on every turn, and all 340 schemas come to roughly 40k tokens. Set `PROXMOX_TOOLSETS` to the areas you need:
+
+```bash
+PROXMOX_TOOLSETS=nodes,qemu,lxc,storage
+```
+
+| Setting | Tools | Approx. tokens |
+|---|--:|--:|
+| all (default) | 340 | 42k |
+| `nodes,qemu,lxc,storage,cluster` | 163 | 22k |
+| `nodes,qemu,lxc,storage` | 126 | 18k |
+| `PROXMOX_READ_ONLY=true` | 149 | 12k |
+| `qemu` | 46 | 7k |
+
+The names are `nodes`, `qemu`, `lxc`, `storage`, `cluster`, `access`, `firewall`, `disks`, `ceph`, `acme`, `sdn`, `notifications`, `pools` and `appliances`. `vms` and `containers` work as aliases for `qemu` and `lxc`. A misspelt name stops the server at startup with the list of valid ones. Toolsets combine with read-only mode.
+
+### 🚦 Tool annotations
+
+Each tool tells the client what it does, through standard MCP annotations:
+
+- **`readOnlyHint: true`** on the 149 tools that only read.
+- **`destructiveHint: true`** on the 73 that delete, stop, wipe, roll back, restore over, or run commands in a guest.
+- **`destructiveHint: false`** on the other writes, such as create, start or update.
+
+A test sends every tool through a recording client and checks its read-only label against the HTTP methods it sends, so the labels can't drift from the code.
 
 <a id="read-only"></a>
 
 ## 🔒 Read-only mode and security
 
-**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **149 of the 340 tools are read-only and keep working.** Three read-style tools send POST requests, so they're blocked too:
+**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **The client sees only the 149 read-only tools**, so it never plans around a tool that would be refused. Three read-style tools send POST requests, so they're hidden too:
 - `vm_agent_ping`;
 - `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets.
 
