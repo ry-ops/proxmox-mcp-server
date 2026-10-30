@@ -121,7 +121,9 @@ def test_node_wide_actions_need_a_list_when_guests_are_protected():
 
 
 async def call(name, args):
-    [content] = await server.call_tool(name, args)
+    result = await server.call_tool(name, args)
+    [content] = result.content
+    assert result.is_error == ("error" in json.loads(content.text))
     return content.text
 
 

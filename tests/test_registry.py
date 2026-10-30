@@ -44,7 +44,7 @@ def test_names_are_unique():
 
 @pytest.mark.parametrize("tool", ALL, ids=lambda t: t.name)
 def test_schema_is_well_formed(tool):
-    schema = tool.inputSchema
+    schema = tool.input_schema
     assert schema["type"] == "object"
     props = schema.get("properties", {})
     missing = set(schema.get("required", [])) - set(props)
@@ -55,10 +55,10 @@ def test_schema_is_well_formed(tool):
 @pytest.mark.parametrize("tool", ALL, ids=lambda t: t.name)
 async def test_read_only_label_matches_http_methods(tool):
     """A tool labelled read-only must only GET; any other tool must send a write."""
-    props = tool.inputSchema.get("properties", {})
+    props = tool.input_schema.get("properties", {})
     args = {
         k: REAL_ARGS.get(k, DUMMY[props[k].get("type", "string")])
-        for k in tool.inputSchema.get("required", [])
+        for k in tool.input_schema.get("required", [])
     }
     client = RecordingClient()
     try:
@@ -73,13 +73,13 @@ async def test_read_only_label_matches_http_methods(tool):
 
 def test_annotations():
     by_name = {t.name: t.annotations for t in ALL}
-    assert by_name["list_vms"].readOnlyHint is True
-    assert by_name["list_vms"].destructiveHint is False
-    assert by_name["start_vm"].readOnlyHint is False
-    assert by_name["start_vm"].destructiveHint is False
+    assert by_name["list_vms"].read_only_hint is True
+    assert by_name["list_vms"].destructive_hint is False
+    assert by_name["start_vm"].read_only_hint is False
+    assert by_name["start_vm"].destructive_hint is False
     for name in ("delete_vm", "wipe_disk", "rollback_vm_snapshot", "vm_agent_exec"):
-        assert by_name[name].readOnlyHint is False
-        assert by_name[name].destructiveHint is True
+        assert by_name[name].read_only_hint is False
+        assert by_name[name].destructive_hint is True
 
 
 @pytest.mark.parametrize("value", [None, "", "all", " ALL ", "qemu,all"])
@@ -106,7 +106,7 @@ def test_toolsets_limit_tools():
 def test_read_only_mode_hides_writes():
     tools, handlers = registry.build(list(registry.TOOLSETS), read_only=True)
     assert tools
-    assert all(t.annotations.readOnlyHint for t in tools)
+    assert all(t.annotations.read_only_hint for t in tools)
     assert "list_vms" in handlers and "delete_vm" not in handlers
     assert len(tools) == sum(registry.is_read_only(t.name) for t in ALL)
 
@@ -122,20 +122,20 @@ def test_agent_card_matches_registry():
     caps = {c["name"]: c for s in card["skills"] for c in s["capabilities"]}
     assert set(caps) == {t.name for t in ALL}
     for t in ALL:
-        assert caps[t.name]["read_only"] == t.annotations.readOnlyHint, t.name
-        assert caps[t.name]["destructive"] == t.annotations.destructiveHint, t.name
+        assert caps[t.name]["read_only"] == t.annotations.read_only_hint, t.name
+        assert caps[t.name]["destructive"] == t.annotations.destructive_hint, t.name
     version = re.search(r'^version = "(.+)"', (root / "pyproject.toml").read_text(), re.M)[1]
     assert card["version"] == version
 
 
 def test_no_destructive_hides_only_destructive_tools():
     tools, handlers = registry.build(list(registry.TOOLSETS), read_only=False, no_destructive=True)
-    assert not any(t.annotations.destructiveHint for t in tools)
+    assert not any(t.annotations.destructive_hint for t in tools)
     assert {"start_vm", "create_vm_snapshot", "list_vms"} <= set(handlers)
     assert not {"delete_vm", "stop_vm", "rollback_vm_snapshot"} & set(handlers)
-    assert len(tools) == len(ALL) - sum(bool(t.annotations.destructiveHint) for t in ALL)
+    assert len(tools) == len(ALL) - sum(bool(t.annotations.destructive_hint) for t in ALL)
 
 
 def test_wait_property_only_on_waitable_tools():
     for t in ALL:
-        assert ("wait" in t.inputSchema["properties"]) == (t.name in registry.WAITABLE), t.name
+        assert ("wait" in t.input_schema["properties"]) == (t.name in registry.WAITABLE), t.name

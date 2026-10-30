@@ -33,8 +33,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    # mcp 2.x removed the @app.list_tools()/@app.call_tool() decorator API used in server.py.
-    "mcp>=1.30.0,<2",
+    # mcp 2 serves both the handshake protocol (2024-11-05 to 2025-11-25) and the stateless
+    # 2026-07-28 protocol. Majors are code changes: Dependabot skips them.
+    "mcp>=2.3.0,<3",
     "httpx>=0.28.1",
     "python-dotenv>=1.2.4",
     # For the streamable-HTTP entrypoint; mcp already depends on both.

@@ -4,7 +4,6 @@ import json
 import re
 
 import pytest
-from pydantic import AnyUrl
 
 from proxmox_mcp import prompts, registry, resources, server
 
@@ -80,7 +79,8 @@ class FakeProxmox:
 async def test_read_resource_through_server(monkeypatch):
     fake = FakeProxmox()
     monkeypatch.setattr(server, "proxmox", fake)
-    [content] = await server.read_resource(AnyUrl("proxmox://nodes"))
+    result = await server.read_resource("proxmox://nodes")
+    [content] = result.contents
     assert content.mime_type == "application/json"
-    assert json.loads(content.content) == {"data": [{"node": "pve1", "status": "online"}]}
+    assert json.loads(content.text) == {"data": [{"node": "pve1", "status": "online"}]}
     assert fake.calls == ["/nodes"]

@@ -26,13 +26,27 @@ import json
 import os
 import sys
 import time
+from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
 import mcp.server.stdio
-from mcp.server import Server
-from mcp.server.lowlevel.helper_types import ReadResourceContents
-from mcp.types import GetPromptResult, Prompt, Resource, ResourceTemplate, TextContent, Tool
-from pydantic import AnyUrl
+from mcp.server import Server, ServerRequestContext
+from mcp.types import (
+    CallToolRequestParams,
+    CallToolResult,
+    GetPromptRequestParams,
+    GetPromptResult,
+    ListPromptsResult,
+    ListResourcesResult,
+    ListResourceTemplatesResult,
+    ListToolsResult,
+    PaginatedRequestParams,
+    ReadResourceRequestParams,
+    ReadResourceResult,
+    TextContent,
+    TextResourceContents,
+    Tool,
+)
 
 from . import audit, auth, guards, prompts, registry, resources, tasks
 from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config
@@ -67,12 +81,8 @@ def startup_summary() -> str:
     return f"Tools: {len(ALL_TOOLS)} ({scope})"
 
 
-def current_principal() -> auth.Principal:
-    """Who sent the request being handled: stdio, or the HTTP token's principal."""
-    try:
-        request = app.request_context.request
-    except LookupError:
-        return auth.STDIO
+def principal_of(request: Any) -> auth.Principal:
+    """Who sent a request: stdio (no HTTP request), or the principal the HTTP auth set."""
     if request is None:
         return auth.STDIO
     state = getattr(request, "scope", {}).get("state") or {}
@@ -83,73 +93,38 @@ def _dump(value: Any) -> str:
     # Compact JSON: indentation costs the client tokens on every large result.
     return json.dumps(value, separators=(",", ":"), ensure_ascii=False, default=str)
 
-# --- MCP server setup ---
+
+def _via(who: auth.Principal) -> str:
+    return "stdio" if who is auth.STDIO else "http"
+
+
+try:
+    VERSION = version("proxmox-mcp-server")
+except PackageNotFoundError:  # running from a source tree that isn't installed
+    VERSION = "0"
 
 proxmox = ProxmoxClient()
-app = Server("proxmox-mcp-server")
 
 
-@app.list_tools()
-async def list_tools() -> list[Tool]:
-    role = current_principal().role
-    if role == "admin":
+# --- What each handler does, with the caller passed in ---
+
+
+def list_tools(who: auth.Principal = auth.STDIO) -> list[Tool]:
+    if who.role == "admin":
         return ALL_TOOLS
-    return [t for t in ALL_TOOLS if auth.allows(role, t.name)]
+    return [t for t in ALL_TOOLS if auth.allows(who.role, t.name)]
 
 
-@app.list_prompts()
-async def list_prompts() -> list[Prompt]:
-    return prompts.list_prompts()
-
-
-@app.get_prompt()
-async def get_prompt(name: str, arguments: dict[str, str] | None) -> GetPromptResult:
-    return prompts.get_prompt(name, arguments)
-
-
-@app.list_resources()
-async def list_resources() -> list[Resource]:
-    return resources.list_resources()
-
-
-@app.list_resource_templates()
-async def list_resource_templates() -> list[ResourceTemplate]:
-    return resources.list_templates()
-
-
-@app.read_resource()
-async def read_resource(uri: AnyUrl) -> list[ReadResourceContents]:
-    who = current_principal()
-    started = time.monotonic()
-    entry: dict[str, Any] = {
-        "who": who.name,
-        "via": "stdio" if who is auth.STDIO else "http",
-        "resource": str(uri),
-    }
-    try:
-        text = await resources.read(proxmox, str(uri))
-        entry["outcome"] = "ok"
-    except Exception as e:
-        entry.update(outcome="error", error=str(e))
-        raise
-    finally:
-        if audit.enabled() and audit.AUDIT_READS:
-            entry["ms"] = round((time.monotonic() - started) * 1000)
-            audit.record(entry)
-    return [ReadResourceContents(content=text, mime_type=resources.MIME)]
-
-
-@app.call_tool()
-async def call_tool(name: str, arguments: Any) -> list[TextContent]:
-    who = current_principal()
+async def call_tool(name: str, arguments: Any, who: auth.Principal = auth.STDIO) -> CallToolResult:
     started = time.monotonic()
     args = dict(arguments or {})
     entry: dict[str, Any] = {
         "who": who.name,
-        "via": "stdio" if who is auth.STDIO else "http",
+        "via": _via(who),
         "tool": name,
         "args": audit.redact(args),
     }
+    failed = False
     try:
         mod = TOOL_MODULE.get(name)
         if mod is None:
@@ -175,13 +150,88 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
                 entry["task_ok"] = result["task"].get("ok")
         text = _dump(result)
     except Exception as e:
+        failed = True
         entry["outcome"] = "refused" if isinstance(e, PermissionError) else "error"
         entry["error"] = str(e)
         text = _dump({"error": str(e), "tool": name})
     if audit.enabled() and (audit.AUDIT_READS or not registry.is_read_only(name)):
         entry["ms"] = round((time.monotonic() - started) * 1000)
         audit.record(entry)
-    return [TextContent(type="text", text=text)]
+    return CallToolResult(content=[TextContent(type="text", text=text)], isError=failed)
+
+
+async def read_resource(uri: str, who: auth.Principal = auth.STDIO) -> ReadResourceResult:
+    started = time.monotonic()
+    entry: dict[str, Any] = {"who": who.name, "via": _via(who), "resource": uri}
+    try:
+        text = await resources.read(proxmox, uri)
+        entry["outcome"] = "ok"
+    except Exception as e:
+        entry.update(outcome="error", error=str(e))
+        raise
+    finally:
+        if audit.enabled() and audit.AUDIT_READS:
+            entry["ms"] = round((time.monotonic() - started) * 1000)
+            audit.record(entry)
+    return ReadResourceResult(
+        contents=[TextResourceContents(uri=uri, mimeType=resources.MIME, text=text)]
+    )
+
+
+# --- MCP protocol handlers ---
+
+
+async def _on_list_tools(
+    ctx: ServerRequestContext, _: PaginatedRequestParams | None
+) -> ListToolsResult:
+    return ListToolsResult(tools=list_tools(principal_of(ctx.request)))
+
+
+async def _on_call_tool(ctx: ServerRequestContext, params: CallToolRequestParams) -> CallToolResult:
+    return await call_tool(params.name, params.arguments, principal_of(ctx.request))
+
+
+async def _on_list_prompts(
+    _: ServerRequestContext, __: PaginatedRequestParams | None
+) -> ListPromptsResult:
+    return ListPromptsResult(prompts=prompts.list_prompts())
+
+
+async def _on_get_prompt(
+    _: ServerRequestContext, params: GetPromptRequestParams
+) -> GetPromptResult:
+    return prompts.get_prompt(params.name, params.arguments)
+
+
+async def _on_list_resources(
+    _: ServerRequestContext, __: PaginatedRequestParams | None
+) -> ListResourcesResult:
+    return ListResourcesResult(resources=resources.list_resources())
+
+
+async def _on_list_resource_templates(
+    _: ServerRequestContext, __: PaginatedRequestParams | None
+) -> ListResourceTemplatesResult:
+    return ListResourceTemplatesResult(resourceTemplates=resources.list_templates())
+
+
+async def _on_read_resource(
+    ctx: ServerRequestContext, params: ReadResourceRequestParams
+) -> ReadResourceResult:
+    return await read_resource(str(params.uri), principal_of(ctx.request))
+
+
+app = Server(
+    "proxmox-mcp-server",
+    version=VERSION,
+    on_list_tools=_on_list_tools,
+    on_call_tool=_on_call_tool,
+    on_list_prompts=_on_list_prompts,
+    on_get_prompt=_on_get_prompt,
+    on_list_resources=_on_list_resources,
+    on_list_resource_templates=_on_list_resource_templates,
+    on_read_resource=_on_read_resource,
+)
 
 
 async def main() -> None:

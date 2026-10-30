@@ -15,8 +15,8 @@ updates:
       prefix: "chore"
       include: "scope"
     ignore:
-      # mcp 2.x removed the @app.list_tools()/@app.call_tool() decorators server.py uses.
-      # Moving to 2.x is a code change, not a version bump (see #28, which broke startup).
+      # An mcp major changes the server API, so moving to one is a code change, not a version
+      # bump (1.x to 2.x was; see #28, which broke startup before the migration).
       - dependency-name: "mcp"
         update-types: ["version-update:semver-major"]
 
