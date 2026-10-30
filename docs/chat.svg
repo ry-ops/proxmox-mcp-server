@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" role="img" aria-labelledby="t d">
   <title id="t">Talk to your cluster</title>
-  <desc id="d">You ask to run df -h inside VM 120. The assistant calls vm_agent_exec through the QEMU guest agent, gets a PID, calls vm_agent_exec_status, and shows the disk usage: root is 69 percent full. It offers resize_vm_disk. A side panel cycles through other questions and the tools that answer them.</desc>
+  <desc id="d">You ask to run df -h inside VM 120. The assistant calls vm_agent_exec, labelled destructive, through the QEMU guest agent, gets a PID, calls vm_agent_exec_status, labelled read-only, and shows the disk usage: root is 69 percent full. It offers resize_vm_disk. A side panel cycles through other questions and the tools that answer them.</desc>
   <style>
     text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
     .muted { fill: #8b96ad; }
@@ -31,10 +31,10 @@
   <!-- Conversation -->
   <rect x="30" y="98" width="600" height="320" rx="16" fill="#161d2b" stroke="#2c3750"/>
   <g class="u"><rect x="330" y="112" width="284" height="34" rx="12" fill="#2a3550"/><text x="346" y="134" font-size="14">Run <tspan class="mono">df -h</tspan> inside VM 120</text></g>
-  <g class="t1"><rect x="46" y="158" width="400" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="176" font-size="12.5" class="mono"><tspan style="fill:#ffc48a">vm_agent_exec</tspan><tspan class="muted"> vmid=120 command=["df","-h"]</tspan></text></g>
-  <g class="r1"><text x="456" y="176" font-size="12.5" class="mono" style="fill:#9ff0c4">→ pid 4242</text></g>
-  <g class="t2"><rect x="46" y="190" width="400" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="208" font-size="12.5" class="mono"><tspan style="fill:#ffc48a">vm_agent_exec_status</tspan><tspan class="muted"> vmid=120 pid=4242</tspan></text></g>
-  <g class="r2"><text x="456" y="208" font-size="12.5" class="mono" style="fill:#9ff0c4">→ exited 0</text></g>
+  <g class="t1"><rect x="46" y="158" width="458" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="176" font-size="12.5" class="mono"><tspan style="fill:#ffc48a">vm_agent_exec</tspan><tspan class="muted"> vmid=120 command=["df","-h"]</tspan></text><text x="494" y="175" text-anchor="end" font-size="9.5" font-weight="800" letter-spacing=".04em" style="fill:#ff9aa5">DESTRUCTIVE</text></g>
+  <g class="r1"><text x="514" y="176" font-size="12.5" class="mono" style="fill:#9ff0c4">→ pid 4242</text></g>
+  <g class="t2"><rect x="46" y="190" width="458" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="208" font-size="12.5" class="mono"><tspan style="fill:#ffc48a">vm_agent_exec_status</tspan><tspan class="muted"> vmid=120 pid=4242</tspan></text><text x="494" y="207" text-anchor="end" font-size="9.5" font-weight="800" letter-spacing=".04em" style="fill:#9ff0c4">READ-ONLY</text></g>
+  <g class="r2"><text x="514" y="208" font-size="12.5" class="mono" style="fill:#9ff0c4">→ exited 0</text></g>
   <rect x="58" y="226" width="556" height="96" rx="10" fill="#0b0f18"/>
   <text x="70" y="243" font-size="10" font-weight="700" class="muted" letter-spacing=".1em">OUTPUT · VM 120 · via QEMU guest agent</text>
   <g class="o0"><text x="70" y="262" font-size="12.5" class="mono" style="fill:#8b96ad" xml:space="preserve">Filesystem      Size  Used Avail Use% Mounted on</text></g>
