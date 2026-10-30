@@ -19,6 +19,7 @@
   <a href="#tools">341 tools</a> ·
   <a href="#prompts">Prompts</a> ·
   <a href="#quick-start">Quick start</a> ·
+  <a href="#clusters">Clusters</a> ·
   <a href="#toolsets">Toolsets</a> ·
   <a href="#http">HTTP</a> ·
   <a href="#read-only">Safety</a> ·
@@ -283,6 +284,35 @@ Add `-e PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` to keep the tool list small. Fo
 </details>
 
 **4. Restart your client completely** (quit it, don't just close the window), and ask it to list your VMs. More detail in [QUICKSTART.md](QUICKSTART.md) and [SETUP.md](SETUP.md).
+
+<a id="clusters"></a>
+
+### 🏢 Several clusters
+
+Run one server per cluster, each under its own name. Every cluster then gets its own credentials, toolsets, safety settings and audit log, and the assistant always knows which cluster a tool acts on, because the tool names carry the server name (`mcp__proxmox-lab__start_vm` and `mcp__proxmox-prod__start_vm`).
+
+```json
+{
+  "mcpServers": {
+    "proxmox-lab": {
+      "command": "uv",
+      "args": ["--directory", "/absolute/path/to/proxmox-mcp-server", "run", "proxmox-mcp-server"],
+      "env": { "PROXMOX_HOST": "10.0.10.5", "PROXMOX_USER": "root@pam",
+               "PROXMOX_TOKEN_NAME": "automation", "PROXMOX_TOKEN_VALUE": "lab-token" }
+    },
+    "proxmox-prod": {
+      "command": "uv",
+      "args": ["--directory", "/absolute/path/to/proxmox-mcp-server", "run", "proxmox-mcp-server"],
+      "env": { "PROXMOX_HOST": "10.0.20.5", "PROXMOX_USER": "mcp@pve",
+               "PROXMOX_TOKEN_NAME": "readonly", "PROXMOX_TOKEN_VALUE": "prod-token",
+               "PROXMOX_NO_DESTRUCTIVE": "true", "PROXMOX_PROTECTED_VMIDS": "100-110",
+               "PROXMOX_TOOLSETS": "nodes,qemu,lxc,storage" }
+    }
+  }
+}
+```
+
+Give each extra cluster only the toolsets it needs, because every server's tools count against the client's context. Over HTTP, run one `proxmox-mcp-server-http` per cluster on its own port.
 
 ## 🔧 Configuration
 
@@ -628,7 +658,7 @@ QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
 
 ## 🗺️ Roadmap
 
-- Several Proxmox clusters from one server, chosen per call
+- One server for several clusters, chosen per call (today: [one server per cluster](#clusters))
 - Progress notifications while waiting for long tasks
 
 What has shipped is in [CHANGELOG.md](CHANGELOG.md).
