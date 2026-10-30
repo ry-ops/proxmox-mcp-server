@@ -6,12 +6,18 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-10-30
+
 ### Added
 - `proxmox-mcp-server-http`: a streamable-HTTP entrypoint that serves the same tools at `/mcp`,
   so the server can run as a network service. It binds to `127.0.0.1` by default and refuses
   any other address without `MCP_AUTH_TOKEN`, a bearer token checked in constant time, unless
   `MCP_HTTP_ALLOW_NO_AUTH=true`. On loopback it enables DNS-rebinding protection. `/healthz`
   answers without auth. Based on #29 by @djstachniak.
+
+### Changed
+- README and its animations cover toolsets, tool annotations and the HTTP entrypoint, with
+  Claude Code setup and troubleshooting for missing tools and HTTP errors (#65).
 
 ## [2.5.0] - 2026-10-30
 
@@ -151,6 +157,7 @@ released on its own.
 
 Initial release.
 
+[2.6.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.2.0...v2.3.0
