@@ -16,6 +16,12 @@ All notable changes to this project are documented here. The format is based on
 - `PROXMOX_AUDIT_LOG`: a JSON-lines log of every write call (file or `stderr`), with time, caller,
   transport, tool, arguments with secrets redacted, outcome, error, task UPID and result, and
   duration. Refused calls are logged too. `PROXMOX_AUDIT_READS=true` adds reads.
+- MCP prompts: `cluster_health_check`, `capacity_report`, `safe_change` (snapshot, change after
+  your go-ahead, verify, offer rollback), `investigate_failed_tasks` and `decommission_guest`.
+  They only guide the model; every step is a normal tool call under the usual rules.
+- MCP resources: `proxmox://cluster/status`, `cluster/resources`, `cluster/tasks`, `nodes` and
+  `storage`, plus templates for one node's status and one VM's or container's config. Each is a
+  single validated GET, so they work in read-only mode and for every role.
 
 ### Changed
 - CI runs Ruff, and the 29 remaining lint warnings in the tool modules are fixed.
