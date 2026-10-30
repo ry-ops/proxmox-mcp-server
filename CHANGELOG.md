@@ -24,6 +24,9 @@ All notable changes to this project are documented here. The format is based on
   single validated GET, so they work in read-only mode and for every role.
 
 ### Changed
+- Four new README animations: waiting for tasks, the safety settings with the audit log,
+  HTTP clients with roles, and the built-in prompts and resources. `docs/gen/build.py`
+  regenerates them.
 - CI runs Ruff, and the 29 remaining lint warnings in the tool modules are fixed.
 
 ## [2.7.0] - 2026-10-30

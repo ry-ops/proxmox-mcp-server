@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 444" width="960" height="444" role="img" aria-labelledby="t d">
+  <title id="t">HTTP clients with their own tokens and roles</title>
+  <desc id="d">Four clients call proxmox-mcp-server-http. ops with the admin role sees 341 tools, ci with the operator role sees 268, grafana with the read role sees 150, and a client with no token gets 401 Unauthorized. The audit log records ci's clone_vm as ok and grafana's stop_vm as refused for its role.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes a1 { 0%,5.00% { transform: translate(0,0); opacity: 0; } 5.62% { opacity: 1; } 10.00% { transform: translate(100px,0px); opacity: 1; } 11.88%,100% { transform: translate(100px,0px); opacity: 0; } } .a1 { animation: a1 16s infinite; }
+    @keyframes a2 { 0%,10.63% { transform: translate(0,0); opacity: 0; } 11.25% { opacity: 1; } 13.12% { transform: translate(64px,0px); opacity: 1; } 15.00%,100% { transform: translate(64px,0px); opacity: 0; } } .a2 { animation: a2 16s infinite; }
+    @keyframes a3 { 0%,13.12% { opacity: 0; transform: translateY(6px); } 15.31%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a3 { animation: a3 16s infinite; }
+    @keyframes a4 { 0%,15.62% { transform: translate(0,0); opacity: 0; } 16.25% { opacity: 1; } 20.62% { transform: translate(100px,0px); opacity: 1; } 22.50%,100% { transform: translate(100px,0px); opacity: 0; } } .a4 { animation: a4 16s infinite; }
+    @keyframes a5 { 0%,21.25% { transform: translate(0,0); opacity: 0; } 21.88% { opacity: 1; } 23.75% { transform: translate(64px,0px); opacity: 1; } 25.62%,100% { transform: translate(64px,0px); opacity: 0; } } .a5 { animation: a5 16s infinite; }
+    @keyframes a6 { 0%,23.75% { opacity: 0; transform: translateY(6px); } 25.94%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a6 { animation: a6 16s infinite; }
+    @keyframes a7 { 0%,26.25% { transform: translate(0,0); opacity: 0; } 26.88% { opacity: 1; } 31.25% { transform: translate(100px,0px); opacity: 1; } 33.12%,100% { transform: translate(100px,0px); opacity: 0; } } .a7 { animation: a7 16s infinite; }
+    @keyframes a8 { 0%,31.88% { transform: translate(0,0); opacity: 0; } 32.50% { opacity: 1; } 34.38% { transform: translate(64px,0px); opacity: 1; } 36.25%,100% { transform: translate(64px,0px); opacity: 0; } } .a8 { animation: a8 16s infinite; }
+    @keyframes a9 { 0%,34.38% { opacity: 0; transform: translateY(6px); } 36.56%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a9 { animation: a9 16s infinite; }
+    @keyframes a10 { 0%,36.88% { transform: translate(0,0); opacity: 0; } 37.50% { opacity: 1; } 41.87% { transform: translate(100px,0px); opacity: 1; } 43.75%,100% { transform: translate(100px,0px); opacity: 0; } } .a10 { animation: a10 16s infinite; }
+    @keyframes a11 { 0%,42.50% { transform: translate(0,0); opacity: 0; } 43.12% { opacity: 1; } 45.00% { transform: translate(64px,0px); opacity: 1; } 46.87%,100% { transform: translate(64px,0px); opacity: 0; } } .a11 { animation: a11 16s infinite; }
+    @keyframes a12 { 0%,45.00% { opacity: 0; transform: translateY(6px); } 47.19%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a12 { animation: a12 16s infinite; }
+    @keyframes a13 { 0%,56.25% { opacity: 0; transform: translateY(6px); } 58.44%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a13 { animation: a13 16s infinite; }
+    @keyframes a14 { 0%,67.50% { opacity: 0; transform: translateY(6px); } 69.69%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a14 { animation: a14 16s infinite; }
+    
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="960" height="444" rx="20" fill="#0f1420"/>
+  <text x="40" y="52" font-size="28" font-weight="800">One server, many clients</text>
+  <text x="40" y="78" font-size="15" class="muted">Serve it over HTTP and give every client its own token and role. Each sees only what its role allows.</text>
+  <rect x="400" y="112" width="170" height="226" rx="16" fill="#1d2536" stroke="#ff8a1f" stroke-width="2.5"/>
+  <text x="485" y="200" text-anchor="middle" font-size="14" font-weight="800">proxmox-mcp</text>
+  <text x="485" y="218" text-anchor="middle" font-size="14" font-weight="800">-server-http</text>
+  <text x="485" y="242" text-anchor="middle" font-size="11" class="mono muted">:8811/mcp</text>
+  <text x="485" y="262" text-anchor="middle" font-size="10.5" class="muted">bearer tokens · roles</text>
+  <rect x="40" y="112" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
+  <text x="56" y="132" font-size="14" font-weight="700">ops</text>
+  <text x="56" y="149" font-size="11.5" class="muted">Claude Code</text>
+  <rect x="196" y="124" width="80" height="22" rx="11" fill="#0f1420" stroke="#ff8a1f"/><text x="236" y="139" text-anchor="middle" font-size="11" font-weight="700" class="mono" style="fill:#ffc48a">admin</text>
+  <line x1="292" y1="135" x2="398" y2="135" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a1" cx="296" cy="135" r="6" fill="#ff8a1f"/>
+  <line x1="572" y1="135" x2="640" y2="135" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a2" cx="574" cy="135" r="6" fill="#ff8a1f"/>
+  <g class="a3"><rect x="644" y="112" width="286" height="46" rx="10" fill="#161d2b" stroke="#ff8a1f"/><text x="662" y="141" font-size="18" font-weight="800" style="fill:#ffc48a">341 tools</text><text x="912" y="140" text-anchor="end" font-size="12" class="muted">everything</text></g>
+  <rect x="40" y="170" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
+  <text x="56" y="190" font-size="14" font-weight="700">ci</text>
+  <text x="56" y="207" font-size="11.5" class="muted">pipeline</text>
+  <rect x="196" y="182" width="80" height="22" rx="11" fill="#0f1420" stroke="#ffb02e"/><text x="236" y="197" text-anchor="middle" font-size="11" font-weight="700" class="mono" style="fill:#ffd48a">operator</text>
+  <line x1="292" y1="193" x2="398" y2="193" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a4" cx="296" cy="193" r="6" fill="#ffb02e"/>
+  <line x1="572" y1="193" x2="640" y2="193" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a5" cx="574" cy="193" r="6" fill="#ffb02e"/>
+  <g class="a6"><rect x="644" y="170" width="286" height="46" rx="10" fill="#161d2b" stroke="#ffb02e"/><text x="662" y="199" font-size="18" font-weight="800" style="fill:#ffd48a">268 tools</text><text x="912" y="198" text-anchor="end" font-size="12" class="muted">no destructive tools</text></g>
+  <rect x="40" y="228" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
+  <text x="56" y="248" font-size="14" font-weight="700">grafana</text>
+  <text x="56" y="265" font-size="11.5" class="muted">dashboard</text>
+  <rect x="196" y="240" width="80" height="22" rx="11" fill="#0f1420" stroke="#3ec7ff"/><text x="236" y="255" text-anchor="middle" font-size="11" font-weight="700" class="mono" style="fill:#a8e4ff">read</text>
+  <line x1="292" y1="251" x2="398" y2="251" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a7" cx="296" cy="251" r="6" fill="#3ec7ff"/>
+  <line x1="572" y1="251" x2="640" y2="251" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a8" cx="574" cy="251" r="6" fill="#3ec7ff"/>
+  <g class="a9"><rect x="644" y="228" width="286" height="46" rx="10" fill="#161d2b" stroke="#3ec7ff"/><text x="662" y="257" font-size="18" font-weight="800" style="fill:#a8e4ff">150 tools</text><text x="912" y="256" text-anchor="end" font-size="12" class="muted">reads only</text></g>
+  <rect x="40" y="286" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
+  <text x="56" y="306" font-size="14" font-weight="700">unknown</text>
+  <text x="56" y="323" font-size="11.5" class="muted">no token</text>
+  <rect x="196" y="298" width="80" height="22" rx="11" fill="#0f1420" stroke="#ff5c6e"/><text x="236" y="313" text-anchor="middle" font-size="11" font-weight="700" class="mono" style="fill:#ff9aa5">—</text>
+  <line x1="292" y1="309" x2="398" y2="309" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a10" cx="296" cy="309" r="6" fill="#ff5c6e"/>
+  <line x1="572" y1="309" x2="640" y2="309" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <circle class="a11" cx="574" cy="309" r="6" fill="#ff5c6e"/>
+  <g class="a12"><rect x="644" y="286" width="286" height="46" rx="10" fill="#161d2b" stroke="#ff5c6e"/><text x="662" y="315" font-size="18" font-weight="800" style="fill:#ff9aa5">401</text><text x="912" y="314" text-anchor="end" font-size="12" class="muted">Unauthorized</text></g>
+  <rect x="30" y="352" width="900" height="76" rx="14" fill="#0b0f18" stroke="#2c3750"/>
+  <text x="48" y="374" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">AUDIT LOG · WHO DID WHAT</text>
+  <g class="a13"><text x="48" y="396" font-size="11.5" class="mono" style="fill:#9ff0c4" xml:space="preserve">{"who":"ci","via":"http","tool":"clone_vm","args":{"vmid":9000,"newid":123},"outcome":"ok","task_ok":true}</text></g>
+  <g class="a14"><text x="48" y="416" font-size="11.5" class="mono" style="fill:#ff9aa5" xml:space="preserve">{"who":"grafana","via":"http","tool":"stop_vm","outcome":"refused","error":"…not allowed for grafana (role: read)"}</text></g>
+</svg>

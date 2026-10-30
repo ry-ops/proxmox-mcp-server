@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 444" width="960" height="444" role="img" aria-labelledby="t d">
+  <title id="t">Built-in MCP prompts and resources</title>
+  <desc id="d">In the client, typing /mcp__proxmox__ lists five prompts. Choosing cluster_health_check runs five read-only tools: get_cluster_status, get_cluster_resources, list_cluster_tasks, get_task_log and get_ha_status. The assistant reports one critical item, one warning and what is OK, with a verdict. Resources such as proxmox://cluster/resources attach live state without a tool call.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes a1 { 0%,1.88% { opacity: 0; transform: translateY(0px); } 4.06%,18.12% { opacity: 1; transform: translateY(0); } 20.31%,100% { opacity: 0; transform: translateY(0); } } .a1 { animation: a1 16s infinite; }
+    @keyframes a2 { 0%,18.75% { opacity: 0; transform: translateY(0px); } 20.94%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a2 { animation: a2 16s infinite; }
+    @keyframes a3 { 0%,3.75% { opacity: 0; transform: translateY(6px); } 5.94%,18.12% { opacity: 1; transform: translateY(0); } 20.31%,100% { opacity: 0; transform: translateY(0); } } .a3 { animation: a3 16s infinite; }
+    @keyframes a4 { 0%,22.50% { opacity: 0; transform: translateY(6px); } 24.69%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a4 { animation: a4 16s infinite; }
+    @keyframes a5 { 0%,27.50% { opacity: 0; transform: translateY(6px); } 29.69%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a5 { animation: a5 16s infinite; }
+    @keyframes a6 { 0%,32.50% { opacity: 0; transform: translateY(6px); } 34.69%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a6 { animation: a6 16s infinite; }
+    @keyframes a7 { 0%,37.50% { opacity: 0; transform: translateY(6px); } 39.69%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a7 { animation: a7 16s infinite; }
+    @keyframes a8 { 0%,42.50% { opacity: 0; transform: translateY(6px); } 44.69%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a8 { animation: a8 16s infinite; }
+    @keyframes a9 { 0%,65.62% { opacity: 0; transform: translateY(6px); } 67.81%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a9 { animation: a9 16s infinite; }
+    @keyframes a10 { 0%,68.75% { opacity: 0; transform: translateY(6px); } 70.94%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a10 { animation: a10 16s infinite; }
+    @keyframes a11 { 0%,71.88% { opacity: 0; transform: translateY(6px); } 74.06%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a11 { animation: a11 16s infinite; }
+    @keyframes a12 { 0%,50.00% { opacity: 0; transform: translateY(6px); } 52.19%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a12 { animation: a12 16s infinite; }
+    @keyframes a13 { 0%,55.62% { opacity: 0; transform: translateY(6px); } 57.81%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a13 { animation: a13 16s infinite; }
+    @keyframes a14 { 0%,61.25% { opacity: 0; transform: translateY(6px); } 63.44%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a14 { animation: a14 16s infinite; }
+    @keyframes a15 { 0%,68.75% { opacity: 0; transform: translateY(6px); } 70.94%,96.25% { opacity: 1; transform: translateY(0); } 98.44%,100% { opacity: 0; transform: translateY(0); } } .a15 { animation: a15 16s infinite; }
+    .alt { opacity: 0; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="960" height="444" rx="20" fill="#0f1420"/>
+  <text x="40" y="52" font-size="28" font-weight="800">Workflows built in</text>
+  <text x="40" y="78" font-size="15" class="muted">Pick a prompt and the assistant runs the steps with real tools, under the same rules as always.</text>
+  <rect x="30" y="98" width="440" height="330" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <rect x="46" y="112" width="408" height="34" rx="10" fill="#0f1420" stroke="#2c3750"/>
+  <g class="alt a1"><text x="60" y="134" font-size="13" class="mono" style="fill:#e6ebf5">/mcp__proxmox__</text></g>
+  <g class="a2"><text x="60" y="134" font-size="13" class="mono" style="fill:#ffc48a">/mcp__proxmox__cluster_health_check</text></g>
+  <g class="alt a3"><rect x="46" y="150" width="408" height="152" rx="10" fill="#1d2536" stroke="#2c3750"/>
+<rect x="52" y="156" width="396" height="26" rx="7" fill="#2a3550"/>
+<text x="64" y="174" font-size="12.5" class="mono" style="fill:#ffc48a">cluster_health_check</text>
+<text x="64" y="202" font-size="12.5" class="mono" style="fill:#8b96ad">capacity_report</text>
+<text x="64" y="230" font-size="12.5" class="mono" style="fill:#8b96ad">safe_change</text>
+<text x="64" y="258" font-size="12.5" class="mono" style="fill:#8b96ad">investigate_failed_tasks</text>
+<text x="64" y="286" font-size="12.5" class="mono" style="fill:#8b96ad">decommission_guest</text>
+</g>
+  <g class="a4"><rect x="46" y="160" width="300" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="178" font-size="12.5" class="mono" style="fill:#ffc48a">get_cluster_status</text><text x="358" y="178" font-size="11" font-weight="800" style="fill:#9ff0c4">READ-ONLY ✓</text></g>
+  <g class="a5"><rect x="46" y="194" width="300" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="212" font-size="12.5" class="mono" style="fill:#ffc48a">get_cluster_resources</text><text x="358" y="212" font-size="11" font-weight="800" style="fill:#9ff0c4">READ-ONLY ✓</text></g>
+  <g class="a6"><rect x="46" y="228" width="300" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="246" font-size="12.5" class="mono" style="fill:#ffc48a">list_cluster_tasks</text><text x="358" y="246" font-size="11" font-weight="800" style="fill:#9ff0c4">READ-ONLY ✓</text></g>
+  <g class="a7"><rect x="46" y="262" width="300" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="280" font-size="12.5" class="mono" style="fill:#ffc48a">get_task_log</text><text x="358" y="280" font-size="11" font-weight="800" style="fill:#9ff0c4">READ-ONLY ✓</text></g>
+  <g class="a8"><rect x="46" y="296" width="300" height="26" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="58" y="314" font-size="12.5" class="mono" style="fill:#ffc48a">get_ha_status</text><text x="358" y="314" font-size="11" font-weight="800" style="fill:#9ff0c4">READ-ONLY ✓</text></g>
+  <line x1="46" y1="342" x2="454" y2="342" stroke="#2c3750"/>
+  <text x="46" y="364" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">RESOURCES · LIVE STATE, NO TOOL CALL</text>
+  <g class="a9"><rect x="46" y="376" width="204" height="22" rx="11" fill="#10283a" stroke="#3ec7ff"/><text x="58" y="391" font-size="11" class="mono" style="fill:#a8e4ff">proxmox://cluster/resources</text></g>
+  <g class="a10"><rect x="260" y="376" width="146" height="22" rx="11" fill="#10283a" stroke="#3ec7ff"/><text x="272" y="391" font-size="11" class="mono" style="fill:#a8e4ff">proxmox://nodes</text></g>
+  <g class="a11"><rect x="46" y="404" width="270" height="22" rx="11" fill="#10283a" stroke="#3ec7ff"/><text x="58" y="419" font-size="11" class="mono" style="fill:#a8e4ff">proxmox://vms/{node}/{vmid}/config</text></g>
+  <rect x="490" y="98" width="440" height="330" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <text x="508" y="124" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">THE ASSISTANT REPORTS</text>
+  <g class="a12"><rect x="508" y="140" width="404" height="72" rx="10" fill="#1d2536"/><rect x="508" y="140" width="5" height="72" rx="2" fill="#ff5c6e"/><text x="526" y="162" font-size="11" font-weight="800" letter-spacing=".08em" style="fill:#ff9aa5">CRITICAL</text><text x="526" y="182" font-size="13">Backup job on pve2 failed: storage 'nas' unreachable</text><text x="526" y="201" font-size="12" class="muted">Fix: check the NFS mount, then rerun the job</text></g>
+  <g class="a13"><rect x="508" y="224" width="404" height="72" rx="10" fill="#1d2536"/><rect x="508" y="224" width="5" height="72" rx="2" fill="#ffb02e"/><text x="526" y="246" font-size="11" font-weight="800" letter-spacing=".08em" style="fill:#ffd48a">WARNING</text><text x="526" y="266" font-size="13">local-lvm on pve1 is almost full</text><text x="526" y="285" font-size="12" class="muted">Fix: prune old snapshots or grow the pool</text></g>
+  <g class="a14"><rect x="508" y="308" width="404" height="72" rx="10" fill="#1d2536"/><rect x="508" y="308" width="5" height="72" rx="2" fill="#3ddc84"/><text x="526" y="330" font-size="11" font-weight="800" letter-spacing=".08em" style="fill:#9ff0c4">OK</text><text x="526" y="350" font-size="13">Quorum held, all nodes online</text><text x="526" y="369" font-size="12" class="muted">HA resources in their requested state</text></g>
+  <g class="a15"><text x="508" y="412" font-size="13" font-weight="700">Verdict: healthy, one backup to fix today.</text></g>
+</svg>
