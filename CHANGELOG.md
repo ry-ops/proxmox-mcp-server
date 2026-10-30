@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `proxmox-mcp-server-http`: a streamable-HTTP entrypoint that serves the same tools at `/mcp`,
+  so the server can run as a network service. It binds to `127.0.0.1` by default and refuses
+  any other address without `MCP_AUTH_TOKEN`, a bearer token checked in constant time, unless
+  `MCP_HTTP_ALLOW_NO_AUTH=true`. On loopback it enables DNS-rebinding protection. `/healthz`
+  answers without auth. Based on #29 by @djstachniak.
+
 ## [2.5.0] - 2026-10-30
 
 ### Added
