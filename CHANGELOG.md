@@ -18,6 +18,16 @@ All notable changes to this project are documented here. The format is based on
   against the HTTP methods it sends, plus schema checks for all 340 tools.
 - CI runs the test suite on Python 3.10 to 3.13 for every push and pull request.
 
+### Fixed
+- Password auth keeps working past two hours. Proxmox tickets expire after 2 hours and the
+  client never renewed them, so every call failed with 401 after that. It now logs in again
+  after 90 minutes, and retries once with a new ticket if Proxmox answers 401 anyway.
+  Concurrent requests share one login. Token auth is unchanged.
+
+### Security
+- `certifi` 2026.10.23 (critical advisory; versions before 2026.10.18 are affected) and
+  `black` 26.10.1 (dev only; high advisory) in `uv.lock`.
+
 ### Changed
 - `PROXMOX_READ_ONLY=true` now advertises only the 149 read tools instead of all 340.
   The write tools were already refused, so clients no longer see tools they cannot use.
