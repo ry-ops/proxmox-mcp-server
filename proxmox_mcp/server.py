@@ -140,7 +140,7 @@ async def call_tool(name: str, arguments: Any, who: auth.Principal = auth.STDIO)
         result = await mod.handle(name, args, proxmox)
         if wait:
             upid = result.get("data") if isinstance(result, dict) else None
-            if tasks.is_upid(upid):
+            if isinstance(upid, str) and tasks.is_upid(upid):
                 result = {**result, "task": await tasks.wait(proxmox, upid)}
         entry["outcome"] = "ok"
         if isinstance(result, dict):
@@ -157,7 +157,7 @@ async def call_tool(name: str, arguments: Any, who: auth.Principal = auth.STDIO)
     if audit.enabled() and (audit.AUDIT_READS or not registry.is_read_only(name)):
         entry["ms"] = round((time.monotonic() - started) * 1000)
         audit.record(entry)
-    return CallToolResult(content=[TextContent(type="text", text=text)], isError=failed)
+    return CallToolResult(content=[TextContent(type="text", text=text)], is_error=failed)
 
 
 async def read_resource(uri: str, who: auth.Principal = auth.STDIO) -> ReadResourceResult:
@@ -174,7 +174,7 @@ async def read_resource(uri: str, who: auth.Principal = auth.STDIO) -> ReadResou
             entry["ms"] = round((time.monotonic() - started) * 1000)
             audit.record(entry)
     return ReadResourceResult(
-        contents=[TextResourceContents(uri=uri, mimeType=resources.MIME, text=text)]
+        contents=[TextResourceContents(uri=uri, mime_type=resources.MIME, text=text)]
     )
 
 
@@ -212,7 +212,7 @@ async def _on_list_resources(
 async def _on_list_resource_templates(
     _: ServerRequestContext, __: PaginatedRequestParams | None
 ) -> ListResourceTemplatesResult:
-    return ListResourceTemplatesResult(resourceTemplates=resources.list_templates())
+    return ListResourceTemplatesResult(resource_templates=resources.list_templates())
 
 
 async def _on_read_resource(

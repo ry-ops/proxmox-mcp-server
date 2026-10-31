@@ -74,7 +74,7 @@ def load_principals(
         parts = item.split(":", 2)
         if len(parts) != 3:
             raise ValueError(f"MCP_AUTH_TOKENS entry {i}: use name:role:token")
-        found.append(_entry(*parts, where=f"MCP_AUTH_TOKENS entry {i}"))
+        found.append(_entry(parts[0], parts[1], parts[2], where=f"MCP_AUTH_TOKENS entry {i}"))
     if tokens_file:
         for n, line in enumerate(Path(tokens_file).read_text().splitlines(), 1):
             line = line.split("#", 1)[0].strip()
@@ -83,7 +83,7 @@ def load_principals(
             parts = line.split()
             if len(parts) != 3:
                 raise ValueError(f"{tokens_file}:{n}: use 'name role token'")
-            found.append(_entry(*parts, where=f"{tokens_file}:{n}"))
+            found.append(_entry(parts[0], parts[1], parts[2], where=f"{tokens_file}:{n}"))
     names = [p.name for p in found]
     tokens_seen = [p.token for p in found]
     if len(set(names)) != len(names):
