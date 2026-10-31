@@ -39,8 +39,8 @@ dependencies = [
     "httpx>=0.28.1",
     "python-dotenv>=1.2.4",
     # For the streamable-HTTP entrypoint; mcp already depends on both.
-    "starlette>=0.37.0",
-    "uvicorn>=0.30.0",
+    "starlette>=1.7.0",
+    "uvicorn>=0.54.0",
 ]
 
 [project.urls]
@@ -63,9 +63,9 @@ packages = ["proxmox_mcp"]
 
 [dependency-groups]
 dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.1.0",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1",
+    "pytest-cov>=7.1.0",
     "black>=26.10.1",
     "ruff>=0.3.0",
     "mypy>=1.9.0",
