@@ -169,10 +169,10 @@ def build(
                 Tool(
                     name=name,
                     description=d["description"],
-                    inputSchema=schema,
+                    input_schema=schema,
                     annotations=ToolAnnotations(
-                        readOnlyHint=ro,
-                        destructiveHint=False if ro else is_destructive(name),
+                        read_only_hint=ro,
+                        destructive_hint=False if ro else is_destructive(name),
                     ),
                 )
             )
