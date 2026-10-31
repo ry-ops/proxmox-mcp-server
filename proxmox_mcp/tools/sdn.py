@@ -231,6 +231,9 @@ TOOLS = [
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
+    # Declared once so mypy does not infer a narrow key type from the first dict literal.
+    params: dict[str, Any]
+    data: dict[str, Any]
     if name == "apply_sdn":
         return await client.put("/cluster/sdn")
 

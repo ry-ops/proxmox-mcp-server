@@ -439,6 +439,9 @@ TOOLS = [
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
+    # Declared once so mypy does not infer a narrow key type from the first dict literal.
+    params: dict[str, Any]
+    data: dict[str, Any]
     if name == "list_users":
         params = {k: args[k] for k in ("enabled", "full") if k in args}
         return await client.get("/access/users", params or None)
