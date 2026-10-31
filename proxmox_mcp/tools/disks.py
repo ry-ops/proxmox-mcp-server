@@ -243,6 +243,9 @@ TOOLS = [
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
+    # Declared once so mypy does not infer a narrow key type from the first dict literal.
+    params: dict[str, Any]
+    data: dict[str, Any]
     node = args.get("node", "")
 
     if name == "list_node_disks":
@@ -250,7 +253,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/nodes/{node}/disks/list", params or None)
 
     elif name == "get_disk_smart":
-        params: dict[str, Any] = {"disk": args["disk"]}
+        params = {"disk": args["disk"]}
         if "healthonly" in args:
             params["healthonly"] = args["healthonly"]
         return await client.get(f"/nodes/{node}/disks/smart", params)

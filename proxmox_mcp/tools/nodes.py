@@ -436,6 +436,9 @@ TOOLS = [
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
+    # Declared once so mypy does not infer a narrow key type from the first dict literal.
+    params: dict[str, Any]
+    data: dict[str, Any]
     node = args.get("node", "")
 
     if name == "list_nodes":
@@ -550,7 +553,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.post(f"/nodes/{node}/status", {"command": args["command"]})
 
     elif name == "node_startall":
-        data: dict[str, Any] = {}
+        data = {}
         if "vms" in args:
             data["vms"] = args["vms"]
         if "force" in args:
