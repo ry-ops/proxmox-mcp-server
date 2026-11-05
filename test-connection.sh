@@ -134,38 +134,9 @@ else
 fi
 
 # ========================================
-# Test 2: API Version
+# Test 2: Authentication
 # ========================================
-print_header "Test 2: API Version"
-
-print_info "Checking API availability (no auth required)"
-
-VERSION=$(curl -k -s --max-time 10 "https://${PROXMOX_HOST}:${PROXMOX_PORT}/api2/json/version" 2>/dev/null)
-
-if echo "$VERSION" | grep -q "version"; then
-    print_success "API responding"
-    
-    # Extract and display version info
-    PVE_VERSION=$(echo "$VERSION" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
-    if [ -n "$PVE_VERSION" ]; then
-        print_info "Proxmox VE Version: $PVE_VERSION"
-    fi
-    
-    RELEASE=$(echo "$VERSION" | grep -o '"release":"[^"]*"' | cut -d'"' -f4)
-    if [ -n "$RELEASE" ]; then
-        print_info "Release: $RELEASE"
-    fi
-else
-    print_error "API not responding correctly"
-    echo ""
-    echo "   Response: $VERSION"
-    exit 1
-fi
-
-# ========================================
-# Test 3: Authentication
-# ========================================
-print_header "Test 3: Authentication"
+print_header "Test 2: Authentication"
 
 if [ "$AUTH_METHOD" = "token" ]; then
     # Test token authentication
@@ -212,6 +183,41 @@ else
         echo ""
         exit 1
     fi
+fi
+
+# ========================================
+# Test 3: API Version
+# ========================================
+print_header "Test 3: API Version"
+
+print_info "Checking API availability with authentication"
+
+if [ "$AUTH_METHOD" = "token" ]; then
+    VERSION=$(curl -k -s --max-time 10 -H "$AUTH_HEADER" \
+        "https://${PROXMOX_HOST}:${PROXMOX_PORT}/api2/json/version" 2>/dev/null)
+else
+    VERSION=$(curl -k -s --max-time 10 -H "Cookie: PVEAuthCookie=${TICKET}" \
+        "https://${PROXMOX_HOST}:${PROXMOX_PORT}/api2/json/version" 2>/dev/null)
+fi
+
+if echo "$VERSION" | grep -q "version"; then
+    print_success "API responding"
+
+    # Extract and display version info
+    PVE_VERSION=$(echo "$VERSION" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+    if [ -n "$PVE_VERSION" ]; then
+        print_info "Proxmox VE Version: $PVE_VERSION"
+    fi
+
+    RELEASE=$(echo "$VERSION" | grep -o '"release":"[^"]*"' | cut -d'"' -f4)
+    if [ -n "$RELEASE" ]; then
+        print_info "Release: $RELEASE"
+    fi
+else
+    print_error "API not responding correctly"
+    echo ""
+    echo "   Response: $VERSION"
+    exit 1
 fi
 
 # ========================================
