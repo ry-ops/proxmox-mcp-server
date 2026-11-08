@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..client import ProxmoxClient
@@ -10,6 +11,9 @@ NODE = {"type": "string", "description": "Node name (e.g. pve01)"}
 OPT_INT = lambda desc: {"type": "integer", "description": desc}  # noqa: E731
 OPT_STR = lambda desc: {"type": "string", "description": desc}  # noqa: E731
 OPT_BOOL = lambda desc: {"type": "boolean", "description": desc}  # noqa: E731
+
+# Container mount point keys accepted in restore_container_backup's `mountpoints`.
+MOUNTPOINT_KEY = re.compile(r"mp\d+")
 
 
 TOOLS = [
@@ -234,7 +238,11 @@ TOOLS = [
     },
     {
         "name": "restore_container_backup",
-        "description": "Restore an LXC container from a backup file.",
+        "description": (
+            "Restore an LXC container from a backup file. Without rootfs, every mount point is "
+            "recreated from the backup at its original size. With rootfs, Proxmox creates only "
+            "rootfs and the mountpoints you pass."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -249,6 +257,19 @@ TOOLS = [
                 "bwlimit": OPT_INT("Bandwidth limit in KB/s"),
                 "pool": OPT_STR("Resource pool"),
                 "unprivileged": OPT_BOOL("Create as unprivileged container"),
+                "rootfs": OPT_STR(
+                    "Root disk override, e.g. local-lvm:48,mountoptions=noatime (size in GiB). "
+                    "Required when mountpoints is set"
+                ),
+                "mountpoints": {
+                    "type": "object",
+                    "description": (
+                        "Mount points to create with rootfs, keyed mp0, mp1, ..., e.g. "
+                        '{"mp0": "local-lvm:248,mp=/data,backup=1"}. Backup mount points '
+                        "not listed here are not restored"
+                    ),
+                    "additionalProperties": {"type": "string"},
+                },
             },
             "required": ["node", "vmid", "ostemplate"],
         },
@@ -328,7 +349,17 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
 
     elif name == "restore_container_backup":
         node = args["node"]
-        data = {k: v for k, v in args.items() if k != "node"}
+        mountpoints = args.get("mountpoints") or {}
+        if not isinstance(mountpoints, dict):
+            raise ValueError("mountpoints must be an object keyed mp0, mp1, ...")
+        bad = sorted(k for k in mountpoints if not MOUNTPOINT_KEY.fullmatch(k))
+        if bad:
+            raise ValueError(f"mountpoints keys must be mp0, mp1, ...; got {', '.join(bad)}")
+        data = {k: v for k, v in args.items() if k not in ("node", "mountpoints")}
+        data.update(mountpoints)
+        # Without restore=1, Proxmox treats the archive as a template: it creates a new
+        # container and drops the backup's config (network, mount points, features).
+        data["restore"] = True
         return await client.post(f"/nodes/{node}/lxc", data)
 
     raise ValueError(f"Unknown tool: {name}")

@@ -66,6 +66,84 @@ async def test_create_vm_extra_config_merged(monkeypatch):
     assert body["ciuser"] == "ubuntu" and "extra_config" not in body and "node" not in body
 
 
+BACKUP = "backup:backup/vzdump-lxc-102-2026_11_08-14_42_01.tar.zst"
+
+
+async def test_restore_container_backup_marks_request_as_restore(monkeypatch):
+    seen = []
+    c = make_client(
+        monkeypatch, lambda r: seen.append(r) or httpx.Response(200, json={"data": "UPID:x"})
+    )
+    await storage.handle(
+        "restore_container_backup",
+        {"node": "pve01", "vmid": 102, "ostemplate": BACKUP, "storage": "local-lvm", "force": True},
+        c,
+    )
+    assert seen[0].url.path == "/api2/json/nodes/pve01/lxc"
+    assert form(seen[0]) == {
+        "vmid": "102",
+        "ostemplate": BACKUP,
+        "storage": "local-lvm",
+        "force": "1",
+        "restore": "1",
+    }
+
+
+async def test_restore_container_backup_sends_disk_overrides(monkeypatch):
+    seen = []
+    c = make_client(
+        monkeypatch, lambda r: seen.append(r) or httpx.Response(200, json={"data": "UPID:x"})
+    )
+    await storage.handle(
+        "restore_container_backup",
+        {
+            "node": "pve01",
+            "vmid": 102,
+            "ostemplate": BACKUP,
+            "rootfs": "local-lvm:48,mountoptions=noatime",
+            "mountpoints": {
+                "mp0": "local-lvm:248,mp=/root/.scrypted/volume,backup=1",
+                "mp1": "local-lvm:1000,mp=/mnt/nvr,backup=0",
+            },
+        },
+        c,
+    )
+    body = form(seen[0])
+    assert body["rootfs"] == "local-lvm:48,mountoptions=noatime" and body["restore"] == "1"
+    assert body["mp0"] == "local-lvm:248,mp=/root/.scrypted/volume,backup=1"
+    assert body["mp1"] == "local-lvm:1000,mp=/mnt/nvr,backup=0"
+    assert "mountpoints" not in body and "node" not in body
+
+
+@pytest.mark.parametrize(
+    "mountpoints",
+    [
+        {"vmid": "100"},  # would replace the target guest after the protected-guest check
+        {"unused0": "local-lvm:vm-102-disk-1"},
+        {"mp": "local-lvm:8,mp=/data"},
+        "mp0=local-lvm:8,mp=/data",
+    ],
+)
+async def test_restore_container_backup_rejects_non_mountpoint_keys(monkeypatch, mountpoints):
+    seen = []
+    c = make_client(
+        monkeypatch, lambda r: seen.append(r) or httpx.Response(200, json={"data": "UPID:x"})
+    )
+    with pytest.raises(ValueError, match="mountpoints"):
+        await storage.handle(
+            "restore_container_backup",
+            {
+                "node": "pve01",
+                "vmid": 102,
+                "ostemplate": BACKUP,
+                "rootfs": "local-lvm:8",
+                "mountpoints": mountpoints,
+            },
+            c,
+        )
+    assert seen == []
+
+
 class DeployFake:
     """Routes the calls deploy_fortigate_vm makes and records them."""
 

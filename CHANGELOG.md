@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format is based on
 
 ### Added
 - README: running several clusters, one server per cluster with its own settings.
+- `restore_container_backup` takes `rootfs` and `mountpoints` (`mp0`, `mp1`, ...) to resize or
+  move a container's disks during the restore. `mountpoints` accepts only `mpN` keys.
+
+### Fixed
+- `restore_container_backup` now sends `restore=1`. Without it, Proxmox treated the backup as a
+  template: it created a new container and dropped the backup's network, mount points and other
+  configuration.
 
 ## [2.9.0] - 2026-10-30
 

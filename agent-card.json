@@ -1619,7 +1619,7 @@
         },
         {
           "name": "restore_container_backup",
-          "description": "Restore an LXC container from a backup file.",
+          "description": "Restore an LXC container from a backup file. Without rootfs, every mount point is recreated from the backup at its original size. With rootfs, Proxmox creates only rootfs and the mountpoints you pass.",
           "inputs": [
             "node",
             "vmid",
@@ -1631,7 +1631,9 @@
             "start (optional)",
             "bwlimit (optional)",
             "pool (optional)",
-            "unprivileged (optional)"
+            "unprivileged (optional)",
+            "rootfs (optional)",
+            "mountpoints (optional)"
           ],
           "read_only": false,
           "destructive": true
