@@ -38,7 +38,7 @@ from starlette.routing import Route
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from . import auth
-from .client import _validate_config
+from .client import _validate_config, tls_warning
 from .server import app, proxmox, startup_summary
 
 # Clients reach a loopback-bound server under these Host/Origin values.
@@ -170,6 +170,8 @@ def run() -> None:
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server (streamable HTTP)", file=sys.stderr)
     print(startup_summary(), file=sys.stderr)
+    if warning := tls_warning():
+        print(warning, file=sys.stderr)
     print(f"Listening on http://{host}:{port}/mcp ({mode})", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
     uvicorn.run(build_asgi_app(host, principals=principals), host=host, port=port)

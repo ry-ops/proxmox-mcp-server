@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import os
 import re
+import ssl
 import sys
 import time
 from typing import Any
@@ -22,6 +23,9 @@ PROXMOX_TOKEN_NAME = os.getenv("PROXMOX_TOKEN_NAME", "")
 PROXMOX_TOKEN_VALUE = os.getenv("PROXMOX_TOKEN_VALUE", "")
 PROXMOX_PASSWORD = os.getenv("PROXMOX_PASSWORD", "")
 PROXMOX_VERIFY_SSL = os.getenv("PROXMOX_VERIFY_SSL", "false").lower() == "true"
+# The Proxmox cluster CA (/etc/pve/pve-root-ca.pem on any node). Set, it turns verification on
+# against that CA, so nodes with their default self-signed certificates can be verified.
+PROXMOX_CA_BUNDLE = os.getenv("PROXMOX_CA_BUNDLE", "")
 PROXMOX_READ_ONLY = os.getenv("PROXMOX_READ_ONLY", "false").lower() == "true"
 
 # A "." or ".." segment would let a tool argument move the request to another endpoint
@@ -45,6 +49,39 @@ def _validate_config() -> None:
             file=sys.stderr,
         )
         sys.exit(1)
+
+
+def tls_verify() -> ssl.SSLContext | bool:
+    """What the client checks the Proxmox certificate against.
+
+    PROXMOX_CA_BUNDLE: that CA file. PROXMOX_VERIFY_SSL=true: the system's trusted CAs.
+    Neither: nothing. A CA file that can't be loaded stops the server rather than
+    falling back to no verification.
+    """
+    if PROXMOX_CA_BUNDLE:
+        try:
+            ctx = ssl.create_default_context(cafile=PROXMOX_CA_BUNDLE)
+        except (OSError, ssl.SSLError) as e:
+            print(f"Error: PROXMOX_CA_BUNDLE={PROXMOX_CA_BUNDLE}: {e}", file=sys.stderr)
+            sys.exit(1)
+        # Python 3.13+ turns on strict RFC 5280 checks, which reject node certificates that
+        # older Proxmox releases issued without an Authority Key Identifier. The chain to this
+        # CA and the hostname are still verified.
+        ctx.verify_flags &= ~ssl.VERIFY_X509_STRICT
+        return ctx
+    return PROXMOX_VERIFY_SSL
+
+
+def tls_warning() -> str | None:
+    """A startup warning when the Proxmox certificate isn't verified, else None."""
+    if PROXMOX_CA_BUNDLE or PROXMOX_VERIFY_SSL:
+        return None
+    return (
+        "Warning: the Proxmox TLS certificate is not verified, so anyone on the network path "
+        "can read the API token or password. Set PROXMOX_CA_BUNDLE to the cluster CA "
+        "(/etc/pve/pve-root-ca.pem on any node), or PROXMOX_VERIFY_SSL=true for a publicly "
+        "trusted certificate."
+    )
 
 
 def _api_error(response: httpx.Response) -> httpx.HTTPStatusError:
@@ -75,7 +112,7 @@ def _api_error(response: httpx.Response) -> httpx.HTTPStatusError:
 class ProxmoxClient:
     def __init__(self) -> None:
         self.base_url = f"https://{PROXMOX_HOST}:{PROXMOX_PORT}/api2/json"
-        self.client = httpx.AsyncClient(verify=PROXMOX_VERIFY_SSL, timeout=30.0)
+        self.client = httpx.AsyncClient(verify=tls_verify(), timeout=30.0)
         self.ticket: str | None = None
         self.csrf_token: str | None = None
         self.token: str | None = None

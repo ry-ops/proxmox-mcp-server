@@ -470,12 +470,15 @@ curl -k https://localhost:8006/api2/json/version
 
 **Solutions:**
 
-**Option 1: Disable verification (testing only)**
+**Option 1: Verify against the Proxmox cluster CA (works with the default certificates)**
 ```bash
-export PROXMOX_VERIFY_SSL=false
+# Copy the cluster CA from any node
+scp root@YOUR_PROXMOX_HOST:/etc/pve/pve-root-ca.pem ~/.config/proxmox-mcp/pve-root-ca.pem
+export PROXMOX_CA_BUNDLE=~/.config/proxmox-mcp/pve-root-ca.pem
 ```
+`PROXMOX_HOST` must be a name or IP address in the node's certificate (its hostname or IP).
 
-**Option 2: Install valid certificate**
+**Option 2: Install a publicly trusted certificate** (then `PROXMOX_VERIFY_SSL=true`)
 ```bash
 # On Proxmox host - use Let's Encrypt
 pvenode acme account register default mail@example.com
@@ -484,12 +487,18 @@ pvenode acme cert order
 systemctl restart pveproxy
 ```
 
-**Option 3: Install custom certificate**
+**Option 3: Install a custom certificate**
 ```bash
 # On Proxmox host
 cp your-cert.pem /etc/pve/local/pveproxy-ssl.pem
 cp your-key.pem /etc/pve/local/pveproxy-ssl.key
 systemctl restart pveproxy
+```
+
+**Last resort: turn verification off (testing only).** The token can then be read by anyone on
+the network path, and the server warns about it at startup.
+```bash
+export PROXMOX_VERIFY_SSL=false
 ```
 
 ### "Token shows 'Privilege Separation: Yes'"

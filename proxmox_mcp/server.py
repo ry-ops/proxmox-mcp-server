@@ -10,6 +10,7 @@ Configuration (environment variables):
     PROXMOX_TOKEN_VALUE API token value (required if no password)
     PROXMOX_PASSWORD    Password (alternative to token auth)
     PROXMOX_VERIFY_SSL  Verify SSL certs (default: false)
+    PROXMOX_CA_BUNDLE   CA file to verify the Proxmox certificate against, e.g. pve-root-ca.pem
     PROXMOX_READ_ONLY   Block all writes (POST/PUT/DELETE); GET only (default: false)
     PROXMOX_TOOLSETS    Comma-separated API areas to load, e.g. nodes,qemu,lxc (default: all)
     PROXMOX_NO_DESTRUCTIVE   Hide tools that delete, stop, wipe or roll back (default: false)
@@ -49,7 +50,7 @@ from mcp.types import (
 )
 
 from . import audit, auth, guards, prompts, registry, resources, tasks
-from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config
+from .client import PROXMOX_READ_ONLY, ProxmoxClient, _validate_config, tls_warning
 
 # --- Build the tool registry ---
 
@@ -242,6 +243,8 @@ async def main() -> None:
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server", file=sys.stderr)
     print(startup_summary(), file=sys.stderr)
+    if warning := tls_warning():
+        print(warning, file=sys.stderr)
     print("=" * 60, file=sys.stderr)
 
     # Close the HTTP client in this event loop: its connections are bound to it.
