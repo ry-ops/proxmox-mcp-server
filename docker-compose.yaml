@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - PROXMOX_HOST=${PROXMOX_HOST:-10.88.140.151}
+      - PROXMOX_HOST=${PROXMOX_HOST:?Set PROXMOX_HOST in .env (the Proxmox host or IP)}
       - PROXMOX_PORT=${PROXMOX_PORT:-8006}
       - PROXMOX_USER=${PROXMOX_USER}
       - PROXMOX_TOKEN_NAME=${PROXMOX_TOKEN_NAME}

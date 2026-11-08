@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- `docker-compose.yaml` no longer defaults `PROXMOX_HOST` to a lab address. Compose now stops
+  with a message when it isn't set. `.env.example` uses a placeholder host.
+
 ### Added
 - `PROXMOX_CA_BUNDLE`: verify the Proxmox certificate against a CA file, such as the cluster's
   `/etc/pve/pve-root-ca.pem`. Proxmox's default self-signed certificates can now be verified
