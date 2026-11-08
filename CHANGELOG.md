@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `PROXMOX_CA_BUNDLE`: verify the Proxmox certificate against a CA file, such as the cluster's
+  `/etc/pve/pve-root-ca.pem`. Proxmox's default self-signed certificates can now be verified
+  instead of turning verification off. A CA file that can't be loaded stops the server.
+- A startup warning when the Proxmox certificate isn't verified (neither `PROXMOX_CA_BUNDLE`
+  nor `PROXMOX_VERIFY_SSL=true`). The default is unchanged.
+
 ## [2.10.0] - 2026-11-08
 
 ### Added

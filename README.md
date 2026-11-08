@@ -323,7 +323,8 @@ Give each extra cluster only the toolsets it needs, because every server's tools
 | `PROXMOX_TOKEN_NAME` + `PROXMOX_TOKEN_VALUE` | one of | | API token auth (recommended) |
 | `PROXMOX_PASSWORD` | one of | | Password auth |
 | `PROXMOX_PORT` | | `8006` | API port |
-| `PROXMOX_VERIFY_SSL` | | `false` | Verify the server's TLS certificate |
+| `PROXMOX_VERIFY_SSL` | | `false` | Verify the server's TLS certificate against the system's trusted CAs |
+| `PROXMOX_CA_BUNDLE` | | | CA file to verify against instead, e.g. a copy of `/etc/pve/pve-root-ca.pem`; works with Proxmox's default self-signed certificates |
 | `PROXMOX_READ_ONLY` | | `false` | Refuse every write and advertise only read tools; see below |
 | `PROXMOX_TOOLSETS` | | all | Comma-separated API areas to load; see below |
 | `PROXMOX_NO_DESTRUCTIVE` | | `false` | Hide the 73 tools that delete, stop, wipe or roll back; see [Safety](#read-only) |
@@ -473,7 +474,7 @@ The rest of the security picture:
 - **For monitoring-only use, combine both locks:** `PROXMOX_READ_ONLY=true` *and* a token with the **`PVEAuditor`** role. The flag stops the server sending writes; the role makes Proxmox refuse them anyway.
 - **The token's permissions are the real limit.** The server exposes destructive operations: deleting VMs, wiping disks, and running commands inside guests. Whatever the token can do, a connected AI client can ask for. Grant the minimum.
 - **Prefer API tokens** over passwords. They can be revoked on their own.
-- **Set `PROXMOX_VERIFY_SSL=true`** in production with valid certificates.
+- **Verify the TLS certificate.** Without it, anyone on the network path can read the token. With Proxmox's default self-signed certificates, copy `/etc/pve/pve-root-ca.pem` from any node and set `PROXMOX_CA_BUNDLE` to it; with a publicly trusted certificate, set `PROXMOX_VERIFY_SSL=true`. The server prints a warning at startup when neither is set.
 - **Keep credentials out of version control**, and restrict network access to the API with firewall rules.
 
 <a id="a2a"></a>
@@ -571,7 +572,7 @@ async def backup_workflow():
 
 - Check `PROXMOX_HOST` (no scheme, no port) and `PROXMOX_PORT`.
 - Check you can reach the host: `curl -k https://YOUR_HOST:8006/api2/json/version`
-- If `PROXMOX_VERIFY_SSL=true`, the certificate must be valid for that host.
+- If `PROXMOX_VERIFY_SSL=true` or `PROXMOX_CA_BUNDLE` is set, the certificate must be valid for `PROXMOX_HOST`. Proxmox's node certificates name the node's hostname and IP addresses, so use one of those.
 </details>
 
 <details>
