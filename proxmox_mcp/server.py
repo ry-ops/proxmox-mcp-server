@@ -65,6 +65,7 @@ except ValueError as e:
 ALL_TOOLS, TOOL_MODULE = registry.build(
     TOOLSETS, read_only=PROXMOX_READ_ONLY, no_destructive=NO_DESTRUCTIVE
 )
+SCHEMAS = {t.name: t.input_schema for t in ALL_TOOLS}
 
 
 def startup_summary() -> str:
@@ -135,6 +136,7 @@ async def call_tool(name: str, arguments: Any, who: auth.Principal = auth.STDIO)
         if not auth.allows(who.role, name):
             raise PermissionError(f"{name} is not allowed for {who.name} (role: {who.role})")
         wait = bool(args.pop("wait", False)) and name in registry.WAITABLE
+        guards.check_args(name, args, SCHEMAS.get(name))
         if not registry.is_read_only(name):
             guards.check(name, args, PROTECTED)
         result = await mod.handle(name, args, proxmox)

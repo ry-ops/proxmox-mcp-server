@@ -25,6 +25,13 @@ All notable changes to this project are documented here. The format is based on
 - `PROXMOX_PROTECTED_VMIDS` now covers replication jobs. `create_replication_job`,
   `update_replication_job` and `delete_replication_job` read the guest from the job ID
   (`100-0` is guest 100) and refuse protected guests.
+- Tool arguments can no longer redirect a request to a different API endpoint. httpx resolves
+  `..` in paths, and the MCP SDK doesn't check arguments against the tool's schema, so a
+  `vmid` of `"999/../100"` stopped guest 100 past `PROXMOX_PROTECTED_VMIDS`, and
+  `update_replication_job` with an `id` of `"../../nodes/pve/qemu/100/config"` changed that
+  guest's config, past both the guard and the operator role. Now the client refuses any
+  path with `.` or `..` segments (or `?`, `#`, `\`), integer arguments must be whole numbers
+  (digit strings still work), and `node` can't contain `/`.
 
 ## [2.9.0] - 2026-10-30
 
