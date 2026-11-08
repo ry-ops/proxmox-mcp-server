@@ -9,6 +9,15 @@ All notable changes to this project are documented here. The format is based on
 ### Added
 - README: running several clusters, one server per cluster with its own settings.
 
+### Changed
+- The Docker image installs the exact versions in `uv.lock` (`uv sync --locked --no-dev`)
+  instead of resolving from `pyproject.toml`, so it runs what CI tested. Base images are
+  pinned by digest, and Dependabot now updates them.
+- One Docker workflow instead of two. `docker-build-push.yml` pushed the same `:latest` image
+  as `docker-build.yaml`; it's removed, and its manual extra-tag input and docs-only skip moved
+  to `docker-build.yaml`.
+- `pyproject.toml` declares Python 3.13 (CI already tested it) and drops the empty author email.
+
 ### Security
 - The audit log now redacts secrets in fields whose names don't look secret: the private key
   in `upload_node_custom_cert`, ACME plugin credentials (`data`), webhook headers, and

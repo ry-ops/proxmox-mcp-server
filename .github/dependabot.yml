@@ -20,6 +20,25 @@ updates:
       - dependency-name: "mcp"
         update-types: ["version-update:semver-major"]
 
+  # Docker base images (Dockerfile pins them by digest)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      # Stay on Python 3.12 until we choose to move; digest and patch updates still come in.
+      - dependency-name: "python"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
