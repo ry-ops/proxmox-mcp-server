@@ -84,6 +84,31 @@ def targets(name: str, args: dict[str, Any]) -> set[int]:
     return found
 
 
+_INTEGER = re.compile(r"\s*-?\d+\s*")
+
+
+def check_args(name: str, args: dict[str, Any], schema: dict[str, Any] | None) -> None:
+    """Raise PermissionError if an argument has the wrong shape for its place in an API path.
+
+    The MCP SDK doesn't validate arguments against the tool's input schema, so this does the
+    part that matters for safety: integer arguments (vmid, newid, ...) must be whole numbers
+    (digit strings are accepted), and `node` can't contain "/". Without it, a vmid such as
+    "999/../100" reached guest 100 while the protected-guest check saw no guest at all.
+    """
+    props = (schema or {}).get("properties", {})
+    for key, value in args.items():
+        if props.get(key, {}).get("type") != "integer" or value is None:
+            continue
+        ok = (isinstance(value, int) and not isinstance(value, bool)) or (
+            isinstance(value, float) and value.is_integer()
+        )
+        if not ok and not (isinstance(value, str) and _INTEGER.fullmatch(value)):
+            raise PermissionError(f"Refusing {name}: {key} must be a whole number, got {value!r}")
+    node = args.get("node")
+    if node is not None and "/" in str(node):
+        raise PermissionError(f"Refusing {name}: node {node!r} can't contain '/'")
+
+
 def check(name: str, args: dict[str, Any], protected: frozenset[int]) -> None:
     """Raise PermissionError if a write tool would change a protected guest."""
     if not protected:

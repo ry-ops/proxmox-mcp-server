@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import re
 import sys
 import time
 from typing import Any
@@ -22,6 +23,11 @@ PROXMOX_TOKEN_VALUE = os.getenv("PROXMOX_TOKEN_VALUE", "")
 PROXMOX_PASSWORD = os.getenv("PROXMOX_PASSWORD", "")
 PROXMOX_VERIFY_SSL = os.getenv("PROXMOX_VERIFY_SSL", "false").lower() == "true"
 PROXMOX_READ_ONLY = os.getenv("PROXMOX_READ_ONLY", "false").lower() == "true"
+
+# A "." or ".." segment would let a tool argument move the request to another endpoint
+# (httpx resolves them before sending), and "?", "#" or "\\" would change the URL's meaning.
+# Tools never build such paths, so refuse them outright.
+_UNSAFE_PATH = re.compile(r"(?:^|/)\.{1,2}(?:/|$)|[?#\\]")
 
 # Proxmox tickets (password auth) expire after 2 hours. Log in again well before that.
 TICKET_LIFETIME = 90 * 60
@@ -124,6 +130,8 @@ class ProxmoxClient:
             raise PermissionError(
                 f"Read-only mode (PROXMOX_READ_ONLY): refusing {method} {path}"
             )
+        if _UNSAFE_PATH.search(path):
+            raise PermissionError(f"Refusing {method} {path!r}: unsafe API path")
         if method not in ("GET", "POST", "PUT", "DELETE"):
             raise ValueError(f"Unsupported method: {method}")
         url = f"{self.base_url}{path}"
