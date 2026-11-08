@@ -6,6 +6,8 @@ Work we plan to do in an upcoming release. Items here are not scheduled yet.
 
 ### Container restores: check `restore_container_backup`
 
+Reported by Will Furphy ([@wfurphy](https://github.com/wfurphy)) in #89. Thank you!
+
 - **Restore flag.** Check that `restore_container_backup` tells Proxmox the request is a
   restore. If it doesn't, Proxmox may treat the backup as a template and skip the backup's
   own configuration (network, mount points, features). Confirm against a live Proxmox VE
