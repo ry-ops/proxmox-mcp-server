@@ -89,6 +89,9 @@ def test_parse_protected():
         ("delete_ha_resource", {"sid": "vm:100"}),
         ("delete_storage_volume", {"node": "pve", "storage": "local-lvm", "volume": "local-lvm:vm-100-disk-0"}),
         ("delete_storage_volume", {"node": "pve", "storage": "nas", "volume": "nas:backup/vzdump-qemu-100-2026_10_30-01_00_00.vma.zst"}),
+        ("create_replication_job", {"id": "100-0", "target": "pve2", "type": "local"}),
+        ("update_replication_job", {"id": "100-1", "schedule": "*/30"}),
+        ("delete_replication_job", {"id": "100-0"}),
     ],
 )
 def test_protected_guest_is_refused(name, args):
@@ -105,6 +108,8 @@ def test_protected_guest_is_refused(name, args):
         ("get_vm_vnc_proxy", {"node": "pve", "vmid": 100}),
         ("delete_storage_volume", {"node": "pve", "storage": "local-lvm", "volume": "local-lvm:vm-1001-disk-0"}),
         ("bulk_start_guests", {"vms": "101,102"}),
+        ("delete_replication_job", {"id": "1001-0"}),
+        ("delete_firewall_group", {"id": "100-0"}),  # only replication job IDs name a guest
     ],
 )
 def test_other_guests_are_allowed(name, args):
