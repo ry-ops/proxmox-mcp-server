@@ -6,9 +6,7 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
-### Changed
-- `docker-compose.yaml` no longer defaults `PROXMOX_HOST` to a lab address. Compose now stops
-  with a message when it isn't set. `.env.example` uses a placeholder host.
+## [2.11.0] - 2026-11-08
 
 ### Added
 - `PROXMOX_CA_BUNDLE`: verify the Proxmox certificate against a CA file, such as the cluster's
@@ -16,6 +14,10 @@ All notable changes to this project are documented here. The format is based on
   instead of turning verification off. A CA file that can't be loaded stops the server.
 - A startup warning when the Proxmox certificate isn't verified (neither `PROXMOX_CA_BUNDLE`
   nor `PROXMOX_VERIFY_SSL=true`). The default is unchanged.
+
+### Changed
+- `docker-compose.yaml` no longer defaults `PROXMOX_HOST` to a lab address. Compose now stops
+  with a message when it isn't set. `.env.example` uses a placeholder host.
 
 ## [2.10.0] - 2026-11-08
 
@@ -259,6 +261,7 @@ released on its own.
 
 Initial release.
 
+[2.11.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.9.0...v2.10.0
 [2.9.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.7.0...v2.8.0
