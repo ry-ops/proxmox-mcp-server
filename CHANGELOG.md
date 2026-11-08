@@ -9,6 +9,14 @@ All notable changes to this project are documented here. The format is based on
 ### Added
 - README: running several clusters, one server per cluster with its own settings.
 
+### Security
+- The audit log now redacts secrets in fields whose names don't look secret: the private key
+  in `upload_node_custom_cert`, ACME plugin credentials (`data`), webhook headers, and
+  `vm_agent_exec` stdin (`input-data`). Before, these were written to the log in plain text.
+- `PROXMOX_PROTECTED_VMIDS` now covers replication jobs. `create_replication_job`,
+  `update_replication_job` and `delete_replication_job` read the guest from the job ID
+  (`100-0` is guest 100) and refuse protected guests.
+
 ## [2.9.0] - 2026-10-30
 
 ### Changed

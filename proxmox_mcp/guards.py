@@ -2,9 +2,10 @@
 
 PROXMOX_PROTECTED_VMIDS lists IDs and ranges, e.g. "100,101,9000-9010". Any write tool aimed at
 one of them is refused before a request is sent: power actions, config changes, snapshots,
-migration, disk moves, deletion, guest-agent commands, HA changes, and deleting its volumes or
-backups. Reads are never blocked. Three writes stay allowed because they leave the guest as it
-is: cloning from it (only the new ID is checked), backing it up, and opening a console.
+migration, disk moves, deletion, guest-agent commands, HA changes, replication jobs, and
+deleting its volumes or backups. Reads are never blocked. Three writes stay allowed because they
+leave the guest as it is: cloning from it (only the new ID is checked), backing it up, and
+opening a console.
 
 Node-wide and bulk power or migrate actions without an explicit guest list would include
 protected guests, so they are refused too. Whole-node shutdown and reboot (node_shutdown)
@@ -31,6 +32,9 @@ _ALL_GUESTS_BY_DEFAULT = {
 # Guest IDs inside volume names: vm-100-disk-0, base-9000-disk-0, subvol-101-disk-0,
 # and backups such as vzdump-qemu-100-2026_10_30-01_00_00.vma.zst.
 _VOLUME_ID = re.compile(r"(?:^|[/:])(?:vm|base|subvol)-(\d+)-|vzdump-(?:qemu|lxc|openvz)-(\d+)-")
+# Replication job IDs name their guest: "100-0" is job 0 of guest 100.
+_REPLICATION_TOOLS = {"create_replication_job", "update_replication_job", "delete_replication_job"}
+_REPLICATION_ID = re.compile(r"\s*(\d+)-\d+\s*")
 
 
 def parse_protected(value: str | None) -> frozenset[int]:
@@ -73,6 +77,10 @@ def targets(name: str, args: dict[str, Any]) -> set[int]:
     found |= _ids(args.get("sid"))
     for m in _VOLUME_ID.finditer(str(args.get("volume", ""))):
         found.add(int(m[1] or m[2]))
+    if name in _REPLICATION_TOOLS:
+        job = _REPLICATION_ID.fullmatch(str(args.get("id", "")))
+        if job:
+            found.add(int(job[1]))
     return found
 
 

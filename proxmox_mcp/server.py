@@ -122,7 +122,7 @@ async def call_tool(name: str, arguments: Any, who: auth.Principal = auth.STDIO)
         "who": who.name,
         "via": _via(who),
         "tool": name,
-        "args": audit.redact(args),
+        "args": audit.redact(args, name),
     }
     failed = False
     try:

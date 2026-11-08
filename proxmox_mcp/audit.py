@@ -25,11 +25,27 @@ AUDIT_READS = os.getenv("PROXMOX_AUDIT_READS", "false").lower() == "true"
 _SECRET = re.compile(r"pass|secret|token|private|api[_-]?key|^value$|cipassword", re.I)
 _lock = threading.Lock()
 
+# Fields whose names don't look secret but carry secrets for these tools.
+_TOOL_SECRETS: dict[str, frozenset[str]] = {
+    "upload_node_custom_cert": frozenset({"key"}),  # TLS private key
+    "create_acme_plugin": frozenset({"data"}),  # DNS API credentials
+    "update_acme_plugin": frozenset({"data"}),
+    "create_webhook_endpoint": frozenset({"header"}),  # may hold Authorization headers
+    "vm_agent_exec": frozenset({"input-data"}),  # stdin, often a password or key
+}
 
-def redact(value: Any) -> Any:
-    """Copy of `value` with secret-looking fields replaced by "***"."""
+
+def redact(value: Any, tool: str | None = None) -> Any:
+    """Copy of `value` with secret-looking fields replaced by "***".
+
+    With `tool`, that tool's own secret fields (see _TOOL_SECRETS) are replaced too.
+    """
+    extra = _TOOL_SECRETS.get(tool or "", frozenset())
     if isinstance(value, dict):
-        return {k: "***" if _SECRET.search(str(k)) else redact(v) for k, v in value.items()}
+        return {
+            k: "***" if k in extra or _SECRET.search(str(k)) else redact(v)
+            for k, v in value.items()
+        }
     if isinstance(value, list):
         return [redact(v) for v in value]
     return value

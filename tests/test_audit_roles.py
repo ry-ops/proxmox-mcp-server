@@ -62,6 +62,24 @@ def test_redact():
     assert audit.redact(args) == {"userid": "bob@pve", "password": "***", "ci": {"cipassword": "***"}, "list": [{"api_key": "***"}]}
 
 
+@pytest.mark.parametrize(
+    "tool,field",
+    [
+        ("upload_node_custom_cert", "key"),
+        ("create_acme_plugin", "data"),
+        ("update_acme_plugin", "data"),
+        ("create_webhook_endpoint", "header"),
+        ("vm_agent_exec", "input-data"),
+    ],
+)
+def test_redact_tool_secret_fields(tool, field):
+    assert audit.redact({field: "s3cret", "node": "pve"}, tool) == {field: "***", "node": "pve"}
+
+
+def test_redact_tool_fields_only_for_that_tool():
+    assert audit.redact({"data": "127.0.0.1 localhost"}, "set_node_hosts") == {"data": "127.0.0.1 localhost"}
+
+
 def test_record_appends_json_lines(tmp_path):
     path = tmp_path / "audit.jsonl"
     audit.record({"tool": "start_vm"}, str(path))
@@ -141,6 +159,14 @@ async def test_audit_redacts_secrets(env):
     entry = audit_lines(log)[0]
     assert entry["args"] == {"userid": "bob@pve", "password": "***"}
     assert "hunter2" not in log.read_text()
+
+
+async def test_audit_redacts_private_key(env):
+    fake, log = env
+    pem = "-----BEGIN PRIVATE KEY-----abc-----END PRIVATE KEY-----"
+    await server.call_tool("upload_node_custom_cert", {"node": "pve", "certificates": "CERT", "key": pem})
+    assert audit_lines(log)[0]["args"]["key"] == "***"
+    assert "BEGIN PRIVATE KEY" not in log.read_text()
 
 
 def session(client, token):
