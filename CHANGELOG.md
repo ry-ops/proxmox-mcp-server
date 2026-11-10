@@ -6,6 +6,25 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+- `restore_container_backup` restores the backup's configuration. It never told Proxmox the
+  request was a restore, so Proxmox treated the backup as a template: it skipped the backup's
+  network, mount points and features, made the container unprivileged by default, and refused
+  `unique`. Reported by Will Furphy ([@wfurphy](https://github.com/wfurphy)) in #89. Thank you!
+
+### Added
+- `restore_container_backup` takes `rootfs` and `mp0` to `mp255` to resize or move disks during
+  a restore, which is the only way to shrink a container disk. With them, Proxmox creates only
+  the disks you list, so `rootfs` is required with any mount point. The description now says
+  that `force` replaces an existing container, disks included.
+
+### Security
+- `PROXMOX_PROTECTED_VMIDS` covers disk inputs. A disk value on any write tool (`rootfs`, `mpN`,
+  `scsiN`, `virtioN`, `ideN`, `sataN`, `efidisk0`, `tpmstate0`, also inside `create_vm`'s
+  `extra_config`) that names a protected guest's volume, such as `local-lvm:vm-100-disk-0`, is
+  refused. Before, it could attach that guest's disk to another guest. `import-from` a
+  protected guest's disk is refused too.
+
 ## [2.11.0] - 2026-11-08
 
 ### Added

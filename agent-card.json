@@ -1620,7 +1620,7 @@
         },
         {
           "name": "restore_container_backup",
-          "description": "Restore an LXC container from a backup file.",
+          "description": "Restore an LXC container from a vzdump backup, with its configuration. Optional rootfs and mp0, mp1, ... resize or move the disks; with force, an existing container is replaced.",
           "inputs": [
             "node",
             "vmid",
@@ -1632,7 +1632,9 @@
             "start (optional)",
             "bwlimit (optional)",
             "pool (optional)",
-            "unprivileged (optional)"
+            "unprivileged (optional)",
+            "rootfs (optional)",
+            "mp0 ... mp255 (optional, with rootfs)"
           ],
           "read_only": false,
           "destructive": true
