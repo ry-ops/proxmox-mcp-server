@@ -9,7 +9,20 @@ from proxmox_mcp import registry
 ALL, HANDLERS = registry.build(list(registry.TOOLSETS), read_only=False)
 DUMMY = {"string": "x", "integer": 1, "number": 1, "boolean": True, "array": [], "object": {}}
 # Arguments that must look real for the tool to reach the API.
-REAL_ARGS = {"upid": "UPID:pve:0003A1B2:01C9D3E4:6720F0A1:qmstart:100:root@pam:"}
+REAL_ARGS = {
+    "upid": "UPID:pve:0003A1B2:01C9D3E4:6720F0A1:qmstart:100:root@pam:",
+    # PDM inputs carry PDM's own patterns.
+    "remote": "pve01",
+    "target": "pve02",
+    "node": "pve01",
+    "datastore": "store1",
+    "storage": "local",
+    "cluster": "5d8e1c3a-7b2f-4e6d-9a1c-3f0b2e4d6a8c",
+    "snapname": "snap1",
+    "vnet": "vnet1",
+    "zone": "zone1",
+    "name": "pve-manager",
+}
 
 
 class RecordingClient:
@@ -18,7 +31,7 @@ class RecordingClient:
     def __init__(self) -> None:
         self.methods: set[str] = set()
 
-    async def request(self, method, path, data=None):
+    async def request(self, method, path, data=None, params=None, body=None):
         self.methods.add(method)
         if "/tasks/" in path and path.endswith("/status"):
             return {"data": {"status": "stopped", "exitstatus": "OK"}}
@@ -57,9 +70,12 @@ async def test_read_only_label_matches_http_methods(tool):
     """A tool labelled read-only must only GET; any other tool must send a write."""
     props = tool.input_schema.get("properties", {})
     args = {
-        k: REAL_ARGS.get(k, DUMMY[props[k].get("type", "string")])
+        k: REAL_ARGS.get(k, (props[k].get("enum") or [DUMMY[props[k].get("type", "string")]])[0])
         for k in tool.input_schema.get("required", [])
     }
+    if tool.name in ("pdm_task_status", "pdm_task_log", "pdm_stop_task"):
+        # Datacenter Manager's own tasks use the Backup Server UPID format, with a task ID field.
+        args["upid"] = "UPID:localhost:00001234:0000ABCD:00000001:6720F0A1:aptupdate::root@pam:"
     client = RecordingClient()
     try:
         await asyncio.wait_for(HANDLERS[tool.name].handle(tool.name, args, client), 2)
@@ -137,5 +153,8 @@ def test_no_destructive_hides_only_destructive_tools():
 
 
 def test_wait_property_only_on_waitable_tools():
+    # PDM's task-status endpoints take `wait` themselves; the tool follows the task instead.
+    own_wait = {"pdm_pve_task_status", "pdm_pbs_task_status"}
     for t in ALL:
-        assert ("wait" in t.input_schema["properties"]) == (t.name in registry.WAITABLE), t.name
+        expected = t.name in registry.WAITABLE or t.name in own_wait
+        assert ("wait" in t.input_schema["properties"]) == expected, t.name

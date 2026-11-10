@@ -11,8 +11,6 @@ import asyncio
 import os
 from typing import Any
 
-from .client import ProxmoxClient
-
 # How long a wait lasts before it returns with the task still running (seconds).
 DEFAULT_TIMEOUT = float(os.getenv("PROXMOX_WAIT_TIMEOUT", "900"))
 MAX_TIMEOUT = 3600.0
@@ -32,19 +30,28 @@ def is_upid(value: Any) -> bool:
 
 
 async def wait(
-    client: ProxmoxClient, upid: str, timeout: float | None = None, poll: float = 1.0
+    client: Any,
+    upid: str,
+    timeout: float | None = None,
+    poll: float = 1.0,
+    task_path: str | None = None,
+    node: str | None = None,
 ) -> dict[str, Any]:
     """Wait for a task to stop, up to `timeout` seconds.
 
     Never raises for a slow or failed task: it reports the outcome, so the caller can decide.
     The result has `upid`, `node`, `status` ("stopped" or "running"), `exitstatus` and
     `ok` (true only for exitstatus "OK"). A failed task also carries the end of its log.
+
+    task_path and node are for tasks outside a Proxmox VE node's /nodes/{node}/tasks, such
+    as Datacenter Manager's /pve/remotes/{remote}/tasks/{upid}.
     """
-    node = upid_node(upid)
+    if node is None:
+        node = upid_node(upid)
     limit = min(max(float(timeout if timeout is not None else DEFAULT_TIMEOUT), 0.0), MAX_TIMEOUT)
     loop = asyncio.get_running_loop()
     deadline = loop.time() + limit
-    path = f"/nodes/{node}/tasks/{upid}"
+    path = task_path or f"/nodes/{node}/tasks/{upid}"
     while True:
         status = (await client.get(f"{path}/status")).get("data") or {}
         if status.get("status") == "stopped":

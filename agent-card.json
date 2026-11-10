@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 341 tools covering nearly the full Proxmox VE API: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 341 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.12.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -41,7 +41,14 @@
       "PROXMOX_PORT": "API port (default: 8006)",
       "PROXMOX_VERIFY_SSL": "Verify SSL certificates (default: false)",
       "PROXMOX_CA_BUNDLE": "CA file to verify the Proxmox certificate against, e.g. pve-root-ca.pem",
-      "PROXMOX_READ_ONLY": "Refuse all write operations; only GET requests are sent (default: false)"
+      "PROXMOX_READ_ONLY": "Refuse all write operations; only GET requests are sent (default: false)",
+      "PDM_HOST": "Proxmox Datacenter Manager hostname or IP; loads the pdm toolset (PROXMOX_HOST is then optional)",
+      "PDM_PORT": "PDM API port (default: 8443)",
+      "PDM_TOKEN_ID": "PDM API token ID, user@realm!name",
+      "PDM_TOKEN_SECRET": "PDM API token secret",
+      "PDM_CA_BUNDLE": "PDM's certificate (or its CA) to verify against",
+      "PDM_TLS_NAME": "Name to check PDM's certificate against when PDM_HOST is an IP, e.g. pdm",
+      "PDM_PROTECTED_GUESTS": "remote:ID entries PDM tools may not change, e.g. pve01:104,*:9000-9010"
     }
   },
   "skills": [
@@ -4085,6 +4092,1011 @@
             "description (optional)"
           ],
           "read_only": false,
+          "destructive": false
+        }
+      ]
+    },
+    {
+      "category": "datacenter_manager",
+      "description": "Proxmox Datacenter Manager: many Proxmox VE clusters and Backup Servers through one PDM. Loads when PDM_HOST is set.",
+      "capabilities": [
+        {
+          "name": "pdm_ceph_cluster",
+          "description": "One Ceph cluster: section summary, status, flags, fs, mds, mgr, mon, osd-tree or pools.",
+          "inputs": [
+            "cluster",
+            "section",
+            "max-age (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_ceph_list_clusters",
+          "description": "Ceph clusters PDM knows of.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_collect_metrics",
+          "description": "Make PDM collect metrics now, from one remote or all of them.",
+          "inputs": [
+            "remote (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_get_remote_config",
+          "description": "The stored connection settings of one remote (secrets are not returned).",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_get_remote_rrddata",
+          "description": "Metric-collection statistics for one remote over a timeframe.",
+          "inputs": [
+            "cf",
+            "remote",
+            "timeframe"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_get_remote_version",
+          "description": "The Proxmox VE or Backup Server version a remote runs.",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_list_remote_tasks",
+          "description": "Tasks across all remotes, newest first (filter by remote, type or state).",
+          "inputs": [
+            "errors (optional)",
+            "limit (optional)",
+            "remote (optional)",
+            "running (optional)",
+            "since (optional)",
+            "start (optional)",
+            "statusfilter (optional)",
+            "typefilter (optional)",
+            "until (optional)",
+            "userfilter (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_list_remotes",
+          "description": "List every remote (Proxmox VE cluster or Backup Server) PDM manages.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_list_resources",
+          "description": "Every guest, node, storage and datastore across all remotes, with status.",
+          "inputs": [
+            "max-age (optional)",
+            "resource-type (optional)",
+            "search (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_list_tasks",
+          "description": "Tasks that PDM itself ran (refreshes, metric collection).",
+          "inputs": [
+            "node",
+            "errors (optional)",
+            "limit (optional)",
+            "running (optional)",
+            "since (optional)",
+            "start (optional)",
+            "statusfilter (optional)",
+            "typefilter (optional)",
+            "until (optional)",
+            "userfilter (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_location_info",
+          "description": "Location information for remotes, optionally within one view.",
+          "inputs": [
+            "max-age (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_metric_collection_status",
+          "description": "When PDM last collected metrics from each remote, and any errors.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_my_permissions",
+          "description": "The permissions of this server's PDM token.",
+          "inputs": [
+            "auth-id (optional)",
+            "path (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_node_status",
+          "description": "CPU, memory and disk usage of the PDM host.",
+          "inputs": [
+            "node"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_datastore_rrddata",
+          "description": "Metrics of a datastore on a Proxmox Backup Server remote.",
+          "inputs": [
+            "cf",
+            "datastore",
+            "remote",
+            "timeframe"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_list_datastores",
+          "description": "Datastores of a Proxmox Backup Server remote.",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_list_namespaces",
+          "description": "Namespaces of a datastore on a Proxmox Backup Server remote.",
+          "inputs": [
+            "datastore",
+            "remote",
+            "max-depth (optional)",
+            "parent (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_list_remotes",
+          "description": "List the Proxmox Backup Server remotes.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_list_snapshots",
+          "description": "Backup snapshots in a datastore on a Proxmox Backup Server remote.",
+          "inputs": [
+            "datastore",
+            "remote",
+            "ns (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_list_tasks",
+          "description": "Tasks on a Proxmox Backup Server remote.",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_node_apt_changelog",
+          "description": "Changelog of a package on a Proxmox Backup Server remote.",
+          "inputs": [
+            "name",
+            "node",
+            "remote",
+            "version (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_node_apt_refresh",
+          "description": "Refresh the package lists on a Proxmox Backup Server remote (apt update).",
+          "inputs": [
+            "node",
+            "remote",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_node_apt_repositories",
+          "description": "APT repositories configured on a Proxmox Backup Server remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_node_apt_updates",
+          "description": "Available package updates on a Proxmox Backup Server remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_node_subscription",
+          "description": "Subscription of a Proxmox Backup Server remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_rrddata",
+          "description": "Metrics of a Proxmox Backup Server remote over a timeframe.",
+          "inputs": [
+            "cf",
+            "remote",
+            "timeframe"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_status",
+          "description": "Status of a Proxmox Backup Server remote (CPU, memory, uptime).",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_stop_task",
+          "description": "Stop a running task on a Proxmox Backup Server remote.",
+          "inputs": [
+            "remote",
+            "upid"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pbs_task_log",
+          "description": "Log of a task on a Proxmox Backup Server remote.",
+          "inputs": [
+            "remote",
+            "upid",
+            "download (optional)",
+            "limit (optional)",
+            "start (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pbs_task_status",
+          "description": "Status of a task on a Proxmox Backup Server remote.",
+          "inputs": [
+            "remote",
+            "upid",
+            "wait (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_ping",
+          "description": "Check that Proxmox Datacenter Manager answers (returns pong).",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_cluster_firewall",
+          "description": "Cluster firewall of a Proxmox VE remote: section options, rules or status.",
+          "inputs": [
+            "remote",
+            "section"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_cluster_options",
+          "description": "Datacenter options of a Proxmox VE remote.",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_cluster_status",
+          "description": "Cluster and node membership status of a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "target-endpoint (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_create_snapshot",
+          "description": "Create a snapshot of a VM or container.",
+          "inputs": [
+            "remote",
+            "snapname",
+            "type",
+            "vmid",
+            "description (optional)",
+            "node (optional)",
+            "vmstate (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_delete_snapshot",
+          "description": "Delete a snapshot of a VM or container.",
+          "inputs": [
+            "remote",
+            "snapname",
+            "type",
+            "vmid",
+            "node (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_firewall_status_all",
+          "description": "Firewall status of every Proxmox VE remote.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_guest_config",
+          "description": "Configuration of a VM or container on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "state",
+            "type",
+            "vmid",
+            "node (optional)",
+            "snapshot (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_guest_firewall",
+          "description": "Firewall of a VM or container: section options or rules.",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_guest_pending",
+          "description": "Pending (not yet applied) configuration of a VM or container.",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_guest_rrddata",
+          "description": "Metrics of a VM or container over a timeframe.",
+          "inputs": [
+            "cf",
+            "remote",
+            "timeframe",
+            "type",
+            "vmid"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_guest_status",
+          "description": "Current status of a VM or container on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_list_guests",
+          "description": "VMs (type qemu) or containers (type lxc) on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "type",
+            "node (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_list_nodes",
+          "description": "Nodes of a Proxmox VE remote.",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_list_remotes",
+          "description": "List the Proxmox VE remotes.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_list_snapshots",
+          "description": "Snapshots of a VM or container on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_list_storage",
+          "description": "Storage on one node of a Proxmox VE remote, with usage.",
+          "inputs": [
+            "node",
+            "remote",
+            "content (optional)",
+            "enabled (optional)",
+            "format (optional)",
+            "storage (optional)",
+            "target (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_list_tasks",
+          "description": "Tasks on a Proxmox VE remote, optionally for one node.",
+          "inputs": [
+            "remote",
+            "node (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_migrate_guest",
+          "description": "Migrate a VM or container to another node in the same cluster.",
+          "inputs": [
+            "remote",
+            "target",
+            "type",
+            "vmid",
+            "bwlimit (optional)",
+            "force (optional)",
+            "migration-network (optional)",
+            "migration-type (optional)",
+            "node (optional)",
+            "online (optional)",
+            "restart (optional)",
+            "target-storage (optional)",
+            "timeout (optional)",
+            "with-local-disks (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_migrate_preconditions",
+          "description": "Whether a VM can migrate within its cluster, and to which nodes.",
+          "inputs": [
+            "remote",
+            "vmid",
+            "node (optional)",
+            "target (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_next_vmid",
+          "description": "The next free VMID on a Proxmox VE remote, e.g. for a migration target.",
+          "inputs": [
+            "remote",
+            "target-endpoint (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_apt_changelog",
+          "description": "Changelog of a package on one node of a Proxmox VE remote.",
+          "inputs": [
+            "name",
+            "node",
+            "remote",
+            "version (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_apt_refresh",
+          "description": "Refresh the package lists on one node of a Proxmox VE remote (apt update).",
+          "inputs": [
+            "node",
+            "remote",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_apt_repositories",
+          "description": "APT repositories configured on one node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_apt_updates",
+          "description": "Available package updates on one node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_config",
+          "description": "Configuration of one node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_firewall",
+          "description": "Node firewall on a Proxmox VE remote: section options, rules or status.",
+          "inputs": [
+            "node",
+            "remote",
+            "section"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_network",
+          "description": "Network interfaces of one node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote",
+            "interface-type (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_rrddata",
+          "description": "Metrics of one node of a Proxmox VE remote over a timeframe.",
+          "inputs": [
+            "cf",
+            "node",
+            "remote",
+            "timeframe"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_status",
+          "description": "Status of one node of a Proxmox VE remote (CPU, memory, uptime, versions).",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_node_subscription",
+          "description": "Subscription of one node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_remote_migrate_guest",
+          "description": "Migrate a VM or container to another Proxmox VE remote (another cluster). With delete, the original is removed after a successful migration.",
+          "inputs": [
+            "remote",
+            "target",
+            "target-bridge",
+            "target-storage",
+            "type",
+            "vmid",
+            "bwlimit (optional)",
+            "delete (optional)",
+            "node (optional)",
+            "online (optional)",
+            "restart (optional)",
+            "target-endpoint (optional)",
+            "target-vmid (optional)",
+            "timeout (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_resources",
+          "description": "Resources of one Proxmox VE remote (guests, nodes, storage, SDN).",
+          "inputs": [
+            "remote",
+            "kind (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_resume_vm",
+          "description": "Resume a paused or suspended VM.",
+          "inputs": [
+            "remote",
+            "vmid",
+            "node (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_rollback_snapshot",
+          "description": "Roll a VM or container back to a snapshot. Changes since then are lost.",
+          "inputs": [
+            "remote",
+            "snapname",
+            "type",
+            "vmid",
+            "node (optional)",
+            "start (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_sdn_vnet_mac_vrf",
+          "description": "MAC-VRF of an EVPN VNet on a node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote",
+            "vnet"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_sdn_zone_ip_vrf",
+          "description": "IP-VRF of an EVPN zone on a node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote",
+            "zone"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_shutdown_guest",
+          "description": "Shut down a VM or container cleanly.",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_start_guest",
+          "description": "Start a VM or container on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_stop_guest",
+          "description": "Stop a VM or container immediately (like pulling the plug).",
+          "inputs": [
+            "remote",
+            "type",
+            "vmid",
+            "node (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_stop_task",
+          "description": "Stop a running task on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "upid"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_pve_storage_rrddata",
+          "description": "Metrics of one storage on a node of a Proxmox VE remote over a timeframe.",
+          "inputs": [
+            "cf",
+            "node",
+            "remote",
+            "storage",
+            "timeframe"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_storage_status",
+          "description": "Status and usage of one storage on a node of a Proxmox VE remote.",
+          "inputs": [
+            "node",
+            "remote",
+            "storage"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_task_log",
+          "description": "Log of a task on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "upid",
+            "download (optional)",
+            "limit (optional)",
+            "start (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_task_status",
+          "description": "Status of a task on a Proxmox VE remote.",
+          "inputs": [
+            "remote",
+            "upid",
+            "wait (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_update_snapshot",
+          "description": "Change a snapshot's description.",
+          "inputs": [
+            "remote",
+            "snapname",
+            "type",
+            "vmid",
+            "description (optional)",
+            "node (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_pve_updates",
+          "description": "Cached package update information for a Proxmox VE remote.",
+          "inputs": [
+            "remote"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_refresh_remote_tasks",
+          "description": "Make PDM refresh its cache of remote tasks now.",
+          "inputs": [
+            "remotes (optional)",
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_refresh_updates",
+          "description": "Make PDM refresh the update summary of every remote now.",
+          "inputs": [
+            "wait (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "pdm_remote_task_statistics",
+          "description": "Task counts across remotes by type and outcome.",
+          "inputs": [
+            "errors (optional)",
+            "limit (optional)",
+            "remote (optional)",
+            "running (optional)",
+            "since (optional)",
+            "start (optional)",
+            "statusfilter (optional)",
+            "typefilter (optional)",
+            "until (optional)",
+            "userfilter (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_resource_status",
+          "description": "Counts of resources by type and state across all remotes.",
+          "inputs": [
+            "max-age (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_sdn_list",
+          "description": "SDN across Proxmox VE remotes: section zones, vnets or controllers.",
+          "inputs": [
+            "section",
+            "pending (optional)",
+            "remotes (optional)",
+            "running (optional)",
+            "ty (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_stop_task",
+          "description": "Stop a running task of PDM itself.",
+          "inputs": [
+            "node",
+            "upid"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "pdm_subscription_status",
+          "description": "Subscription status of every remote.",
+          "inputs": [
+            "max-age (optional)",
+            "verbose (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_task_log",
+          "description": "Log of a task PDM itself ran.",
+          "inputs": [
+            "node",
+            "upid",
+            "download (optional)",
+            "limit (optional)",
+            "start (optional)",
+            "test-status (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_task_status",
+          "description": "Status of a task PDM itself ran.",
+          "inputs": [
+            "node",
+            "upid"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_top_entities",
+          "description": "The guests and nodes using the most CPU or memory across all remotes.",
+          "inputs": [
+            "timeframe (optional)",
+            "view (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_update_summary",
+          "description": "Pending package updates on every remote node, as PDM last saw them.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "pdm_version",
+          "description": "Proxmox Datacenter Manager version and release.",
+          "inputs": [],
+          "read_only": true,
           "destructive": false
         }
       ]

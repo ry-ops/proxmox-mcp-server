@@ -133,3 +133,65 @@ def check(name: str, args: dict[str, Any], protected: frozenset[int]) -> None:
         raise PermissionError(
             f"Refusing {name}: guest {', '.join(map(str, hit))} is protected (PROXMOX_PROTECTED_VMIDS)"
         )
+
+
+# --- Proxmox Datacenter Manager ---
+#
+# VMIDs are only unique within a cluster, so PDM_PROTECTED_GUESTS names the remote too:
+# "pve01:104,pve01:105" or "*:9000-9010" (every remote). PROXMOX_PROTECTED_VMIDS doesn't apply
+# to PDM tools: PDM can't tell which of its remotes is the Proxmox VE host this server uses.
+
+# The worker ID (a VMID for guest tasks) in a UPID. Proxmox VE UPIDs are
+# node:pid:pstart:starttime:type:id:user; PDM and Backup Server add a task ID after pstart.
+_UPID_WID = re.compile(
+    r"UPID:[^:]+:[0-9A-Fa-f]{8}:[0-9A-Fa-f]{8,9}:(?:[0-9A-Fa-f]{8,16}:)?[0-9A-Fa-f]{8}:[^:]+:(\d+):"
+)
+
+
+def parse_pdm_protected(value: str | None) -> dict[str, frozenset[int]]:
+    """Turn "pve01:104,*:9000-9010" into {"pve01": {104}, "*": {9000, ..., 9010}}."""
+    found: dict[str, set[int]] = {}
+    for part in (value or "").replace(" ", "").split(","):
+        if not part:
+            continue
+        remote, sep, ids = part.rpartition(":")
+        if not sep or not remote or not ids or not re.fullmatch(r"\*|[A-Za-z0-9_][A-Za-z0-9._\-]*", remote):
+            raise ValueError(
+                f"Invalid PDM_PROTECTED_GUESTS entry: {part!r} (use remote:ID, remote:ID-ID or *:ID)"
+            )
+        try:
+            found.setdefault(remote, set()).update(parse_protected(ids))
+        except ValueError as e:
+            raise ValueError(f"Invalid PDM_PROTECTED_GUESTS entry: {part!r} ({e})") from e
+    return {r: frozenset(ids) for r, ids in found.items()}
+
+
+def pdm_targets(name: str, args: dict[str, Any]) -> set[tuple[str, int]]:
+    """The (remote, VMID) pairs a PDM write tool would change."""
+    found: set[tuple[str, int]] = set()
+    remote = str(args.get("remote", ""))
+    for vmid in _ids(args.get("vmid")):
+        found.add((remote, vmid))
+    if name == "pdm_pve_remote_migrate_guest" and args.get("target"):
+        target_ids = _ids(args.get("target-vmid")) or _ids(args.get("vmid"))
+        found |= {(str(args["target"]), vmid) for vmid in target_ids}
+    if name.endswith("_stop_task") and remote:
+        m = _UPID_WID.search(str(args.get("upid", "")))
+        if m:
+            found.add((remote, int(m[1])))
+    return found
+
+
+def check_pdm(name: str, args: dict[str, Any], protected: dict[str, frozenset[int]]) -> None:
+    """Raise PermissionError if a PDM write tool would change a protected guest."""
+    if not protected:
+        return
+    hit = sorted(
+        f"{remote}:{vmid}"
+        for remote, vmid in pdm_targets(name, args)
+        if vmid in protected.get(remote, frozenset()) or vmid in protected.get("*", frozenset())
+    )
+    if hit:
+        raise PermissionError(
+            f"Refusing {name}: guest {', '.join(hit)} is protected (PDM_PROTECTED_GUESTS)"
+        )
