@@ -28,6 +28,7 @@ from .tools import (
     lxc,
     nodes,
     notifications,
+    pdm,
     pools,
     qemu,
     sdn,
@@ -51,7 +52,11 @@ TOOLSETS: dict[str, ModuleType] = {
     "notifications": notifications,
     "pools": pools,
     "appliances": appliances,
+    # Proxmox Datacenter Manager: loads only with PDM_HOST set (see server.py).
+    "pdm": pdm,
 }
+# Toolsets that talk to a Proxmox VE API directly.
+PVE_TOOLSETS = [name for name in TOOLSETS if name != "pdm"]
 
 # Loaded with every toolset selection: tools any of them may need.
 CORE = [tasks]
@@ -68,7 +73,7 @@ WAITABLE = {
     "create_container_snapshot", "rollback_container_snapshot", "delete_container_snapshot",
     "backup_vm", "restore_vm_backup", "restore_container_backup",
     "download_url_to_storage",
-}
+} | pdm.WAITABLE
 WAIT_PROPERTY = {
     "type": "boolean",
     "description": "Wait for the task to finish and return its outcome (default false)",
@@ -112,6 +117,8 @@ _DESTRUCTIVE = {
 
 def is_read_only(name: str) -> bool:
     """True when the tool only issues GET requests."""
+    if name in pdm.NAMES:
+        return name in pdm.READS
     if name in _READS:
         return True
     if name in _WRITES:
@@ -121,6 +128,8 @@ def is_read_only(name: str) -> bool:
 
 def is_destructive(name: str) -> bool:
     """True when the tool can remove, stop, overwrite or irreversibly change something."""
+    if name in pdm.NAMES:
+        return name in pdm.DESTRUCTIVE
     return name.startswith(_DESTRUCTIVE_PREFIXES) or name in _DESTRUCTIVE
 
 
@@ -146,15 +155,17 @@ def parse_toolsets(value: str | None) -> list[str]:
 
 
 def build(
-    toolsets: list[str], read_only: bool, no_destructive: bool = False
+    toolsets: list[str], read_only: bool, no_destructive: bool = False, core: bool = True
 ) -> tuple[list[Tool], dict[str, ModuleType]]:
     """The tools to advertise, and the module that handles each one.
 
     read_only drops every write tool; no_destructive drops only the destructive ones.
+    core=False leaves out the Proxmox VE core tools (wait_for_task), for a server that only
+    talks to Datacenter Manager.
     """
     tools: list[Tool] = []
     handlers: dict[str, Any] = {}
-    for mod in [TOOLSETS[ts] for ts in toolsets] + CORE:
+    for mod in [TOOLSETS[ts] for ts in toolsets] + (CORE if core else []):
         for d in mod.TOOLS:
             name = d["name"]
             ro = is_read_only(name)

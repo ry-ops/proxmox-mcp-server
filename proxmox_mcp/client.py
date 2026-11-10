@@ -38,7 +38,11 @@ TICKET_LIFETIME = 90 * 60
 
 
 def _validate_config() -> None:
-    if not PROXMOX_HOST or not PROXMOX_USER:
+    """Check the Proxmox VE settings. Without PROXMOX_HOST there is nothing to check: the
+    server may be talking only to Proxmox Datacenter Manager (see server._validate_config)."""
+    if not PROXMOX_HOST:
+        return
+    if not PROXMOX_USER:
         print("Error: PROXMOX_HOST and PROXMOX_USER must be set", file=sys.stderr)
         sys.exit(1)
     use_token = PROXMOX_TOKEN_NAME and PROXMOX_TOKEN_VALUE
@@ -51,30 +55,38 @@ def _validate_config() -> None:
         sys.exit(1)
 
 
+def ca_context(ca_bundle: str, setting: str) -> ssl.SSLContext:
+    """An SSL context that trusts ca_bundle. A file that can't be loaded stops the server
+    rather than falling back to no verification."""
+    try:
+        ctx = ssl.create_default_context(cafile=ca_bundle)
+    except (OSError, ssl.SSLError) as e:
+        print(f"Error: {setting}={ca_bundle}: {e}", file=sys.stderr)
+        sys.exit(1)
+    # Python 3.13+ turns on strict RFC 5280 checks, which reject node certificates that
+    # older Proxmox releases issued without an Authority Key Identifier. The chain to this
+    # CA and the hostname are still verified.
+    ctx.verify_flags &= ~ssl.VERIFY_X509_STRICT
+    # Accept a self-signed server certificate in the file as the trust anchor (Python 3.13+
+    # does this by default), so a Proxmox product's own certificate can be pinned this way.
+    ctx.verify_flags |= ssl.VERIFY_X509_PARTIAL_CHAIN
+    return ctx
+
+
 def tls_verify() -> ssl.SSLContext | bool:
     """What the client checks the Proxmox certificate against.
 
     PROXMOX_CA_BUNDLE: that CA file. PROXMOX_VERIFY_SSL=true: the system's trusted CAs.
-    Neither: nothing. A CA file that can't be loaded stops the server rather than
-    falling back to no verification.
+    Neither: nothing.
     """
     if PROXMOX_CA_BUNDLE:
-        try:
-            ctx = ssl.create_default_context(cafile=PROXMOX_CA_BUNDLE)
-        except (OSError, ssl.SSLError) as e:
-            print(f"Error: PROXMOX_CA_BUNDLE={PROXMOX_CA_BUNDLE}: {e}", file=sys.stderr)
-            sys.exit(1)
-        # Python 3.13+ turns on strict RFC 5280 checks, which reject node certificates that
-        # older Proxmox releases issued without an Authority Key Identifier. The chain to this
-        # CA and the hostname are still verified.
-        ctx.verify_flags &= ~ssl.VERIFY_X509_STRICT
-        return ctx
+        return ca_context(PROXMOX_CA_BUNDLE, "PROXMOX_CA_BUNDLE")
     return PROXMOX_VERIFY_SSL
 
 
 def tls_warning() -> str | None:
     """A startup warning when the Proxmox certificate isn't verified, else None."""
-    if PROXMOX_CA_BUNDLE or PROXMOX_VERIFY_SSL:
+    if not PROXMOX_HOST or PROXMOX_CA_BUNDLE or PROXMOX_VERIFY_SSL:
         return None
     return (
         "Warning: the Proxmox TLS certificate is not verified, so anyone on the network path "
@@ -84,7 +96,9 @@ def tls_warning() -> str | None:
     )
 
 
-def _network_error(error: httpx.TransportError, base_url: str) -> ConnectionError:
+def _network_error(
+    error: httpx.TransportError, base_url: str, product: str = "Proxmox", prefix: str = "PROXMOX"
+) -> ConnectionError:
     """A ConnectionError that says which address failed and how.
 
     httpx's own messages are often empty (a connect timeout has none), which reached clients
@@ -96,16 +110,17 @@ def _network_error(error: httpx.TransportError, base_url: str) -> ConnectionErro
     else:
         what = str(error).strip() or type(error).__name__
     if "CERTIFICATE_VERIFY_FAILED" in what:
+        ca = "the cluster CA (/etc/pve/pve-root-ca.pem)" if prefix == "PROXMOX" else "its certificate"
         hint = (
-            "The certificate isn't trusted: set PROXMOX_CA_BUNDLE to the cluster CA "
-            "(/etc/pve/pve-root-ca.pem), and use a PROXMOX_HOST the certificate names."
+            f"The certificate isn't trusted: set {prefix}_CA_BUNDLE to {ca}, and use a "
+            f"{prefix}_HOST the certificate names."
         )
     else:
         hint = (
-            "Check PROXMOX_HOST and PROXMOX_PORT, and that this machine can route to that "
+            f"Check {prefix}_HOST and {prefix}_PORT, and that this machine can route to that "
             "address (a VPN can capture the traffic)."
         )
-    return ConnectionError(f"Can't reach Proxmox at {where}: {what}. {hint}")
+    return ConnectionError(f"Can't reach {product} at {where}: {what}. {hint}")
 
 
 def _api_error(response: httpx.Response) -> httpx.HTTPStatusError:

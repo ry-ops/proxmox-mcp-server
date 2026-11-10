@@ -87,6 +87,7 @@ def pve(tmp_path_factory):
 
 
 def settings(monkeypatch, ca="", verify=False):
+    monkeypatch.setattr(client_mod, "PROXMOX_HOST", "pve.test")
     monkeypatch.setattr(client_mod, "PROXMOX_CA_BUNDLE", ca)
     monkeypatch.setattr(client_mod, "PROXMOX_VERIFY_SSL", verify)
 
@@ -152,3 +153,10 @@ def test_ca_bundle_still_checks_the_hostname(pve, monkeypatch):
     settings(monkeypatch, ca=str(tmp / "ca.pem"))
     ctx = client_mod.tls_verify()
     assert ctx.check_hostname is True and ctx.verify_mode == ssl.CERT_REQUIRED
+
+
+def test_no_warning_without_a_proxmox_ve_host(monkeypatch):
+    # A server that only talks to Datacenter Manager has no Proxmox VE certificate to check.
+    settings(monkeypatch)
+    monkeypatch.setattr(client_mod, "PROXMOX_HOST", "")
+    assert client_mod.tls_warning() is None

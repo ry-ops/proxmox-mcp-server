@@ -37,9 +37,9 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from . import auth
-from .client import _validate_config, tls_warning
-from .server import app, proxmox, startup_summary
+from . import auth, pdm_client
+from .client import PROXMOX_HOST
+from .server import _validate_config, app, pdm, proxmox, startup_summary, tls_warnings
 
 # Clients reach a loopback-bound server under these Host/Origin values.
 _LOOPBACK_HOSTS = ["127.0.0.1:*", "localhost:*", "[::1]:*"]
@@ -129,12 +129,14 @@ def build_asgi_app(
 
     @contextlib.asynccontextmanager
     async def lifespan(_: Starlette) -> AsyncIterator[None]:
-        await proxmox.authenticate()
+        if PROXMOX_HOST or not pdm_client.configured():
+            await proxmox.authenticate()
         try:
             async with manager.run():
                 yield
         finally:
             await proxmox.close()
+            await pdm.close()
 
     return Starlette(
         routes=[
@@ -170,7 +172,7 @@ def run() -> None:
     print("=" * 60, file=sys.stderr)
     print("Proxmox VE MCP Server (streamable HTTP)", file=sys.stderr)
     print(startup_summary(), file=sys.stderr)
-    if warning := tls_warning():
+    for warning in tls_warnings():
         print(warning, file=sys.stderr)
     print(f"Listening on http://{host}:{port}/mcp ({mode})", file=sys.stderr)
     print("=" * 60, file=sys.stderr)

@@ -6,6 +6,26 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- **Proxmox Datacenter Manager.** A `pdm` toolset of 89 tools, phases 1 and 2 of the plan in
+  ROADMAP.md, loads when `PDM_HOST` is set. It reads resources, tasks, updates and subscriptions
+  across all remotes; nodes, guests, snapshots, storage, firewall, SDN, Ceph and metrics on
+  Proxmox VE remotes; datastores, namespaces and snapshots on Backup Server remotes. It also
+  starts, stops, shuts down and resumes guests, manages snapshots, migrates within a cluster and
+  to another cluster, stops tasks, and refreshes updates, task caches and metrics. The tools are
+  generated from PDM's API schema (`scripts/pdm/gen.py`), and every input is checked against
+  PDM's own patterns and limits before a request is sent.
+- `PDM_PROTECTED_GUESTS` protects guests per remote (`pve01:104`, `*:9000-9010`), including
+  migration targets and stopping a protected guest's tasks.
+- `PDM_CA_BUNDLE` pins PDM's own self-signed certificate, and `PDM_TLS_NAME` checks it against a
+  name it contains (`pdm`), since it doesn't name the host's IP.
+- The server can run with only Datacenter Manager settings: `PROXMOX_HOST` is no longer required
+  when `PDM_HOST` is set.
+
+### Fixed
+- `wait` is only taken from tools that wait. Before, it was removed from every call, so a tool
+  with a `wait` input of its own never received it.
+
 ### Fixed
 - Network failures say what failed. A connection timeout reached clients as `{"error": ""}`;
   now it reads "Can't reach Proxmox at https://HOST:8006: timed out", with a hint to check the

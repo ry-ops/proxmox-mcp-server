@@ -1,0 +1,4722 @@
+{
+ "endpoint_count": 327,
+ "tools": [
+  {
+   "name": "pdm_ceph_cluster",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "One Ceph cluster: section summary, status, flags, fs, mds, mgr, mon, osd-tree or pools.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/flags",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "flags"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/fs",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "fs"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/mds",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "mds"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/mgr",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "mgr"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/mon",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "mon"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/osd-tree",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "osd-tree"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/pools",
+     "params": [
+      "cluster"
+     ],
+     "when": {
+      "section": "pools"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/status",
+     "params": [
+      "cluster",
+      "max-age"
+     ],
+     "when": {
+      "section": "status"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/ceph/clusters/{cluster}/summary",
+     "params": [
+      "cluster",
+      "max-age"
+     ],
+     "when": {
+      "section": "summary"
+     }
+    }
+   ],
+   "patterns": {
+    "cluster": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cluster": {
+      "type": "string",
+      "description": "Ceph cluster identifier (fsid).",
+      "minLength": 8,
+      "maxLength": 64
+     },
+     "section": {
+      "type": "string",
+      "enum": [
+       "flags",
+       "fs",
+       "mds",
+       "mgr",
+       "mon",
+       "osd-tree",
+       "pools",
+       "status",
+       "summary"
+      ],
+      "description": "Which part to read"
+     },
+     "max-age": {
+      "type": "integer",
+      "description": "Serve a cached status if it is younger than this many seconds.",
+      "minimum": 0
+     }
+    },
+    "required": [
+     "cluster",
+     "section"
+    ]
+   }
+  },
+  {
+   "name": "pdm_ceph_list_clusters",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Ceph clusters PDM knows of.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/ceph/clusters",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_collect_metrics",
+   "phase": "2",
+   "kind": "write",
+   "waitable": false,
+   "description": "Make PDM collect metrics now, from one remote or all of them.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/remotes/metric-collection/trigger",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_get_remote_config",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "The stored connection settings of one remote (secrets are not returned).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/remote/{remote}/config",
+     "params": [
+      "remote",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_get_remote_rrddata",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Metric-collection statistics for one remote over a timeframe.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/remote/{remote}/rrddata",
+     "params": [
+      "cf",
+      "remote",
+      "remote",
+      "timeframe"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cf": {
+      "type": "string",
+      "description": "RRD consolidation mode",
+      "enum": [
+       "MAX",
+       "AVERAGE"
+      ]
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     }
+    },
+    "required": [
+     "cf",
+     "remote",
+     "timeframe"
+    ]
+   }
+  },
+  {
+   "name": "pdm_get_remote_version",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "The Proxmox VE or Backup Server version a remote runs.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/remote/{remote}/version",
+     "params": [
+      "remote",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_list_remote_tasks",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Tasks across all remotes, newest first (filter by remote, type or state).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/tasks/list",
+     "params": [
+      "errors",
+      "limit",
+      "remote",
+      "running",
+      "since",
+      "start",
+      "statusfilter",
+      "typefilter",
+      "until",
+      "userfilter",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "errors": {
+      "type": "boolean",
+      "description": "Only list erroneous tasks. (default: false)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "Only list this amount of tasks. (0 means no limit) (default: 50)"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "running": {
+      "type": "boolean",
+      "description": "Only list running tasks. (default: false)"
+     },
+     "since": {
+      "type": "integer",
+      "description": "Only list tasks since this UNIX epoch."
+     },
+     "start": {
+      "type": "integer",
+      "description": "List tasks beginning from this offset. (default: 0)"
+     },
+     "statusfilter": {
+      "type": "array",
+      "description": "Only list tasks which have any one of the listed status.",
+      "items": {
+       "type": "string",
+       "description": "The state of a task.",
+       "enum": [
+        "ok",
+        "warning",
+        "error",
+        "unknown"
+       ]
+      }
+     },
+     "typefilter": {
+      "type": "string",
+      "description": "Only list tasks whose type contains this."
+     },
+     "until": {
+      "type": "integer",
+      "description": "Only list tasks until this UNIX epoch."
+     },
+     "userfilter": {
+      "type": "string",
+      "description": "Only list tasks from this user."
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_list_remotes",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "List every remote (Proxmox VE cluster or Backup Server) PDM manages.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/remote",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_list_resources",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Every guest, node, storage and datastore across all remotes, with status.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/resources/list",
+     "params": [
+      "max-age",
+      "resource-type",
+      "search",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "max-age": {
+      "type": "integer",
+      "description": "Maximum age (in seconds) of cached remote resources. (default: 30)",
+      "minimum": 0
+     },
+     "resource-type": {
+      "type": "string",
+      "description": "Type of a PDM resource.",
+      "enum": [
+       "storage",
+       "qemu",
+       "lxc",
+       "network",
+       "datastore",
+       "node"
+      ]
+     },
+     "search": {
+      "type": "string",
+      "description": "Search term to filter for, uses special syntax e.g. <TODO>"
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_list_tasks",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Tasks that PDM itself ran (refreshes, metric collection).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/nodes/{node}/tasks",
+     "params": [
+      "errors",
+      "limit",
+      "node",
+      "running",
+      "since",
+      "start",
+      "statusfilter",
+      "typefilter",
+      "until",
+      "userfilter"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "errors": {
+      "type": "boolean",
+      "description": "Only list erroneous tasks. (default: false)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "Only list this amount of tasks. (0 means no limit) (default: 50)"
+     },
+     "running": {
+      "type": "boolean",
+      "description": "Only list running tasks. (default: false)"
+     },
+     "since": {
+      "type": "integer",
+      "description": "Only list tasks since this UNIX epoch."
+     },
+     "start": {
+      "type": "integer",
+      "description": "List tasks beginning from this offset. (default: 0)"
+     },
+     "statusfilter": {
+      "type": "array",
+      "description": "Only list tasks which have any one of the listed status.",
+      "items": {
+       "type": "string",
+       "description": "The state of a task.",
+       "enum": [
+        "ok",
+        "warning",
+        "error",
+        "unknown"
+       ]
+      }
+     },
+     "typefilter": {
+      "type": "string",
+      "description": "Only list tasks whose type contains this."
+     },
+     "until": {
+      "type": "integer",
+      "description": "Only list tasks until this UNIX epoch."
+     },
+     "userfilter": {
+      "type": "string",
+      "description": "Only list tasks from this user."
+     }
+    },
+    "required": [
+     "node"
+    ]
+   }
+  },
+  {
+   "name": "pdm_location_info",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Location information for remotes, optionally within one view.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/resources/location-info",
+     "params": [
+      "max-age",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "max-age": {
+      "type": "integer",
+      "description": "Maximum age (in seconds) of cached remote resources. If remote is not reachable or returns an error for the location, the last value from the cache will be returned in any case (default: 86400)",
+      "minimum": 0
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_metric_collection_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "When PDM last collected metrics from each remote, and any errors.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/metric-collection/status",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_my_permissions",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "The permissions of this server's PDM token.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/access/permissions",
+     "params": [
+      "auth-id",
+      "path"
+     ]
+    }
+   ],
+   "patterns": {
+    "auth-id": "^(?:(?:[^\\s:/[:cntrl:]]+)@(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)|(?:[^\\s:/[:cntrl:]]+)@(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)!(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*))$",
+    "path": "^(?:/|(?:/(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*))+)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "auth-id": {
+      "type": "string",
+      "description": "Authentication ID",
+      "minLength": 3,
+      "maxLength": 64
+     },
+     "path": {
+      "type": "string",
+      "description": "Access control path.",
+      "minLength": 1,
+      "maxLength": 128
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_node_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "CPU, memory and disk usage of the PDM host.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/nodes/{node}/status",
+     "params": [
+      "node"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "node"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_datastore_rrddata",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Metrics of a datastore on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/datastore/{datastore}/rrddata",
+     "params": [
+      "cf",
+      "datastore",
+      "remote",
+      "timeframe"
+     ]
+    }
+   ],
+   "patterns": {
+    "datastore": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cf": {
+      "type": "string",
+      "description": "RRD consolidation mode",
+      "enum": [
+       "MAX",
+       "AVERAGE"
+      ]
+     },
+     "datastore": {
+      "type": "string",
+      "description": "Datastore name.",
+      "minLength": 3,
+      "maxLength": 32
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     }
+    },
+    "required": [
+     "cf",
+     "datastore",
+     "remote",
+     "timeframe"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_list_datastores",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Datastores of a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/datastore",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_list_namespaces",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Namespaces of a datastore on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/datastore/{datastore}/namespaces",
+     "params": [
+      "datastore",
+      "max-depth",
+      "parent",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "parent": "^(?:(?:(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)/){0,7}(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*))?$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "datastore": {
+      "type": "string",
+      "description": "The datastore ID."
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "max-depth": {
+      "type": "integer",
+      "description": "The maximum depth that namespaces should be (recursively) listed.",
+      "minimum": 0
+     },
+     "parent": {
+      "type": "string",
+      "description": "Namespace.",
+      "maxLength": 256
+     }
+    },
+    "required": [
+     "datastore",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_list_remotes",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "List the Proxmox Backup Server remotes.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_pbs_list_snapshots",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Backup snapshots in a datastore on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/datastore/{datastore}/snapshots",
+     "params": [
+      "datastore",
+      "ns",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "datastore": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "ns": "^(?:(?:(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)/){0,7}(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*))?$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "datastore": {
+      "type": "string",
+      "description": "Datastore name.",
+      "minLength": 3,
+      "maxLength": 32
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "ns": {
+      "type": "string",
+      "description": "Namespace.",
+      "maxLength": 256
+     }
+    },
+    "required": [
+     "datastore",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_list_tasks",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Tasks on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/tasks",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_node_apt_changelog",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Changelog of a package on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/nodes/{node}/apt/changelog",
+     "params": [
+      "name",
+      "node",
+      "remote",
+      "version"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "name": "^[a-z0-9][-+.a-z0-9:]+$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "Package name to get changelog of."
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "version": {
+      "type": "string",
+      "description": "Package version to get changelog of. Omit to use candidate version."
+     }
+    },
+    "required": [
+     "name",
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_node_apt_refresh",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Refresh the package lists on a Proxmox Backup Server remote (apt update).",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pbs/remotes/{remote}/nodes/{node}/apt/update",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_node_apt_repositories",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "APT repositories configured on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/nodes/{node}/apt/repositories",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_node_apt_updates",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Available package updates on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/nodes/{node}/apt/update",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_node_subscription",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Subscription of a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/nodes/{node}/subscription",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_rrddata",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Metrics of a Proxmox Backup Server remote over a timeframe.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/rrddata",
+     "params": [
+      "cf",
+      "remote",
+      "timeframe"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cf": {
+      "type": "string",
+      "description": "RRD consolidation mode",
+      "enum": [
+       "MAX",
+       "AVERAGE"
+      ]
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     }
+    },
+    "required": [
+     "cf",
+     "remote",
+     "timeframe"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Status of a Proxmox Backup Server remote (CPU, memory, uptime).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/status",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_stop_task",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": false,
+   "description": "Stop a running task on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "DELETE",
+     "path": "/pbs/remotes/{remote}/tasks/{upid}",
+     "params": [
+      "remote",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "upid": {
+      "type": "string",
+      "description": "A remote UPID",
+      "minLength": 42
+     }
+    },
+    "required": [
+     "remote",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_task_log",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Log of a task on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/tasks/{upid}/log",
+     "params": [
+      "download",
+      "limit",
+      "remote",
+      "start",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "upid": {
+      "type": "string",
+      "description": "A remote UPID",
+      "minLength": 42
+     },
+     "download": {
+      "type": "boolean",
+      "description": "Whether the tasklog file should be downloaded. This parameter can't be used in conjunction with other parameters (default: false)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "The amount of lines to read from the tasklog. Setting this parameter to 0 will return all lines until the end of the file. (default: 50)",
+      "minimum": 0
+     },
+     "start": {
+      "type": "integer",
+      "description": "Start at this line when reading the tasklog (default: 0)",
+      "minimum": 0
+     }
+    },
+    "required": [
+     "remote",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pbs_task_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Status of a task on a Proxmox Backup Server remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pbs/remotes/{remote}/tasks/{upid}/status",
+     "params": [
+      "remote",
+      "upid",
+      "wait"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "upid": {
+      "type": "string",
+      "description": "A remote UPID",
+      "minLength": 42
+     },
+     "wait": {
+      "type": "boolean",
+      "description": "wait for the task to finish before returning its result (default: false)"
+     }
+    },
+    "required": [
+     "remote",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_ping",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Check that Proxmox Datacenter Manager answers (returns pong).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/ping",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_pve_cluster_firewall",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Cluster firewall of a Proxmox VE remote: section options, rules or status.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/firewall/options",
+     "params": [
+      "remote"
+     ],
+     "when": {
+      "section": "options"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/firewall/rules",
+     "params": [
+      "remote"
+     ],
+     "when": {
+      "section": "rules"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/firewall/status",
+     "params": [
+      "remote"
+     ],
+     "when": {
+      "section": "status"
+     }
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "section": {
+      "type": "string",
+      "enum": [
+       "options",
+       "rules",
+       "status"
+      ],
+      "description": "Which part to read"
+     }
+    },
+    "required": [
+     "remote",
+     "section"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_cluster_options",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Datacenter options of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/options",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_cluster_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Cluster and node membership status of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/cluster-status",
+     "params": [
+      "remote",
+      "target-endpoint"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "target-endpoint": {
+      "type": "string",
+      "description": "The target endpoint to use for the connection."
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_create_snapshot",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Create a snapshot of a VM or container.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/snapshot",
+     "params": [
+      "description",
+      "node",
+      "remote",
+      "snapname",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/snapshot",
+     "params": [
+      "description",
+      "node",
+      "remote",
+      "snapname",
+      "vmid",
+      "vmstate"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "snapname": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "snapname": {
+      "type": "string",
+      "description": "The name of the snapshot",
+      "maxLength": 40
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "description": {
+      "type": "string",
+      "description": "A textual description or comment."
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "vmstate": {
+      "type": "boolean",
+      "description": "Include the VM's RAM state, so the snapshot resumes exactly where it left off."
+     }
+    },
+    "required": [
+     "remote",
+     "snapname",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_delete_snapshot",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": true,
+   "description": "Delete a snapshot of a VM or container.",
+   "endpoints": [
+    {
+     "method": "DELETE",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/snapshot/{snapname}",
+     "params": [
+      "node",
+      "remote",
+      "snapname",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/snapshot/{snapname}",
+     "params": [
+      "node",
+      "remote",
+      "snapname",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "snapname": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "snapname": {
+      "type": "string",
+      "description": "The name of the snapshot",
+      "maxLength": 40
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "snapname",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_firewall_status_all",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Firewall status of every Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/firewall/status",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_pve_guest_config",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Configuration of a VM or container on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/config",
+     "params": [
+      "node",
+      "remote",
+      "snapshot",
+      "state",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/config",
+     "params": [
+      "node",
+      "remote",
+      "snapshot",
+      "state",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "snapshot": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "state": {
+      "type": "string",
+      "description": "Guest configuration access. (default: \"pending\")",
+      "enum": [
+       "pending",
+       "active"
+      ]
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "snapshot": {
+      "type": "string",
+      "description": "The name of the snapshot",
+      "maxLength": 40
+     }
+    },
+    "required": [
+     "remote",
+     "state",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_guest_firewall",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Firewall of a VM or container: section options or rules.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/firewall/options",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/firewall/rules",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/firewall/options",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/firewall/rules",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "lxc",
+       "qemu",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_guest_pending",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Pending (not yet applied) configuration of a VM or container.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/pending",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/pending",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_guest_rrddata",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Metrics of a VM or container over a timeframe.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/rrddata",
+     "params": [
+      "cf",
+      "remote",
+      "timeframe",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/rrddata",
+     "params": [
+      "cf",
+      "remote",
+      "timeframe",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cf": {
+      "type": "string",
+      "description": "RRD consolidation mode",
+      "enum": [
+       "MAX",
+       "AVERAGE"
+      ]
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     }
+    },
+    "required": [
+     "cf",
+     "remote",
+     "timeframe",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_guest_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Current status of a VM or container on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/status",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/status",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_list_guests",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "VMs (type qemu) or containers (type lxc) on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc",
+     "params": [
+      "node",
+      "remote"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu",
+     "params": [
+      "node",
+      "remote"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_list_nodes",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Nodes of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_list_remotes",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "List the Proxmox VE remotes.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_pve_list_snapshots",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Snapshots of a VM or container on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/snapshot",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/snapshot",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_list_storage",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Storage on one node of a Proxmox VE remote, with usage.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/storage",
+     "params": [
+      "content",
+      "enabled",
+      "format",
+      "node",
+      "remote",
+      "storage",
+      "target"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "content": {
+      "type": "array",
+      "description": "A list of contenttypes to filter for",
+      "items": {
+       "type": "string",
+       "description": "Storage content type.",
+       "enum": [
+        "backup",
+        "images",
+        "import",
+        "iso",
+        "none",
+        "rootdir",
+        "snippets",
+        "vztmpl"
+       ]
+      }
+     },
+     "enabled": {
+      "type": "boolean",
+      "description": "Only include enabled storages."
+     },
+     "format": {
+      "type": "boolean",
+      "description": "Include format information."
+     },
+     "storage": {
+      "type": "string",
+      "description": "Only list status for specified storage."
+     },
+     "target": {
+      "type": "string",
+      "description": "If target is different to 'node', only list shared storages which are accessible by both."
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_list_tasks",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Tasks on a Proxmox VE remote, optionally for one node.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/tasks",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_migrate_guest",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": true,
+   "description": "Migrate a VM or container to another node in the same cluster.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/migrate",
+     "params": [
+      "bwlimit",
+      "node",
+      "online",
+      "remote",
+      "restart",
+      "target",
+      "target-storage",
+      "timeout",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/migrate",
+     "params": [
+      "bwlimit",
+      "force",
+      "migration-network",
+      "migration-type",
+      "node",
+      "online",
+      "remote",
+      "target",
+      "target-storage",
+      "vmid",
+      "with-local-disks"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "target": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "migration-network": "^(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))/\\d{1,2})$|(?:(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){6})(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:::(?:(?:[0-9a-fA-F]{1,4}):){5})(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:(?:(?:[0-9a-fA-F]{1,4}))?::(?:(?:[0-9a-fA-F]{1,4}):){4})(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){0,1}(?:[0-9a-fA-F]{1,4}))?::(?:(?:[0-9a-fA-F]{1,4}):){3})(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){0,2}(?:[0-9a-fA-F]{1,4}))?::(?:(?:[0-9a-fA-F]{1,4}):){2})(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){0,3}(?:[0-9a-fA-F]{1,4}))?::(?:(?:[0-9a-fA-F]{1,4}):){1})(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){0,4}(?:[0-9a-fA-F]{1,4}))?::)(?:(?:(?:(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9]))|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))))|(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){0,5}(?:[0-9a-fA-F]{1,4}))?::)(?:[0-9a-fA-F]{1,4}))|(?:(?:(?:(?:(?:[0-9a-fA-F]{1,4}):){0,6}(?:[0-9a-fA-F]{1,4}))?::)))/\\d{1,3})$)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "target": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "bwlimit": {
+      "type": "integer",
+      "description": "Override I/O bandwidth limit (in KiB/s).",
+      "minimum": 0
+     },
+     "force": {
+      "type": "boolean",
+      "description": "Allow to migrate VMs with local devices. (default: false)"
+     },
+     "migration-network": {
+      "type": "string",
+      "description": "CIDR of the (sub) network that is used for migration."
+     },
+     "migration-type": {
+      "type": "string",
+      "description": "Migration traffic is encrypted using an SSH tunnel by default. On secure, completely private networks this can be disabled to increase performance.",
+      "enum": [
+       "secure",
+       "insecure"
+      ]
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "online": {
+      "type": "boolean",
+      "description": "Attempt an online migration if the container is running."
+     },
+     "restart": {
+      "type": "boolean",
+      "description": "Perform a restart-migration if the container is running."
+     },
+     "target-storage": {
+      "type": "array",
+      "description": "List of storage mappings",
+      "items": {
+       "type": "string",
+       "description": "Mappings of source storages to target storages."
+      }
+     },
+     "timeout": {
+      "type": "integer",
+      "description": "Shutdown timeout for restart-migrations."
+     },
+     "with-local-disks": {
+      "type": "boolean",
+      "description": "Enable live storage migration for local disks."
+     }
+    },
+    "required": [
+     "remote",
+     "target",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_migrate_preconditions",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Whether a VM can migrate within its cluster, and to which nodes.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/migrate",
+     "params": [
+      "node",
+      "remote",
+      "target",
+      "vmid"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "target": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "target": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_next_vmid",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "The next free VMID on a Proxmox VE remote, e.g. for a migration target.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/cluster-nextid",
+     "params": [
+      "remote",
+      "target-endpoint"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "target-endpoint": {
+      "type": "string",
+      "description": "The target endpoint to use for the connection."
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_apt_changelog",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Changelog of a package on one node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/apt/changelog",
+     "params": [
+      "name",
+      "node",
+      "remote",
+      "version"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "name": "^[a-z0-9][-+.a-z0-9:]+$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "Package name to get changelog of."
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "version": {
+      "type": "string",
+      "description": "Package version to get changelog of. Omit to use candidate version."
+     }
+    },
+    "required": [
+     "name",
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_apt_refresh",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Refresh the package lists on one node of a Proxmox VE remote (apt update).",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/nodes/{node}/apt/update",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_apt_repositories",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "APT repositories configured on one node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/apt/repositories",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_apt_updates",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Available package updates on one node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/apt/update",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_config",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Configuration of one node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/config",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_firewall",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Node firewall on a Proxmox VE remote: section options, rules or status.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/firewall/options",
+     "params": [
+      "node",
+      "remote"
+     ],
+     "when": {
+      "section": "options"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/firewall/rules",
+     "params": [
+      "node",
+      "remote"
+     ],
+     "when": {
+      "section": "rules"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/firewall/status",
+     "params": [
+      "node",
+      "remote"
+     ],
+     "when": {
+      "section": "status"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "section": {
+      "type": "string",
+      "enum": [
+       "options",
+       "rules",
+       "status"
+      ],
+      "description": "Which part to read"
+     }
+    },
+    "required": [
+     "node",
+     "remote",
+     "section"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_network",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Network interfaces of one node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/network",
+     "params": [
+      "interface-type",
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "interface-type": {
+      "type": "string",
+      "description": "Only list specific interface types.",
+      "enum": [
+       "bridge",
+       "bond",
+       "eth",
+       "alias",
+       "vlan",
+       "fabric",
+       "OVSBridge",
+       "OVSBond",
+       "OVSPort",
+       "OVSIntPort",
+       "vnet",
+       "any_bridge",
+       "any_local_bridge",
+       "include_sdn"
+      ]
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_rrddata",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Metrics of one node of a Proxmox VE remote over a timeframe.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/rrddata",
+     "params": [
+      "cf",
+      "node",
+      "remote",
+      "timeframe"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cf": {
+      "type": "string",
+      "description": "RRD consolidation mode",
+      "enum": [
+       "MAX",
+       "AVERAGE"
+      ]
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     }
+    },
+    "required": [
+     "cf",
+     "node",
+     "remote",
+     "timeframe"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Status of one node of a Proxmox VE remote (CPU, memory, uptime, versions).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/status",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_node_subscription",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Subscription of one node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/subscription",
+     "params": [
+      "node",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "node",
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_remote_migrate_guest",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": true,
+   "description": "Migrate a VM or container to another Proxmox VE remote (another cluster). With delete, the original is removed after a successful migration.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/remote-migrate",
+     "params": [
+      "bwlimit",
+      "delete",
+      "node",
+      "online",
+      "remote",
+      "restart",
+      "target",
+      "target-bridge",
+      "target-endpoint",
+      "target-storage",
+      "target-vmid",
+      "timeout",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/remote-migrate",
+     "params": [
+      "bwlimit",
+      "delete",
+      "node",
+      "online",
+      "remote",
+      "target",
+      "target-bridge",
+      "target-endpoint",
+      "target-storage",
+      "target-vmid",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "target": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "target": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "target-bridge": {
+      "type": "array",
+      "description": "List of bridge mappings",
+      "items": {
+       "type": "string",
+       "description": "Mappings of source bridges to remote bridges."
+      }
+     },
+     "target-storage": {
+      "type": "array",
+      "description": "List of storage mappings",
+      "items": {
+       "type": "string",
+       "description": "Mappings of source storages to target storages."
+      }
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "bwlimit": {
+      "type": "integer",
+      "description": "Override I/O bandwidth limit (in KiB/s).",
+      "minimum": 0
+     },
+     "delete": {
+      "type": "boolean",
+      "description": "Delete the original VM and related data after successful migration. (default: false)"
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "online": {
+      "type": "boolean",
+      "description": "Perform an online migration if the vm is running. (default: false)"
+     },
+     "restart": {
+      "type": "boolean",
+      "description": "Perform a restart-migration."
+     },
+     "target-endpoint": {
+      "type": "string",
+      "description": "The target endpoint to use for the connection."
+     },
+     "target-vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "timeout": {
+      "type": "integer",
+      "description": "Add a shutdown timeout for the restart-migration."
+     }
+    },
+    "required": [
+     "remote",
+     "target",
+     "target-bridge",
+     "target-storage",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_resources",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Resources of one Proxmox VE remote (guests, nodes, storage, SDN).",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/resources",
+     "params": [
+      "kind",
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "kind": {
+      "type": "string",
+      "description": "Resource type.",
+      "enum": [
+       "vm",
+       "storage",
+       "node",
+       "sdn"
+      ]
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_resume_vm",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Resume a paused or suspended VM.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/resume",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_rollback_snapshot",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": true,
+   "description": "Roll a VM or container back to a snapshot. Changes since then are lost.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/snapshot/{snapname}/rollback",
+     "params": [
+      "node",
+      "remote",
+      "snapname",
+      "start",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/snapshot/{snapname}/rollback",
+     "params": [
+      "node",
+      "remote",
+      "snapname",
+      "start",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "snapname": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "snapname": {
+      "type": "string",
+      "description": "The name of the snapshot",
+      "maxLength": 40
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "start": {
+      "type": "boolean",
+      "description": "Start the container after a successful rollback."
+     }
+    },
+    "required": [
+     "remote",
+     "snapname",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_sdn_vnet_mac_vrf",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "MAC-VRF of an EVPN VNet on a node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/sdn/vnets/{vnet}/mac-vrf",
+     "params": [
+      "node",
+      "remote",
+      "vnet"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "vnet": {
+      "type": "string",
+      "description": "The name for an SDN object (zone / vnet / fabric)."
+     }
+    },
+    "required": [
+     "node",
+     "remote",
+     "vnet"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_sdn_zone_ip_vrf",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "IP-VRF of an EVPN zone on a node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/sdn/zones/{zone}/ip-vrf",
+     "params": [
+      "node",
+      "remote",
+      "zone"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "zone": {
+      "type": "string",
+      "description": "The name for an SDN object (zone / vnet / fabric)."
+     }
+    },
+    "required": [
+     "node",
+     "remote",
+     "zone"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_shutdown_guest",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": true,
+   "description": "Shut down a VM or container cleanly.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/shutdown",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/shutdown",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_start_guest",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Start a VM or container on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/start",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/start",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_stop_guest",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": true,
+   "description": "Stop a VM or container immediately (like pulling the plug).",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/stop",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/stop",
+     "params": [
+      "node",
+      "remote",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_stop_task",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": false,
+   "description": "Stop a running task on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "DELETE",
+     "path": "/pve/remotes/{remote}/tasks/{upid}",
+     "params": [
+      "remote",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "upid": {
+      "type": "string",
+      "description": "A remote UPID",
+      "minLength": 42
+     }
+    },
+    "required": [
+     "remote",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_storage_rrddata",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Metrics of one storage on a node of a Proxmox VE remote over a timeframe.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/storage/{storage}/rrddata",
+     "params": [
+      "cf",
+      "node",
+      "remote",
+      "storage",
+      "timeframe"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "storage": "^(?i:[a-z][a-z0-9\\-_.]*[a-z0-9])$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "cf": {
+      "type": "string",
+      "description": "RRD consolidation mode",
+      "enum": [
+       "MAX",
+       "AVERAGE"
+      ]
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "storage": {
+      "type": "string",
+      "description": "Storage ID."
+     },
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     }
+    },
+    "required": [
+     "cf",
+     "node",
+     "remote",
+     "storage",
+     "timeframe"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_storage_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Status and usage of one storage on a node of a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/nodes/{node}/storage/{storage}/status",
+     "params": [
+      "node",
+      "remote",
+      "storage"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "storage": "^(?i:[a-z][a-z0-9\\-_.]*[a-z0-9])$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "storage": {
+      "type": "string",
+      "description": "Storage ID."
+     }
+    },
+    "required": [
+     "node",
+     "remote",
+     "storage"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_task_log",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Log of a task on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/tasks/{upid}/log",
+     "params": [
+      "download",
+      "limit",
+      "remote",
+      "start",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "upid": {
+      "type": "string",
+      "description": "A remote UPID",
+      "minLength": 42
+     },
+     "download": {
+      "type": "boolean",
+      "description": "Whether the tasklog file should be downloaded. This parameter can't be used in conjunction with other parameters (default: false)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "The amount of lines to read from the tasklog. Setting this parameter to 0 will return all lines until the end of the file. (default: 50)",
+      "minimum": 0
+     },
+     "start": {
+      "type": "integer",
+      "description": "Start at this line when reading the tasklog (default: 0)",
+      "minimum": 0
+     }
+    },
+    "required": [
+     "remote",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_task_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Status of a task on a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/tasks/{upid}/status",
+     "params": [
+      "remote",
+      "upid",
+      "wait"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "upid": {
+      "type": "string",
+      "description": "A remote UPID",
+      "minLength": 42
+     },
+     "wait": {
+      "type": "boolean",
+      "description": "wait for the task to finish before returning its result (default: false)"
+     }
+    },
+    "required": [
+     "remote",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_update_snapshot",
+   "phase": "2",
+   "kind": "write",
+   "waitable": false,
+   "description": "Change a snapshot's description.",
+   "endpoints": [
+    {
+     "method": "PUT",
+     "path": "/pve/remotes/{remote}/lxc/{vmid}/snapshot/{snapname}/config",
+     "params": [
+      "description",
+      "node",
+      "remote",
+      "snapname",
+      "vmid"
+     ],
+     "when": {
+      "type": "lxc"
+     }
+    },
+    {
+     "method": "PUT",
+     "path": "/pve/remotes/{remote}/qemu/{vmid}/snapshot/{snapname}/config",
+     "params": [
+      "description",
+      "node",
+      "remote",
+      "snapname",
+      "vmid"
+     ],
+     "when": {
+      "type": "qemu"
+     }
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "snapname": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "snapname": {
+      "type": "string",
+      "description": "The name of the snapshot",
+      "maxLength": 40
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "lxc",
+       "qemu"
+      ],
+      "description": "Qemu (vm) or lxc (container)"
+     },
+     "vmid": {
+      "type": "integer",
+      "description": "A guest ID",
+      "minimum": 1
+     },
+     "description": {
+      "type": "string",
+      "description": "A textual description or comment."
+     },
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     }
+    },
+    "required": [
+     "remote",
+     "snapname",
+     "type",
+     "vmid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_pve_updates",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Cached package update information for a Proxmox VE remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/pve/remotes/{remote}/updates",
+     "params": [
+      "remote"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": [
+     "remote"
+    ]
+   }
+  },
+  {
+   "name": "pdm_refresh_remote_tasks",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Make PDM refresh its cache of remote tasks now.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/remotes/tasks/refresh",
+     "params": [
+      "remotes"
+     ]
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "remotes": {
+      "type": "array",
+      "description": "Optional list of tasks to fetch tasks from.",
+      "items": {
+       "type": "string",
+       "description": "Remote ID.",
+       "minLength": 2,
+       "maxLength": 32
+      }
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_refresh_updates",
+   "phase": "2",
+   "kind": "write",
+   "waitable": true,
+   "description": "Make PDM refresh the update summary of every remote now.",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/remotes/updates/refresh",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_remote_task_statistics",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Task counts across remotes by type and outcome.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/tasks/statistics",
+     "params": [
+      "errors",
+      "limit",
+      "remote",
+      "running",
+      "since",
+      "start",
+      "statusfilter",
+      "typefilter",
+      "until",
+      "userfilter",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "remote": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$",
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "errors": {
+      "type": "boolean",
+      "description": "Only list erroneous tasks. (default: false)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "Only list this amount of tasks. (0 means no limit) (default: 50)"
+     },
+     "remote": {
+      "type": "string",
+      "description": "Remote ID.",
+      "minLength": 2,
+      "maxLength": 32
+     },
+     "running": {
+      "type": "boolean",
+      "description": "Only list running tasks. (default: false)"
+     },
+     "since": {
+      "type": "integer",
+      "description": "Only list tasks since this UNIX epoch."
+     },
+     "start": {
+      "type": "integer",
+      "description": "List tasks beginning from this offset. (default: 0)"
+     },
+     "statusfilter": {
+      "type": "array",
+      "description": "Only list tasks which have any one of the listed status.",
+      "items": {
+       "type": "string",
+       "description": "The state of a task.",
+       "enum": [
+        "ok",
+        "warning",
+        "error",
+        "unknown"
+       ]
+      }
+     },
+     "typefilter": {
+      "type": "string",
+      "description": "Only list tasks whose type contains this."
+     },
+     "until": {
+      "type": "integer",
+      "description": "Only list tasks until this UNIX epoch."
+     },
+     "userfilter": {
+      "type": "string",
+      "description": "Only list tasks from this user."
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_resource_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Counts of resources by type and state across all remotes.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/resources/status",
+     "params": [
+      "max-age",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "max-age": {
+      "type": "integer",
+      "description": "Maximum age (in seconds) of cached remote resources. (default: 30)",
+      "minimum": 0
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_sdn_list",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "SDN across Proxmox VE remotes: section zones, vnets or controllers.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/sdn/controllers",
+     "params": [
+      "pending",
+      "remotes",
+      "running",
+      "ty"
+     ],
+     "when": {
+      "section": "controllers"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/sdn/vnets",
+     "params": [
+      "pending",
+      "remotes",
+      "running"
+     ],
+     "when": {
+      "section": "vnets"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/sdn/zones",
+     "params": [
+      "pending",
+      "remotes",
+      "running",
+      "ty"
+     ],
+     "when": {
+      "section": "zones"
+     }
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "section": {
+      "type": "string",
+      "enum": [
+       "controllers",
+       "vnets",
+       "zones"
+      ],
+      "description": "Which part to read"
+     },
+     "pending": {
+      "type": "boolean",
+      "description": "Include a list of attributes whose changes are currently pending."
+     },
+     "remotes": {
+      "type": "array",
+      "description": "Only return controllers from the specified remotes.",
+      "items": {
+       "type": "string",
+       "description": "Remote ID.",
+       "minLength": 3,
+       "maxLength": 32
+      }
+     },
+     "running": {
+      "type": "boolean",
+      "description": "If true shows the running configuration, otherwise the pending configuration."
+     },
+     "ty": {
+      "type": "string",
+      "description": "Only list sdn controllers of specific type",
+      "enum": [
+       "bgp",
+       "evpn",
+       "faucet",
+       "isis"
+      ]
+     }
+    },
+    "required": [
+     "section"
+    ]
+   }
+  },
+  {
+   "name": "pdm_stop_task",
+   "phase": "2",
+   "kind": "destructive",
+   "waitable": false,
+   "description": "Stop a running task of PDM itself.",
+   "endpoints": [
+    {
+     "method": "DELETE",
+     "path": "/nodes/{node}/tasks/{upid}",
+     "params": [
+      "node",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "upid": "^UPID:(?P<node>[a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?):(?P<pid>[0-9A-Fa-f]{8}):(?P<pstart>[0-9A-Fa-f]{8,9}):(?P<task_id>[0-9A-Fa-f]{8,16}):(?P<starttime>[0-9A-Fa-f]{8}):(?P<wtype>[^:\\s]+):(?P<wid>[^:\\s]*):(?P<authid>[^:\\s]+):$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "upid": {
+      "type": "string",
+      "description": "Unique Process/Task Identifier",
+      "minLength": 36
+     }
+    },
+    "required": [
+     "node",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_subscription_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Subscription status of every remote.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/resources/subscription",
+     "params": [
+      "max-age",
+      "verbose",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "max-age": {
+      "type": "integer",
+      "description": "Maximum age (in seconds) of cached remote subscription state. (default: 86400)",
+      "minimum": 0
+     },
+     "verbose": {
+      "type": "boolean",
+      "description": "If true, includes subscription information per node (with enough privileges) (default: false)"
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_task_log",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Log of a task PDM itself ran.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/nodes/{node}/tasks/{upid}/log",
+     "params": [
+      "download",
+      "limit",
+      "node",
+      "start",
+      "test-status",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "upid": "^UPID:(?P<node>[a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?):(?P<pid>[0-9A-Fa-f]{8}):(?P<pstart>[0-9A-Fa-f]{8,9}):(?P<task_id>[0-9A-Fa-f]{8,16}):(?P<starttime>[0-9A-Fa-f]{8}):(?P<wtype>[^:\\s]+):(?P<wid>[^:\\s]*):(?P<authid>[^:\\s]+):$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "upid": {
+      "type": "string",
+      "description": "Unique Process/Task Identifier",
+      "minLength": 36
+     },
+     "download": {
+      "type": "boolean",
+      "description": "Whether the tasklog file should be downloaded. This parameter can't be used in conjunction with other parameters (default: false)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "The amount of lines to read from the tasklog. Setting this parameter to 0 will return all lines until the end of the file. (default: 50)",
+      "minimum": 0
+     },
+     "start": {
+      "type": "integer",
+      "description": "Start at this line when reading the tasklog (default: 0)",
+      "minimum": 0
+     },
+     "test-status": {
+      "type": "boolean",
+      "description": "Test task status, and set result attribute \"active\" accordingly."
+     }
+    },
+    "required": [
+     "node",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_task_status",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Status of a task PDM itself ran.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/nodes/{node}/tasks/{upid}/status",
+     "params": [
+      "node",
+      "upid"
+     ]
+    }
+   ],
+   "patterns": {
+    "node": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+    "upid": "^UPID:(?P<node>[a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?):(?P<pid>[0-9A-Fa-f]{8}):(?P<pstart>[0-9A-Fa-f]{8,9}):(?P<task_id>[0-9A-Fa-f]{8,16}):(?P<starttime>[0-9A-Fa-f]{8}):(?P<wtype>[^:\\s]+):(?P<wid>[^:\\s]*):(?P<authid>[^:\\s]+):$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "string",
+      "description": "Node name (or 'localhost')"
+     },
+     "upid": {
+      "type": "string",
+      "description": "Unique Process/Task Identifier",
+      "minLength": 36
+     }
+    },
+    "required": [
+     "node",
+     "upid"
+    ]
+   }
+  },
+  {
+   "name": "pdm_top_entities",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "The guests and nodes using the most CPU or memory across all remotes.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/resources/top-entities",
+     "params": [
+      "timeframe",
+      "view"
+     ]
+    }
+   ],
+   "patterns": {
+    "view": "^(?:[A-Za-z0-9_][A-Za-z0-9._\\-]*)$"
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "timeframe": {
+      "type": "string",
+      "description": "RRD time frame",
+      "enum": [
+       "hour",
+       "day",
+       "week",
+       "month",
+       "year",
+       "decade"
+      ]
+     },
+     "view": {
+      "type": "string",
+      "description": "View name.",
+      "minLength": 2,
+      "maxLength": 32
+     }
+    },
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_update_summary",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Pending package updates on every remote node, as PDM last saw them.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/remotes/updates/summary",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  },
+  {
+   "name": "pdm_version",
+   "phase": "1",
+   "kind": "read",
+   "waitable": false,
+   "description": "Proxmox Datacenter Manager version and release.",
+   "endpoints": [
+    {
+     "method": "GET",
+     "path": "/version",
+     "params": []
+    }
+   ],
+   "patterns": {},
+   "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+   }
+  }
+ ]
+}

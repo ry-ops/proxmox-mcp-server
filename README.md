@@ -314,12 +314,41 @@ Run one server per cluster, each under its own name. Every cluster then gets its
 
 Give each extra cluster only the toolsets it needs, because every server's tools count against the client's context. Over HTTP, run one `proxmox-mcp-server-http` per cluster on its own port.
 
+<a id="pdm"></a>
+
+### 🛰️ Proxmox Datacenter Manager
+
+If you run [Proxmox Datacenter Manager](https://pdm.proxmox.com/) (PDM), point the server at it and the `pdm` toolset loads: 89 tools that reach every Proxmox VE cluster and Proxmox Backup Server PDM manages, through one connection. It can run alongside a direct Proxmox VE connection, or on its own.
+
+- **Across everything:** resources, top consumers, tasks, pending updates and subscriptions for all remotes at once.
+- **Per remote:** nodes, guests, configs, snapshots, storage, firewall, tasks and metrics on Proxmox VE remotes; datastores, namespaces, snapshots and tasks on Backup Server remotes; SDN and Ceph.
+- **Actions:** start, stop, shut down and resume guests; create, delete, roll back and describe snapshots; migrate within a cluster or **to another cluster** (`pdm_pve_remote_migrate_guest`); stop tasks; refresh updates, task caches and metrics. Actions take `wait`.
+
+Tools that cover both VMs and containers take `type` (`qemu` or `lxc`). Every input is checked against PDM's own schema before a request is sent.
+
+```json
+"env": {
+  "PDM_HOST": "10.0.0.20",
+  "PDM_TOKEN_ID": "root@pam!proxmox-mcp",
+  "PDM_TOKEN_SECRET": "…",
+  "PDM_CA_BUNDLE": "/path/to/pdm-api.pem",
+  "PDM_TLS_NAME": "pdm",
+  "PDM_PROTECTED_GUESTS": "pve01:104,pve01:105"
+}
+```
+
+Create the token in PDM under **Configuration → Access Control → API Tokens**, then give it a role under **Permissions** (PDM tokens have no permissions of their own): **Auditor** for read-only, **Administrator** for actions. For `PDM_CA_BUNDLE`, copy `/etc/proxmox-datacenter-manager/auth/api.pem` from the PDM host. Its self-signed certificate names `pdm` and `localhost`, not the host's IP, so when `PDM_HOST` is an IP also set `PDM_TLS_NAME=pdm`: the certificate is checked against that name while the server connects to the IP.
+
+**Protected guests.** VMIDs are only unique within a cluster, so PDM tools use `PDM_PROTECTED_GUESTS`, with the remote in each entry: `pve01:104`, or `*:9000-9010` for every remote. A migration is refused when its source or its target is protected. `PROXMOX_PROTECTED_VMIDS` doesn't apply to PDM tools. `PROXMOX_READ_ONLY`, `PROXMOX_NO_DESTRUCTIVE`, HTTP roles and the audit log apply as usual.
+
+The tools are generated from PDM's published API schema; [ROADMAP.md](ROADMAP.md) maps all 327 PDM endpoints and what's planned next.
+
 ## 🔧 Configuration
 
 | Variable | Required | Default | What it does |
 |---|:---:|---|---|
-| `PROXMOX_HOST` | ✅ | | Hostname or IP, **without** scheme or port (`192.168.1.100`, not `https://192.168.1.100:8006`) |
-| `PROXMOX_USER` | ✅ | | e.g. `root@pam`, `admin@pve` |
+| `PROXMOX_HOST` | ✅¹ | | Hostname or IP, **without** scheme or port (`192.168.1.100`, not `https://192.168.1.100:8006`) |
+| `PROXMOX_USER` | ✅¹ | | e.g. `root@pam`, `admin@pve` |
 | `PROXMOX_TOKEN_NAME` + `PROXMOX_TOKEN_VALUE` | one of | | API token auth (recommended) |
 | `PROXMOX_PASSWORD` | one of | | Password auth |
 | `PROXMOX_PORT` | | `8006` | API port |
@@ -338,6 +367,15 @@ Give each extra cluster only the toolsets it needs, because every server's tools
 | `PROXMOX_AUDIT_LOG` | | | File, or `stderr`, for a JSON-lines log of every write call; see [Audit log](#audit) |
 | `PROXMOX_AUDIT_READS` | | `false` | Log read calls too |
 | `MCP_HTTP_ALLOW_NO_AUTH` | | `false` | HTTP entrypoint only: allow a non-loopback address with no token |
+| `PDM_HOST` | ✅¹ | | Proxmox Datacenter Manager hostname or IP; loads the `pdm` toolset. See [Datacenter Manager](#pdm) |
+| `PDM_PORT` | | `8443` | PDM API port |
+| `PDM_TOKEN_ID` + `PDM_TOKEN_SECRET` | with `PDM_HOST` | | PDM API token, `user@realm!name`, and its secret |
+| `PDM_CA_BUNDLE` | | | PDM's certificate (or its CA) to verify against |
+| `PDM_TLS_NAME` | | | Name to check PDM's certificate against when `PDM_HOST` is an IP it doesn't name, e.g. `pdm` |
+| `PDM_VERIFY_SSL` | | `false` | Verify PDM's certificate against the system's trusted CAs instead |
+| `PDM_PROTECTED_GUESTS` | | | `remote:ID` entries PDM tools may not change, e.g. `pve01:104,*:9000-9010` |
+
+¹ Set `PROXMOX_HOST` (with `PROXMOX_USER` and a token or password) to talk to Proxmox VE directly, `PDM_HOST` to go through Datacenter Manager, or both.
 
 <a id="toolsets"></a>
 
@@ -659,7 +697,7 @@ QUICKSTART.md · SETUP.md · USAGE.md · CHANGELOG.md
 
 ## 🗺️ Roadmap
 
-- One server for several clusters, chosen per call (today: [one server per cluster](#clusters))
+- One server for several clusters without Datacenter Manager, chosen per call (today: [one server per cluster](#clusters), or [through PDM](#pdm))
 - Progress notifications while waiting for long tasks
 
 What has shipped is in [CHANGELOG.md](CHANGELOG.md).
