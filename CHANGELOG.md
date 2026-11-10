@@ -6,17 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
-### Fixed
-- `restore_container_backup` restores the backup's configuration. It never told Proxmox the
-  request was a restore, so Proxmox treated the backup as a template: it skipped the backup's
-  network, mount points and features, made the container unprivileged by default, and refused
-  `unique`. Reported by Will Furphy ([@wfurphy](https://github.com/wfurphy)) in #89. Thank you!
+## [2.12.0] - 2026-11-09
 
 ### Added
 - `restore_container_backup` takes `rootfs` and `mp0` to `mp255` to resize or move disks during
   a restore, which is the only way to shrink a container disk. With them, Proxmox creates only
   the disks you list, so `rootfs` is required with any mount point. The description now says
   that `force` replaces an existing container, disks included.
+
+### Fixed
+- `restore_container_backup` restores the backup's configuration. It never told Proxmox the
+  request was a restore, so Proxmox treated the backup as a template: it skipped the backup's
+  network, mount points and features, made the container unprivileged by default, and refused
+  `unique`. Reported by Will Furphy ([@wfurphy](https://github.com/wfurphy)) in #89. Thank you!
 
 ### Security
 - `PROXMOX_PROTECTED_VMIDS` covers disk inputs. A disk value on any write tool (`rootfs`, `mpN`,
@@ -280,6 +282,7 @@ released on its own.
 
 Initial release.
 
+[2.12.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.9.0...v2.10.0
 [2.9.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.8.0...v2.9.0
