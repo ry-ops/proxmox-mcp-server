@@ -337,7 +337,14 @@ Tools that cover both VMs and containers take `type` (`qemu` or `lxc`). Every in
 }
 ```
 
-Create the token in PDM under **Configuration → Access Control → API Tokens**, then give it a role under **Permissions** (PDM tokens have no permissions of their own): **Auditor** for read-only, **Administrator** for actions. For `PDM_CA_BUNDLE`, copy `/etc/proxmox-datacenter-manager/auth/api.pem` from the PDM host. Its self-signed certificate names `pdm` and `localhost`, not the host's IP, so when `PDM_HOST` is an IP also set `PDM_TLS_NAME=pdm`: the certificate is checked against that name while the server connects to the IP.
+Create the token in PDM under **Configuration → Access Control → API Tokens**, then give it roles under **Permissions**. PDM tokens start with no permissions, and never get more than their user:
+
+| Path | Role | Covers |
+|---|---|---|
+| `/resource` | **Auditor** for read-only, **Administrator** for actions | Every remote: reads need `Resource.Audit`; actions need `Resource.Manage` (power, snapshots, stopping tasks), `Resource.Modify` (refreshing package lists) and `Resource.Migrate` |
+| `/system` | **Auditor** | `pdm_node_status` (the PDM host's own usage) |
+
+PDM can also protect a guest itself: a **NoAccess** entry for the token on `/resource/<remote>/guest/<vmid>` (for example `/resource/pve01/guest/104`) makes PDM refuse every call about that guest, whatever this server does. For `PDM_CA_BUNDLE`, copy `/etc/proxmox-datacenter-manager/auth/api.pem` from the PDM host. Its self-signed certificate names `pdm` and `localhost`, not the host's IP, so when `PDM_HOST` is an IP also set `PDM_TLS_NAME=pdm`: the certificate is checked against that name while the server connects to the IP.
 
 **Protected guests.** VMIDs are only unique within a cluster, so PDM tools use `PDM_PROTECTED_GUESTS`, with the remote in each entry: `pve01:104`, or `*:9000-9010` for every remote. A migration is refused when its source or its target is protected. `PROXMOX_PROTECTED_VMIDS` doesn't apply to PDM tools. `PROXMOX_READ_ONLY`, `PROXMOX_NO_DESTRUCTIVE`, HTTP roles and the audit log apply as usual.
 
