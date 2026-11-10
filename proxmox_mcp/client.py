@@ -84,6 +84,30 @@ def tls_warning() -> str | None:
     )
 
 
+def _network_error(error: httpx.TransportError, base_url: str) -> ConnectionError:
+    """A ConnectionError that says which address failed and how.
+
+    httpx's own messages are often empty (a connect timeout has none), which reached clients
+    as {"error": ""}.
+    """
+    where = base_url.removesuffix("/api2/json")
+    if isinstance(error, httpx.TimeoutException):
+        what = "timed out"
+    else:
+        what = str(error).strip() or type(error).__name__
+    if "CERTIFICATE_VERIFY_FAILED" in what:
+        hint = (
+            "The certificate isn't trusted: set PROXMOX_CA_BUNDLE to the cluster CA "
+            "(/etc/pve/pve-root-ca.pem), and use a PROXMOX_HOST the certificate names."
+        )
+    else:
+        hint = (
+            "Check PROXMOX_HOST and PROXMOX_PORT, and that this machine can route to that "
+            "address (a VPN can capture the traffic)."
+        )
+    return ConnectionError(f"Can't reach Proxmox at {where}: {what}. {hint}")
+
+
 def _api_error(response: httpx.Response) -> httpx.HTTPStatusError:
     """An HTTPStatusError that keeps the reason Proxmox gives in the response body.
 
@@ -130,10 +154,13 @@ class ProxmoxClient:
 
     async def _login(self) -> None:
         """Get a new ticket with the password."""
-        response = await self.client.post(
-            f"{self.base_url}/access/ticket",
-            data={"username": PROXMOX_USER, "password": PROXMOX_PASSWORD},
-        )
+        try:
+            response = await self.client.post(
+                f"{self.base_url}/access/ticket",
+                data={"username": PROXMOX_USER, "password": PROXMOX_PASSWORD},
+            )
+        except httpx.TransportError as e:
+            raise _network_error(e, self.base_url) from e
         if response.is_error:
             raise _api_error(response)
         data = response.json()["data"]
@@ -191,14 +218,17 @@ class ProxmoxClient:
         self, method: str, url: str, data: dict[str, Any] | None
     ) -> httpx.Response:
         headers = self._headers(method)
-        if method == "GET":
-            response = await self.client.get(url, headers=headers, params=data)
-        elif method == "POST":
-            response = await self.client.post(url, headers=headers, data=data)
-        elif method == "PUT":
-            response = await self.client.put(url, headers=headers, data=data)
-        else:
-            response = await self.client.delete(url, headers=headers, params=data)
+        try:
+            if method == "GET":
+                response = await self.client.get(url, headers=headers, params=data)
+            elif method == "POST":
+                response = await self.client.post(url, headers=headers, data=data)
+            elif method == "PUT":
+                response = await self.client.put(url, headers=headers, data=data)
+            else:
+                response = await self.client.delete(url, headers=headers, params=data)
+        except httpx.TransportError as e:
+            raise _network_error(e, self.base_url) from e
         return response
 
     async def get(self, path: str, params: dict[str, Any] | None = None) -> Any:

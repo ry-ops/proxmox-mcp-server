@@ -155,8 +155,9 @@ async def call_tool(name: str, arguments: Any, who: auth.Principal = auth.STDIO)
     except Exception as e:
         failed = True
         entry["outcome"] = "refused" if isinstance(e, PermissionError) else "error"
-        entry["error"] = str(e)
-        text = _dump({"error": str(e), "tool": name})
+        # Some exceptions have no message; an empty error string tells the client nothing.
+        entry["error"] = str(e) or type(e).__name__
+        text = _dump({"error": entry["error"], "tool": name})
     if audit.enabled() and (audit.AUDIT_READS or not registry.is_read_only(name)):
         entry["ms"] = round((time.monotonic() - started) * 1000)
         audit.record(entry)
@@ -170,7 +171,7 @@ async def read_resource(uri: str, who: auth.Principal = auth.STDIO) -> ReadResou
         text = await resources.read(proxmox, uri)
         entry["outcome"] = "ok"
     except Exception as e:
-        entry.update(outcome="error", error=str(e))
+        entry.update(outcome="error", error=str(e) or type(e).__name__)
         raise
     finally:
         if audit.enabled() and audit.AUDIT_READS:

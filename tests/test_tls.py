@@ -6,7 +6,6 @@ import ipaddress
 import ssl
 import threading
 
-import httpx
 import pytest
 
 from proxmox_mcp import client as client_mod
@@ -113,14 +112,14 @@ async def test_ca_bundle_verifies_a_self_signed_proxmox_certificate(pve, monkeyp
 async def test_ca_bundle_rejects_a_certificate_from_another_ca(pve, monkeypatch):
     tmp, port = pve
     settings(monkeypatch, ca=str(tmp / "other-ca.pem"))
-    with pytest.raises(httpx.ConnectError, match="CERTIFICATE_VERIFY_FAILED"):
+    with pytest.raises(ConnectionError, match="CERTIFICATE_VERIFY_FAILED.*PROXMOX_CA_BUNDLE"):
         await get_version(port)
 
 
 async def test_verify_ssl_uses_system_cas_which_reject_the_proxmox_ca(pve, monkeypatch):
     _, port = pve
     settings(monkeypatch, verify=True)
-    with pytest.raises(httpx.ConnectError, match="CERTIFICATE_VERIFY_FAILED"):
+    with pytest.raises(ConnectionError, match="CERTIFICATE_VERIFY_FAILED.*PROXMOX_CA_BUNDLE"):
         await get_version(port)
 
 
