@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+- Network failures say what failed. A connection timeout reached clients as `{"error": ""}`;
+  now it reads "Can't reach Proxmox at https://HOST:8006: timed out", with a hint to check the
+  host, port and routing, or `PROXMOX_CA_BUNDLE` for certificate errors. Any exception without a
+  message reports its type instead of an empty string.
+
 ## [2.12.0] - 2026-11-09
 
 ### Added
