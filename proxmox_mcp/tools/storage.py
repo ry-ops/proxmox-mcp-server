@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..client import ProxmoxClient
@@ -10,6 +11,9 @@ NODE = {"type": "string", "description": "Node name (e.g. pve01)"}
 OPT_INT = lambda desc: {"type": "integer", "description": desc}  # noqa: E731
 OPT_STR = lambda desc: {"type": "string", "description": desc}  # noqa: E731
 OPT_BOOL = lambda desc: {"type": "boolean", "description": desc}  # noqa: E731
+
+# Container mount point inputs: mp0 to mp255.
+_MOUNT_POINT = re.compile(r"mp(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])")
 
 
 TOOLS = [
@@ -234,22 +238,39 @@ TOOLS = [
     },
     {
         "name": "restore_container_backup",
-        "description": "Restore an LXC container from a backup file.",
+        "description": (
+            "Restore an LXC container from a vzdump backup, with the backup's own configuration "
+            "(network, mount points, features). By default every disk is recreated at its backed-up "
+            "size on `storage`. To resize or move disks (the only way to shrink one), pass rootfs and "
+            "any mount points to keep as mp0, mp1, ...: Proxmox then creates only the disks you list. "
+            "With force, an existing container with this ID is replaced, disks included; Proxmox "
+            "refuses if it is running or has protection set."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "node": NODE,
                 "vmid": OPT_INT("Target container ID"),
                 "ostemplate": OPT_STR("Backup archive volume ID (e.g. local:backup/vzdump-lxc-106-2024_01_01.tar.zst)"),
-                "storage": OPT_STR("Target storage for rootfs"),
+                "storage": OPT_STR("Storage for the restored disks (default: local)"),
                 "hostname": OPT_STR("Hostname override"),
-                "force": OPT_BOOL("Overwrite existing container"),
+                "force": OPT_BOOL("Replace an existing container with this ID, including its disks"),
                 "unique": OPT_BOOL("Assign unique MAC addresses"),
                 "start": OPT_BOOL("Start container after restore"),
                 "bwlimit": OPT_INT("Bandwidth limit in KB/s"),
                 "pool": OPT_STR("Resource pool"),
-                "unprivileged": OPT_BOOL("Create as unprivileged container"),
+                "unprivileged": OPT_BOOL("Override the backup's unprivileged setting"),
+                "rootfs": OPT_STR(
+                    "Root disk instead of the backed-up one: STORAGE:SIZE_GIB[,options] "
+                    "(e.g. local-lvm:16), or just a size in GiB on `storage`. Required with any mpN"
+                ),
+                "mp0": OPT_STR("Mount point 0 to create (e.g. local-lvm:100,mp=/data). Only with rootfs"),
+                "mp1": OPT_STR("Mount point 1 to create. Only with rootfs"),
+                "mp2": OPT_STR("Mount point 2 to create. Only with rootfs"),
+                "mp3": OPT_STR("Mount point 3 to create. Only with rootfs"),
             },
+            # mp4 to mp255 work the same way.
+            "patternProperties": {"^mp([4-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$": {"type": "string"}},
             "required": ["node", "vmid", "ostemplate"],
         },
     },
@@ -329,6 +350,14 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
     elif name == "restore_container_backup":
         node = args["node"]
         data = {k: v for k, v in args.items() if k != "node"}
+        mount_points = sorted(k for k in data if _MOUNT_POINT.fullmatch(k))
+        if mount_points and "rootfs" not in data:
+            # Proxmox refuses this too, but only after the task has started.
+            raise ValueError(f"{', '.join(mount_points)} need rootfs: with any mount point given, "
+                             "Proxmox creates only the disks you list")
+        # Without restore=1, Proxmox treats the archive as a template: it skips the backup's
+        # configuration and refuses `unique` (which requires restore).
+        data["restore"] = True
         return await client.post(f"/nodes/{node}/lxc", data)
 
     raise ValueError(f"Unknown tool: {name}")
