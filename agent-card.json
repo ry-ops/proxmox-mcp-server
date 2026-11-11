@@ -4493,11 +4493,11 @@
           "description": "Configuration of a VM or container on a Proxmox VE remote.",
           "inputs": [
             "remote",
-            "state",
             "type",
             "vmid",
             "node (optional)",
-            "snapshot (optional)"
+            "snapshot (optional)",
+            "state (optional)"
           ],
           "read_only": true,
           "destructive": false
