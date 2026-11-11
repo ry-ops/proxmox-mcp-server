@@ -4120,7 +4120,7 @@
         },
         {
           "name": "pdm_collect_metrics",
-          "description": "Make PDM collect metrics now, from one remote or all of them.",
+          "description": "Make PDM collect metrics now, from one remote or all of them. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [
             "remote (optional)"
           ],
@@ -4138,7 +4138,7 @@
         },
         {
           "name": "pdm_get_remote_rrddata",
-          "description": "Metric-collection statistics for one remote over a timeframe.",
+          "description": "Metric-collection statistics for one remote over a timeframe. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [
             "cf",
             "remote",
@@ -4224,7 +4224,7 @@
         },
         {
           "name": "pdm_metric_collection_status",
-          "description": "When PDM last collected metrics from each remote, and any errors.",
+          "description": "When PDM last collected metrics from each remote, and any errors. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [],
           "read_only": true,
           "destructive": false
@@ -4283,7 +4283,7 @@
         },
         {
           "name": "pdm_pbs_list_remotes",
-          "description": "List the Proxmox Backup Server remotes.",
+          "description": "List the Proxmox Backup Server remotes. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [],
           "read_only": true,
           "destructive": false
@@ -4573,7 +4573,7 @@
         },
         {
           "name": "pdm_pve_list_remotes",
-          "description": "List the Proxmox VE remotes.",
+          "description": "List the Proxmox VE remotes. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [],
           "read_only": true,
           "destructive": false
@@ -4829,7 +4829,7 @@
         },
         {
           "name": "pdm_pve_sdn_vnet_mac_vrf",
-          "description": "MAC-VRF of an EVPN VNet on a node of a Proxmox VE remote.",
+          "description": "MAC-VRF of an EVPN VNet on a node of a Proxmox VE remote. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [
             "node",
             "remote",
@@ -4840,7 +4840,7 @@
         },
         {
           "name": "pdm_pve_sdn_zone_ip_vrf",
-          "description": "IP-VRF of an EVPN zone on a node of a Proxmox VE remote.",
+          "description": "IP-VRF of an EVPN zone on a node of a Proxmox VE remote. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
           "inputs": [
             "node",
             "remote",

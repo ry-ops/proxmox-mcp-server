@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- Seven PDM tools say in their descriptions that PDM allows them only for `root@pam` with a
+  password, so API tokens get 403: `pdm_pve_list_remotes`, `pdm_pbs_list_remotes`,
+  `pdm_metric_collection_status`, `pdm_collect_metrics`, `pdm_get_remote_rrddata` and the two
+  EVPN lookups. Their endpoints declare no access rule, which in Proxmox's API framework means
+  superuser only. `scripts/pdm/gen.py` detects this from the schema.
+
 ## [2.13.0] - 2026-11-10
 
 ### Added

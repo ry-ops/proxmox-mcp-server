@@ -7,6 +7,7 @@
    "kind": "read",
    "waitable": false,
    "description": "One Ceph cluster: section summary, status, flags, fs, mds, mgr, mon, osd-tree or pools.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -147,6 +148,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Ceph clusters PDM knows of.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -167,7 +169,8 @@
    "phase": "2",
    "kind": "write",
    "waitable": false,
-   "description": "Make PDM collect metrics now, from one remote or all of them.",
+   "description": "Make PDM collect metrics now, from one remote or all of them. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "POST",
@@ -200,6 +203,7 @@
    "kind": "read",
    "waitable": false,
    "description": "The stored connection settings of one remote (secrets are not returned).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -234,7 +238,8 @@
    "phase": "1",
    "kind": "read",
    "waitable": false,
-   "description": "Metric-collection statistics for one remote over a timeframe.",
+   "description": "Metric-collection statistics for one remote over a timeframe. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "GET",
@@ -294,6 +299,7 @@
    "kind": "read",
    "waitable": false,
    "description": "The Proxmox VE or Backup Server version a remote runs.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -329,6 +335,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Tasks across all remotes, newest first (filter by remote, type or state).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -424,6 +431,7 @@
    "kind": "read",
    "waitable": false,
    "description": "List every remote (Proxmox VE cluster or Backup Server) PDM manages.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -445,6 +453,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Every guest, node, storage and datastore across all remotes, with status.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -501,6 +510,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Tasks that PDM itself ran (refreshes, metric collection).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -588,6 +598,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Location information for remotes, optionally within one view.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -625,7 +636,8 @@
    "phase": "1",
    "kind": "read",
    "waitable": false,
-   "description": "When PDM last collected metrics from each remote, and any errors.",
+   "description": "When PDM last collected metrics from each remote, and any errors. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "GET",
@@ -647,6 +659,7 @@
    "kind": "read",
    "waitable": false,
    "description": "The permissions of this server's PDM token.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -687,6 +700,7 @@
    "kind": "read",
    "waitable": false,
    "description": "CPU, memory and disk usage of the PDM host.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -719,6 +733,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Metrics of a datastore on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -786,6 +801,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Datastores of a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -820,6 +836,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Namespaces of a datastore on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -872,7 +889,8 @@
    "phase": "1",
    "kind": "read",
    "waitable": false,
-   "description": "List the Proxmox Backup Server remotes.",
+   "description": "List the Proxmox Backup Server remotes. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "GET",
@@ -894,6 +912,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Backup snapshots in a datastore on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -944,6 +963,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Tasks on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -978,6 +998,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Changelog of a package on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1031,6 +1052,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Refresh the package lists on a Proxmox Backup Server remote (apt update).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -1072,6 +1094,7 @@
    "kind": "read",
    "waitable": false,
    "description": "APT repositories configured on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1113,6 +1136,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Available package updates on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1154,6 +1178,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Subscription of a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1195,6 +1220,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Metrics of a Proxmox Backup Server remote over a timeframe.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1253,6 +1279,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Status of a Proxmox Backup Server remote (CPU, memory, uptime).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1287,6 +1314,7 @@
    "kind": "destructive",
    "waitable": false,
    "description": "Stop a running task on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "DELETE",
@@ -1328,6 +1356,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Log of a task on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1386,6 +1415,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Status of a task on a Proxmox Backup Server remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1432,6 +1462,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Check that Proxmox Datacenter Manager answers (returns pong).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1453,6 +1484,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Cluster firewall of a Proxmox VE remote: section options, rules or status.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1520,6 +1552,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Datacenter options of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1554,6 +1587,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Cluster and node membership status of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1593,6 +1627,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Create a snapshot of a VM or container.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -1684,6 +1719,7 @@
    "kind": "destructive",
    "waitable": true,
    "description": "Delete a snapshot of a VM or container.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "DELETE",
@@ -1764,6 +1800,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Firewall status of every Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1785,6 +1822,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Configuration of a VM or container on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1876,6 +1914,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Firewall of a VM or container: section options or rules.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -1973,6 +2012,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Pending (not yet applied) configuration of a VM or container.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2044,6 +2084,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Metrics of a VM or container over a timeframe.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2134,6 +2175,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Current status of a VM or container on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2205,6 +2247,7 @@
    "kind": "read",
    "waitable": false,
    "description": "VMs (type qemu) or containers (type lxc) on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2268,6 +2311,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Nodes of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2301,7 +2345,8 @@
    "phase": "1",
    "kind": "read",
    "waitable": false,
-   "description": "List the Proxmox VE remotes.",
+   "description": "List the Proxmox VE remotes. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "GET",
@@ -2323,6 +2368,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Snapshots of a VM or container on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2394,6 +2440,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Storage on one node of a Proxmox VE remote, with usage.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2474,6 +2521,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Tasks on a Proxmox VE remote, optionally for one node.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2514,6 +2562,7 @@
    "kind": "destructive",
    "waitable": true,
    "description": "Migrate a VM or container to another node in the same cluster.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -2651,6 +2700,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Whether a VM can migrate within its cluster, and to which nodes.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2704,6 +2754,7 @@
    "kind": "read",
    "waitable": false,
    "description": "The next free VMID on a Proxmox VE remote, e.g. for a migration target.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2743,6 +2794,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Changelog of a package on one node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2796,6 +2848,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Refresh the package lists on one node of a Proxmox VE remote (apt update).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -2837,6 +2890,7 @@
    "kind": "read",
    "waitable": false,
    "description": "APT repositories configured on one node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2878,6 +2932,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Available package updates on one node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2919,6 +2974,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Configuration of one node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -2960,6 +3016,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Node firewall on a Proxmox VE remote: section options, rules or status.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3036,6 +3093,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Network interfaces of one node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3098,6 +3156,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Metrics of one node of a Proxmox VE remote over a timeframe.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3163,6 +3222,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Status of one node of a Proxmox VE remote (CPU, memory, uptime, versions).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3204,6 +3264,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Subscription of one node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3245,6 +3306,7 @@
    "kind": "destructive",
    "waitable": true,
    "description": "Migrate a VM or container to another Proxmox VE remote (another cluster). With delete, the original is removed after a successful migration.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -3390,6 +3452,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Resources of one Proxmox VE remote (guests, nodes, storage, SDN).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3435,6 +3498,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Resume a paused or suspended VM.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -3482,6 +3546,7 @@
    "kind": "destructive",
    "waitable": true,
    "description": "Roll a VM or container back to a snapshot. Changes since then are lost.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -3567,7 +3632,8 @@
    "phase": "1",
    "kind": "read",
    "waitable": false,
-   "description": "MAC-VRF of an EVPN VNet on a node of a Proxmox VE remote.",
+   "description": "MAC-VRF of an EVPN VNet on a node of a Proxmox VE remote. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "GET",
@@ -3614,7 +3680,8 @@
    "phase": "1",
    "kind": "read",
    "waitable": false,
-   "description": "IP-VRF of an EVPN zone on a node of a Proxmox VE remote.",
+   "description": "IP-VRF of an EVPN zone on a node of a Proxmox VE remote. PDM allows this only for root@pam logged in with a password: API tokens, including this server's, get 403 Forbidden.",
+   "superuser_only": true,
    "endpoints": [
     {
      "method": "GET",
@@ -3662,6 +3729,7 @@
    "kind": "destructive",
    "waitable": true,
    "description": "Shut down a VM or container cleanly.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -3733,6 +3801,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Start a VM or container on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -3804,6 +3873,7 @@
    "kind": "destructive",
    "waitable": true,
    "description": "Stop a VM or container immediately (like pulling the plug).",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -3875,6 +3945,7 @@
    "kind": "destructive",
    "waitable": false,
    "description": "Stop a running task on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "DELETE",
@@ -3916,6 +3987,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Metrics of one storage on a node of a Proxmox VE remote over a timeframe.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -3988,6 +4060,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Status and usage of one storage on a node of a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4036,6 +4109,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Log of a task on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4094,6 +4168,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Status of a task on a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4140,6 +4215,7 @@
    "kind": "write",
    "waitable": false,
    "description": "Change a snapshot's description.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "PUT",
@@ -4226,6 +4302,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Cached package update information for a Proxmox VE remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4260,6 +4337,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Make PDM refresh its cache of remote tasks now.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -4294,6 +4372,7 @@
    "kind": "write",
    "waitable": true,
    "description": "Make PDM refresh the update summary of every remote now.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "POST",
@@ -4315,6 +4394,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Task counts across remotes by type and outcome.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4410,6 +4490,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Counts of resources by type and state across all remotes.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4448,6 +4529,7 @@
    "kind": "read",
    "waitable": false,
    "description": "SDN across Proxmox VE remotes: section zones, vnets or controllers.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4542,6 +4624,7 @@
    "kind": "destructive",
    "waitable": false,
    "description": "Stop a running task of PDM itself.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "DELETE",
@@ -4582,6 +4665,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Subscription status of every remote.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4625,6 +4709,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Log of a task PDM itself ran.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4687,6 +4772,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Status of a task PDM itself ran.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4727,6 +4813,7 @@
    "kind": "read",
    "waitable": false,
    "description": "The guests and nodes using the most CPU or memory across all remotes.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4772,6 +4859,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Pending package updates on every remote node, as PDM last saw them.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",
@@ -4793,6 +4881,7 @@
    "kind": "read",
    "waitable": false,
    "description": "Proxmox Datacenter Manager version and release.",
+   "superuser_only": false,
    "endpoints": [
     {
      "method": "GET",

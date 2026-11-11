@@ -344,6 +344,8 @@ Create the token in PDM under **Configuration → Access Control → API Tokens*
 | `/resource` | **Auditor** for read-only, **Administrator** for actions | Every remote: reads need `Resource.Audit`; actions need `Resource.Manage` (power, snapshots, stopping tasks), `Resource.Modify` (refreshing package lists) and `Resource.Migrate` |
 | `/system` | **Auditor** | `pdm_node_status` (the PDM host's own usage) |
 
+Seven tools reach endpoints PDM 1.1 allows only for `root@pam` logged in with a password, so with an API token they return 403 whatever its roles: `pdm_pve_list_remotes` and `pdm_pbs_list_remotes` (use `pdm_list_remotes` instead), `pdm_metric_collection_status`, `pdm_collect_metrics`, `pdm_get_remote_rrddata`, and the two EVPN lookups. Their descriptions say so.
+
 PDM can also protect a guest itself: a **NoAccess** entry for the token on `/resource/<remote>/guest/<vmid>` (for example `/resource/pve01/guest/104`) makes PDM refuse every call about that guest, whatever this server does. For `PDM_CA_BUNDLE`, copy `/etc/proxmox-datacenter-manager/auth/api.pem` from the PDM host. Its self-signed certificate names `pdm` and `localhost`, not the host's IP, so when `PDM_HOST` is an IP also set `PDM_TLS_NAME=pdm`: the certificate is checked against that name while the server connects to the IP.
 
 **Protected guests.** VMIDs are only unique within a cluster, so PDM tools use `PDM_PROTECTED_GUESTS`, with the remote in each entry: `pve01:104`, or `*:9000-9010` for every remote. A migration is refused when its source or its target is protected. `PROXMOX_PROTECTED_VMIDS` doesn't apply to PDM tools. `PROXMOX_READ_ONLY`, `PROXMOX_NO_DESTRUCTIVE`, HTTP roles and the audit log apply as usual.

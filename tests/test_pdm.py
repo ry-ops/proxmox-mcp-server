@@ -451,3 +451,20 @@ def test_required_inputs_with_a_default_are_filled_in():
     assert pdm.request_of("pdm_pve_guest_config", {**args, "state": "active"})[2] == {
         "state": "active"
     }
+
+
+def test_superuser_only_tools_say_so():
+    # PDM 1.1 declares no access rule on these endpoints, so only root@pam with a password may
+    # call them; API tokens get 403 (confirmed against PDM 1.1.9). Their descriptions say so.
+    flagged = {n for n, t in pdm._TOOLS.items() if t["superuser_only"]}
+    assert flagged == {
+        "pdm_pve_list_remotes",
+        "pdm_pbs_list_remotes",
+        "pdm_metric_collection_status",
+        "pdm_collect_metrics",
+        "pdm_get_remote_rrddata",
+        "pdm_pve_sdn_vnet_mac_vrf",
+        "pdm_pve_sdn_zone_ip_vrf",
+    }
+    for t in pdm.TOOLS:
+        assert ("root@pam" in t["description"]) == (t["name"] in flagged), t["name"]
