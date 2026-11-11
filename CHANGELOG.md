@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.13.1] - 2026-11-10
+
 ### Changed
 - Seven PDM tools say in their descriptions that PDM allows them only for `root@pam` with a
   password, so API tokens get 403: `pdm_pve_list_remotes`, `pdm_pbs_list_remotes`,
@@ -324,6 +326,7 @@ released on its own.
 
 Initial release.
 
+[2.13.1]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.13.0...v2.13.1
 [2.13.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.10.0...v2.11.0
