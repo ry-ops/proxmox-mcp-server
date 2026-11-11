@@ -935,7 +935,7 @@ wheels = [
 
 [[package]]
 name = "proxmox-mcp-server"
-version = "2.13.0"
+version = "2.13.1"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
