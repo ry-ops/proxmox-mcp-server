@@ -432,3 +432,22 @@ async def test_pinned_certificate_rejects_a_wrong_name(pdm_server, monkeypatch):
     with pytest.raises(ConnectionError, match="CERTIFICATE_VERIFY_FAILED"):
         await c.get("/version")
     await c.close()
+
+
+@pytest.mark.parametrize(
+    "given",
+    [PVE_UPID, "pve01!" + PVE_UPID, "pve:pve01!" + PVE_UPID],  # list_tasks, PDM, list_remote_tasks
+)
+def test_task_tools_take_every_task_id_form(given):
+    _, path, _ = pdm.request_of("pdm_pve_task_status", {"remote": "pve01", "upid": given})
+    assert path == f"/pve/remotes/pve01/tasks/pve01!{PVE_UPID}/status"
+
+
+def test_required_inputs_with_a_default_are_filled_in():
+    # PDM requires guest config's `state` but documents a default ("pending"); callers may skip it.
+    args = {"remote": "pve01", "type": "qemu", "vmid": 108}
+    assert "state" not in pdm._TOOLS["pdm_pve_guest_config"]["inputSchema"]["required"]
+    assert pdm.request_of("pdm_pve_guest_config", args)[2] == {"state": "pending"}
+    assert pdm.request_of("pdm_pve_guest_config", {**args, "state": "active"})[2] == {
+        "state": "active"
+    }

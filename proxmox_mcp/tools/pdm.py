@@ -77,13 +77,35 @@ def _path(ep: dict[str, Any], args: dict[str, Any]) -> str:
     return _PLACEHOLDER.sub(lambda m: quote(str(args[m[1]]), safe=":!@"), ep["path"])
 
 
+# Tools that take a remote task ID. PDM wants "remote!UPID:...", but its own lists hand out
+# plain "UPID:..." (pdm_pve_list_tasks) and "pve:remote!UPID:..." (pdm_list_remote_tasks).
+_REMOTE_TASK_TOOLS = {
+    "pdm_pve_task_status", "pdm_pve_task_log", "pdm_pve_stop_task",
+    "pdm_pbs_task_status", "pdm_pbs_task_log", "pdm_pbs_stop_task",
+}
+
+
+def remote_task_id(remote: str, upid: str) -> str:
+    """Any of the three forms PDM uses, as the "remote!UPID:..." its task endpoints take."""
+    upid = str(upid)
+    if "!" in upid.split("UPID:", 1)[0]:
+        prefix, _, rest = upid.partition("!")
+        return f"{prefix.split(':')[-1]}!{rest}"  # drop a "pve:" or "pbs:" product prefix
+    return f"{remote}!{upid}"
+
+
 def request_of(name: str, args: dict[str, Any]) -> tuple[str, str, dict[str, Any]]:
     """The method, path and remaining inputs (query or body) for a tool call."""
     tool = _TOOLS[name]
+    if name in _REMOTE_TASK_TOOLS and args.get("upid") and args.get("remote"):
+        args = {**args, "upid": remote_task_id(str(args["remote"]), str(args["upid"]))}
     _check(name, tool, args)
     ep = _endpoint(tool, args)
     in_path = set(_PLACEHOLDER.findall(ep["path"]))
     rest = {k: v for k, v in args.items() if k in ep["params"] and k not in in_path}
+    for key, value in tool["defaults"].items():
+        if key in ep["params"] and key not in in_path:
+            rest.setdefault(key, value)
     return ep["method"], _path(ep, args), rest
 
 
@@ -111,8 +133,9 @@ def task_path(name: str, args: dict[str, Any], upid: str) -> tuple[str, str]:
     quoted = quote(upid, safe=":!@")
     if first.startswith("/pve/") or first.startswith("/pbs/"):
         product = first.split("/")[1]
-        remote = args["remote"]
-        return f"/{product}/remotes/{quote(str(remote), safe='')}/tasks/{quoted}", str(remote)
+        remote = str(args["remote"])
+        quoted = quote(remote_task_id(remote, upid), safe=":!@")
+        return f"/{product}/remotes/{quote(remote, safe='')}/tasks/{quoted}", remote
     return f"/nodes/localhost/tasks/{quoted}", "localhost"
 
 

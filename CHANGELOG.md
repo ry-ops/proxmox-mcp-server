@@ -15,6 +15,9 @@ All notable changes to this project are documented here. The format is based on
   to another cluster, stops tasks, and refreshes updates, task caches and metrics. The tools are
   generated from PDM's API schema (`scripts/pdm/gen.py`), and every input is checked against
   PDM's own patterns and limits before a request is sent.
+- PDM task tools take a task ID in any form PDM hands out (`UPID:…`, `remote!UPID:…`,
+  `pve:remote!UPID:…`), and inputs PDM requires but documents a default for (guest config's
+  `state`) are optional, with the server sending the default. Both found testing against PDM 1.1.9.
 - `PDM_PROTECTED_GUESTS` protects guests per remote (`pve01:104`, `*:9000-9010`), including
   migration targets and stopping a protected guest's tasks.
 - `PDM_CA_BUNDLE` pins PDM's own self-signed certificate, and `PDM_TLS_NAME` checks it against a

@@ -504,6 +504,7 @@ def build_tools(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         required_sets = []
         endpoints = []
         selector_values: dict[str, list[str]] = {}
+        defaults: dict[str, Any] = {}
         waitable = False
         for r in eps:
             info = r["info"]
@@ -522,7 +523,12 @@ def build_tools(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 if (pat := py_pattern(prop)) is not None:
                     patterns.setdefault(pname, pat)
                 if not prop.get("optional"):
-                    required.add(pname)
+                    if prop.get("default") is None:
+                        required.add(pname)
+                    else:
+                        # PDM requires it but documents a default (guest config's `state` is
+                        # "pending"): optional for callers, and the server sends the default.
+                        defaults.setdefault(pname, prop["default"])
             # PDM's schema leaves some path parameters out (/nodes/{node}/tasks has no `node`).
             for pname in re.findall(r"\{([^}]+)\}", path):
                 if pname not in props:
@@ -569,6 +575,7 @@ def build_tools(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "description": DESCRIPTIONS[name],
                 "endpoints": endpoints,
                 "patterns": patterns,
+                "defaults": defaults,
                 "inputSchema": {
                     "type": "object",
                     "properties": dict(
