@@ -13,7 +13,9 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import quote
 
-from .. import tasks
+import httpx
+
+from .. import pdm_client, tasks
 
 _SPEC = json.loads(Path(__file__).with_name("pdm_spec.json").read_text())
 _TOOLS: dict[str, dict[str, Any]] = {t["name"]: t for t in _SPEC["tools"]}
@@ -27,6 +29,39 @@ READS = frozenset(n for n, t in _TOOLS.items() if t["kind"] == "read")
 DESTRUCTIVE = frozenset(n for n, t in _TOOLS.items() if t["kind"] == "destructive")
 WAITABLE = frozenset(n for n, t in _TOOLS.items() if t["waitable"])
 _PATTERNS = {n: {k: re.compile(p) for k, p in t["patterns"].items()} for n, t in _TOOLS.items()}
+
+# Tools whose PDM endpoint declares no access rule, which PDM treats as superuser only:
+# root@pam signed in with a password. No API token qualifies, so when PDM refuses one of these,
+# the error says what's needed and what to use instead.
+SUPERUSER_ONLY = frozenset(n for n, t in _TOOLS.items() if t.get("superuser_only"))
+_UI = "Use PDM's web UI signed in as root@pam"
+_ELEVATED_HINTS = {
+    "pdm_pve_list_remotes": "Instead, pdm_list_remotes lists every remote with its type (type: pve).",
+    "pdm_pbs_list_remotes": "Instead, pdm_list_remotes lists every remote with its type (type: pbs).",
+    "pdm_metric_collection_status": (
+        "As root@pam, run on the PDM host: proxmox-datacenter-manager-client metric-collection status"
+    ),
+    "pdm_collect_metrics": (
+        "As root@pam, run on the PDM host: proxmox-datacenter-manager-client metric-collection "
+        "trigger (add the remote to collect only that one)"
+    ),
+    "pdm_get_remote_rrddata": f"{_UI} to see a remote's metric-collection graphs.",
+    "pdm_pve_sdn_vnet_mac_vrf": f"{_UI}: SDN -> EVPN shows the MAC-VRF of each VNet.",
+    "pdm_pve_sdn_zone_ip_vrf": f"{_UI}: SDN -> EVPN shows the IP-VRF of each zone.",
+}
+
+
+def elevated_message(name: str, method: str, path: str) -> str:
+    """Why a superuser-only tool was refused, what it needs, and what to use instead."""
+    token = pdm_client.PDM_TOKEN_ID or "an API token"
+    return (
+        f"{name} needs elevated permissions: Proxmox Datacenter Manager's superuser, root@pam "
+        f"signed in with a password. PDM 1.1 declares no access rule for {method} {path}, so every "
+        f"API token gets 403 Forbidden whatever its roles, including this server's ({token}). "
+        "Changing the token's permissions can't fix this. " + _ELEVATED_HINTS.get(name, f"{_UI}.")
+    )
+
+
 _PLACEHOLDER = re.compile(r"\{([^}]+)\}")
 
 
@@ -80,8 +115,12 @@ def _path(ep: dict[str, Any], args: dict[str, Any]) -> str:
 # Tools that take a remote task ID. PDM wants "remote!UPID:...", but its own lists hand out
 # plain "UPID:..." (pdm_pve_list_tasks) and "pve:remote!UPID:..." (pdm_list_remote_tasks).
 _REMOTE_TASK_TOOLS = {
-    "pdm_pve_task_status", "pdm_pve_task_log", "pdm_pve_stop_task",
-    "pdm_pbs_task_status", "pdm_pbs_task_log", "pdm_pbs_stop_task",
+    "pdm_pve_task_status",
+    "pdm_pve_task_log",
+    "pdm_pve_stop_task",
+    "pdm_pbs_task_status",
+    "pdm_pbs_task_log",
+    "pdm_pbs_stop_task",
 }
 
 
@@ -121,9 +160,14 @@ async def handle(name: str, args: dict[str, Any], client: Any) -> Any:
         path, node = task_path(name, args, str(args["upid"]))
         return {"data": await tasks.wait(client, str(args["upid"]), task_path=path, node=node)}
     method, path, rest = request_of(name, args)
-    if method in ("GET", "DELETE"):
-        return await client.request(method, path, params=rest)
-    return await client.request(method, path, body=rest)
+    try:
+        if method in ("GET", "DELETE"):
+            return await client.request(method, path, params=rest)
+        return await client.request(method, path, body=rest)
+    except httpx.HTTPStatusError as e:
+        if name in SUPERUSER_ONLY and e.response.status_code == 403:
+            raise PermissionError(elevated_message(name, method, path)) from e
+        raise
 
 
 def task_path(name: str, args: dict[str, Any], upid: str) -> tuple[str, str]:
