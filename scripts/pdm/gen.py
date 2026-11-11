@@ -381,6 +381,13 @@ DESTRUCTIVE = {
     "pdm_stop_task",
 }
 
+# Appended to tools whose PDM endpoint declares no access rule. PDM then allows only the
+# superuser, root@pam logged in with a password; no API token qualifies, not even root's.
+SUPERUSER_NOTE = (
+    " PDM allows this only for root@pam logged in with a password: API tokens, including this "
+    "server's, get 403 Forbidden."
+)
+
 # Path parameters get clearer input names where PDM's are generic.
 RENAME = {"/remotes/remote/{id}": {"id": "remote"}}
 
@@ -505,9 +512,12 @@ def build_tools(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         endpoints = []
         selector_values: dict[str, list[str]] = {}
         defaults: dict[str, Any] = {}
+        superuser_only = False
         waitable = False
         for r in eps:
             info = r["info"]
+            if not info.get("permissions"):
+                superuser_only = True
             params = params_of(info)
             rename = RENAME.get(re.sub(r"/(config|version|rrddata)$", "", r["path"]), {})
             path = r["path"]
@@ -572,7 +582,8 @@ def build_tools(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "phase": eps[0]["phase"],
                 "kind": kind,
                 "waitable": waitable,
-                "description": DESCRIPTIONS[name],
+                "description": DESCRIPTIONS[name] + (SUPERUSER_NOTE if superuser_only else ""),
+                "superuser_only": superuser_only,
                 "endpoints": endpoints,
                 "patterns": patterns,
                 "defaults": defaults,
