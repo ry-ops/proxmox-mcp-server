@@ -468,3 +468,45 @@ def test_superuser_only_tools_say_so():
     }
     for t in pdm.TOOLS:
         assert ("root@pam" in t["description"]) == (t["name"] in flagged), t["name"]
+
+
+class Refusing:
+    """A PDM that answers 403 Forbidden, as PDM 1.1 does for superuser-only endpoints."""
+
+    async def request(self, method, path, params=None, body=None):
+        request = httpx.Request(method, f"https://pdm.test:8443/api2/json{path}")
+        response = httpx.Response(403, request=request, text="permission check failed")
+        raise httpx.HTTPStatusError("403 Forbidden", request=request, response=response)
+
+
+@pytest.mark.parametrize("name", sorted(pdm.SUPERUSER_ONLY))
+async def test_superuser_only_refusal_explains_the_elevation(name, monkeypatch):
+    monkeypatch.setattr(pdm_client, "PDM_TOKEN_ID", "root@pam!proxmox-mcp")
+    tool = pdm._TOOLS[name]
+    args = {k: REAL[k] for k in tool["inputSchema"]["required"]}
+    with pytest.raises(PermissionError) as refused:
+        await pdm.handle(name, args, Refusing())
+    message = str(refused.value)
+    assert "elevated permissions" in message and "root@pam signed in with a password" in message
+    assert "root@pam!proxmox-mcp" in message and "can't fix this" in message
+
+
+async def test_other_tools_keep_pdms_403():
+    with pytest.raises(httpx.HTTPStatusError):
+        await pdm.handle("pdm_list_remotes", {}, Refusing())
+
+
+async def test_refusal_reaches_the_client_as_refused(with_pdm, monkeypatch):
+    monkeypatch.setattr(server, "pdm", Refusing())
+    failed, body = await call("pdm_pve_list_remotes", {})
+    assert failed and "pdm_list_remotes lists every remote" in body["error"]
+
+
+REAL = {
+    "remote": "pve01",
+    "node": "pve01",
+    "vnet": "vnet1",
+    "zone": "zone1",
+    "cf": "AVERAGE",
+    "timeframe": "hour",
+}

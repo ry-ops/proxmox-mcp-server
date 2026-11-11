@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format is based on
   `pdm_metric_collection_status`, `pdm_collect_metrics`, `pdm_get_remote_rrddata` and the two
   EVPN lookups. Their endpoints declare no access rule, which in Proxmox's API framework means
   superuser only. `scripts/pdm/gen.py` detects this from the schema.
+- When PDM refuses one of those seven, the error says so at call time: the tool needs elevated
+  permissions (PDM's superuser, `root@pam` with a password), the token's roles can't fix it, and
+  what to use instead (`pdm_list_remotes`, the `proxmox-datacenter-manager-client
+  metric-collection` commands, or PDM's web UI). Other tools' errors are unchanged.
 
 ## [2.13.0] - 2026-11-10
 
