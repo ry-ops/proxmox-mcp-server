@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.13.0] - 2026-11-10
+
 ### Added
 - **Proxmox Datacenter Manager.** A `pdm` toolset of 89 tools, phases 1 and 2 of the plan in
   ROADMAP.md, loads when `PDM_HOST` is set. It reads resources, tasks, updates and subscriptions
@@ -311,6 +313,7 @@ released on its own.
 
 Initial release.
 
+[2.13.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.9.0...v2.10.0
