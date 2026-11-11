@@ -4,6 +4,55 @@ Work we plan to do in an upcoming release. Items here are not scheduled yet.
 
 ## Planned
 
+### Deploy an OS by asking: Ubuntu, Kali, Windows 11 and PDM
+
+Ask "create a Kali VM" (or Ubuntu, Windows 11, a Datacenter Manager) and get a running,
+reachable guest, with the image fetched, checked and installed unattended. Today
+`deploy_cloud_vms` needs a cloud image already on storage and knows no OS by name.
+
+**Tools.** One per OS, so a request maps to a tool by name, each with only its own inputs:
+`deploy_ubuntu_vm`, `deploy_kali_vm`, `deploy_windows11_vm`, `deploy_pdm_vm`, plus
+`list_os_images` (what's cached on storage, and the latest official version of each). They share
+one internal builder. `deploy_cloud_vms` stays as it is.
+
+**Images**, from official sources only, checksum-verified, cached on `local` and reused:
+
+| OS | Source | How it gets onto Proxmox |
+|---|---|---|
+| Ubuntu 24.04 | `cloud-images.ubuntu.com`, `SHA256SUMS` | `download-url` (import) |
+| PDM | Debian 13 `genericcloud` from `cloud.debian.org`, `SHA512SUMS`; PDM from Proxmox's `pdm-no-subscription` repo | `download-url` (import), then cloud-init installs PDM |
+| Kali | `kali.download/cloud-images`, `SHA256SUMS`. Published only as `.tar.xz`, which Proxmox can't decompress (it handles gz, lzo, zst, bz2) | The server downloads it (≈240 MB), repacks the sparse 25 GiB `disk.raw` as qcow2 holding only its ≈1 GiB of data, and uploads that (`upload`, import) |
+| Windows 11 | Microsoft gives no stable download URL, so a Windows 11 ISO already on storage, found automatically; VirtIO drivers from `fedorapeople.org` (stable URL) | Existing ISO; `download-url` (iso) for the drivers |
+
+**Unattended setup through a seed ISO.** Proxmox's upload API accepts ISO, template and import
+files but not cloud-init snippets, so the server builds a small ISO in memory (ISO 9660 with
+Joliet names) and uploads it:
+
+- **Linux and PDM:** a `cidata` volume (cloud-init's NoCloud source) with `user-data`,
+  `meta-data` and `network-config`. It sets the user and key or password, installs
+  `qemu-guest-agent`, and for PDM adds the repository and installs `proxmox-datacenter-manager`
+  and its UI.
+- **Windows 11:** `autounattend.xml`. It loads the VirtIO storage driver during Setup, makes a UEFI
+  GPT layout, installs Windows 11 Pro without activation (licensing stays with you), creates the
+  Administrator account, and installs the VirtIO guest tools (drivers plus guest agent) at first
+  logon. The VM is q35 with UEFI, Secure Boot keys, TPM 2.0 and VirtIO disk and network. The
+  server answers "Press any key to boot from CD" with `sendkey`.
+- Seed ISOs hold credentials, so they're deleted once the guest reports through its agent.
+
+**Credentials.** An SSH public key if given; otherwise a generated password for the default
+user (Linux) or Administrator (Windows), returned once in the tool result. The audit log redacts
+it, and nothing else stores it.
+
+**Done means reachable.** Linux tools wait for the guest agent and report the IP; `deploy_pdm_vm`
+also waits for cloud-init to finish and returns the PDM URL; `deploy_windows11_vm` waits for the
+guest tools (an install takes 20 to 40 minutes) and accepts `wait` limits like other long tasks.
+
+**Safety.** Writes, not destructive. They refuse a name or VMID already in use, respect
+`PROXMOX_PROTECTED_VMIDS` and read-only mode, and never touch existing guests.
+
+**Order.** Seed ISO builder and Ubuntu, then PDM, Kali and Windows 11, each tested end to end on a
+live node with throwaway guests.
+
 ### Proxmox Datacenter Manager (PDM) support
 
 **Status:** phases 1 and 2 shipped in v2.13.0 (the `pdm` toolset, 89 tools, tested against
