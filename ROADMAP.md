@@ -6,6 +6,9 @@ Work we plan to do in an upcoming release. Items here are not scheduled yet.
 
 ### Proxmox Datacenter Manager (PDM) support
 
+**Status:** phases 1 and 2 shipped in v2.13.0 (the `pdm` toolset, 89 tools, tested against
+PDM 1.1.9). Phase 3 is planned.
+
 Add PDM as a `pdm` toolset in this server, so one server can manage several Proxmox VE
 clusters and Proxmox Backup Servers through PDM, alongside the existing tools that talk to one
 Proxmox VE API. Phases 1 and 2 ship together in the first release.
