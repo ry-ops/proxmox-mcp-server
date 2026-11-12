@@ -33,4 +33,4 @@ services:
       start_period: 10s
     labels:
       - "com.cortex.mcp-server=proxmox"
-      - "com.cortex.version=2.13.1"
+      - "com.cortex.version=2.14.0"

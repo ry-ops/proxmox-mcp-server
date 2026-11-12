@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.14.0] - 2026-11-12
+
 ### Added
 - **Deploy an OS by asking:** `deploy_ubuntu_vm`, `deploy_kali_vm`, `deploy_pdm_vm` and
   `deploy_windows11_vm`, plus `list_os_images`, in the `appliances` toolset. Each fetches the
@@ -19,6 +21,8 @@ All notable changes to this project are documented here. The format is based on
     enterprise repository removed.
   - Windows 11 gets UEFI, Secure Boot keys, TPM 2.0, VirtIO drivers during Setup and the VirtIO
     guest tools at first logon; the server answers the "Press any key" boot prompt.
+- README: animated walkthroughs of deploying by asking and of Datacenter Manager, with the
+  tool counts brought up to date.
 - The client can upload files to storage (`ProxmoxClient.upload`), and the server builds ISO 9660
   images with Joliet names (`seediso.py`) and qcow2 images (`qcow2.py`) with no new dependencies.
 
@@ -342,6 +346,7 @@ released on its own.
 
 Initial release.
 
+[2.14.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.13.1...v2.14.0
 [2.13.1]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.13.0...v2.13.1
 [2.13.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.11.0...v2.12.0
