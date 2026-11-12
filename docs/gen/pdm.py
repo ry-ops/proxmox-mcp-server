@@ -57,7 +57,7 @@ for name, what, y, col, tcol in remotes:
 
 # A read fans out
 b.append(f'  <circle class="{A.move(0.6, 1.6, 100, 0)}" cx="200" cy="208" r="6" fill="{ORANGE}"/>')
-for name, _, y, col, _ in remotes:
+for _name, _, y, col, _ in remotes:
     b.append(f'  <circle class="{A.move(1.7, 2.6, 120, y + 38 - 208)}" cx="500" cy="208" r="6" fill="{col}"/>')
 b.append(
     f'  <g class="{A.fade(0.4, END)}"><rect x="30" y="100" width="300" height="30" rx="8" fill="{CARD}" stroke="{ORANGE}"/>'
