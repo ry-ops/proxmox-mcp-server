@@ -6,7 +6,7 @@ Work we plan to do in an upcoming release. Items here are not scheduled yet.
 
 ### Deploy an OS by asking: Ubuntu, Kali, Windows 11 and PDM
 
-**Status:** built (unreleased): the five tools are in the `appliances` toolset, covered by unit
+**Status:** shipped in v2.14.0: the five tools are in the `appliances` toolset, covered by unit
 tests; not yet run against a live node.
 
 Ask "create a Kali VM" (or Ubuntu, Windows 11, a Datacenter Manager) and get a running,
