@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 532" width="960" height="532" role="img" aria-labelledby="t d">
+  <title id="t">Deploy an OS by asking</title>
+  <desc id="d">You ask for a Kali VM and the server runs deploy_kali_vm: it fetches Kali's official cloud image and checks its SHA-256, repacks the sparse 25 GiB disk as a 1.06 GiB qcow2, builds a cloud-init seed ISO, creates and boots VM 120, waits for the guest agent to report 10.0.0.77, and deletes the seed ISO. The result shows the address, the user and a password returned once. Below, Ubuntu, Kali, Windows 11 and Datacenter Manager build side by side, each tool finishing with how to reach the machine.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes a1 { 0%,2.22% { opacity: 0; transform: translateY(6px); } 4.17%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a1 { animation: a1 18s infinite; }
+    @keyframes a2 { 0%,7.78% { opacity: 0; transform: translateY(6px); } 9.72%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a2 { animation: a2 18s infinite; }
+    @keyframes a3 { 0%,57.78% { opacity: 0; transform: translateY(6px); } 59.72%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a3 { animation: a3 18s infinite; }
+    @keyframes a4 { 0%,12.22% { opacity: 0; transform: translateY(6px); } 14.17%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a4 { animation: a4 18s infinite; }
+    @keyframes a5 { 0%,19.72% { opacity: 0; transform: translateY(6px); } 21.67%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a5 { animation: a5 18s infinite; }
+    @keyframes a6 { 0%,27.22% { opacity: 0; transform: translateY(6px); } 29.17%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a6 { animation: a6 18s infinite; }
+    @keyframes a7 { 0%,34.72% { opacity: 0; transform: translateY(6px); } 36.67%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a7 { animation: a7 18s infinite; }
+    @keyframes a8 { 0%,42.22% { opacity: 0; transform: translateY(6px); } 44.17%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a8 { animation: a8 18s infinite; }
+    @keyframes a9 { 0%,49.72% { opacity: 0; transform: translateY(6px); } 51.67%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a9 { animation: a9 18s infinite; }
+    @keyframes a10 { 0%,13.33% { opacity: 0; transform: translateY(6px); } 15.28%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a10 { animation: a10 18s infinite; }
+    @keyframes a11 { 0%,16.67% { width: 0; } 36.11%,96.67% { width: 230px; } 98.61%,100% { width: 0; } } .a11 { animation: a11 18s infinite; }
+    @keyframes a12 { 0%,36.67% { opacity: 0; transform: translateY(6px); } 38.61%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a12 { animation: a12 18s infinite; }
+    @keyframes a13 { 0%,15.56% { opacity: 0; transform: translateY(6px); } 17.50%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a13 { animation: a13 18s infinite; }
+    @keyframes a14 { 0%,18.89% { width: 0; } 53.33%,96.67% { width: 230px; } 98.61%,100% { width: 0; } } .a14 { animation: a14 18s infinite; }
+    @keyframes a15 { 0%,53.89% { opacity: 0; transform: translateY(6px); } 55.83%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a15 { animation: a15 18s infinite; }
+    @keyframes a16 { 0%,17.78% { opacity: 0; transform: translateY(6px); } 19.72%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a16 { animation: a16 18s infinite; }
+    @keyframes a17 { 0%,21.11% { width: 0; } 77.78%,96.67% { width: 230px; } 98.61%,100% { width: 0; } } .a17 { animation: a17 18s infinite; }
+    @keyframes a18 { 0%,78.33% { opacity: 0; transform: translateY(6px); } 80.28%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a18 { animation: a18 18s infinite; }
+    @keyframes a19 { 0%,20.00% { opacity: 0; transform: translateY(6px); } 21.94%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a19 { animation: a19 18s infinite; }
+    @keyframes a20 { 0%,23.33% { width: 0; } 64.44%,96.67% { width: 230px; } 98.61%,100% { width: 0; } } .a20 { animation: a20 18s infinite; }
+    @keyframes a21 { 0%,65.00% { opacity: 0; transform: translateY(6px); } 66.94%,96.67% { opacity: 1; transform: translateY(0); } 98.61%,100% { opacity: 0; transform: translateY(0); } } .a21 { animation: a21 18s infinite; }
+    
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="960" height="532" rx="20" fill="#0f1420"/>
+  <text x="40" y="52" font-size="28" font-weight="800">Ask for a machine, get a running one</text>
+  <text x="40" y="78" font-size="15" class="muted">Official image, checksum checked, installed unattended, reachable when the tool returns.</text>
+  <rect x="30" y="98" width="300" height="250" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <text x="48" y="124" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">YOU ASK</text>
+  <g class="a1"><rect x="48" y="138" width="264" height="46" rx="12" fill="#1d2536" stroke="#3ec7ff"/><text x="62" y="158" font-size="13.5" style="fill:#a8e4ff">Spin up a Kali VM</text><text x="62" y="175" font-size="13.5" style="fill:#a8e4ff">for the lab, please.</text></g>
+  <g class="a2"><rect x="48" y="198" width="264" height="30" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="60" y="218" font-size="12" class="mono"><tspan style="fill:#ffc48a">deploy_kali_vm</tspan><tspan class="muted"> node=pve01</tspan></text></g>
+  <g class="a3"><rect x="48" y="244" width="264" height="88" rx="12" fill="#0b0f18" stroke="#3ddc84"/><text x="62" y="266" font-size="12" class="mono" style="fill:#9ff0c4" xml:space="preserve">status   ready</text><text x="62" y="284" font-size="12" class="mono" style="fill:#9ff0c4" xml:space="preserve">ip       10.0.0.77</text><text x="62" y="302" font-size="12" class="mono" style="fill:#9ff0c4" xml:space="preserve">user     kali</text><text x="62" y="320" font-size="12" class="mono" style="fill:#9ff0c4" xml:space="preserve">password •••••••• (once)</text></g>
+  <rect x="346" y="98" width="584" height="250" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <text x="364" y="124" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">THE SERVER DOES</text>
+  <g class="a4"><circle cx="374" cy="142" r="9" fill="#1d2536" stroke="#ffc48a" stroke-width="2"/><text x="374" y="146" text-anchor="middle" font-size="11" font-weight="800" style="fill:#ffc48a">✓</text><text x="392" y="146" font-size="13.5" font-weight="700">Fetch Kali's official cloud image</text><text x="912" y="146" text-anchor="end" font-size="11.5" class="muted">241 MB · SHA-256 checked</text></g>
+  <g class="a5"><circle cx="374" cy="175" r="9" fill="#1d2536" stroke="#ffb02e" stroke-width="2"/><text x="374" y="179" text-anchor="middle" font-size="11" font-weight="800" style="fill:#ffb02e">✓</text><text x="392" y="179" font-size="13.5" font-weight="700">Repack the sparse disk as qcow2</text><text x="912" y="179" text-anchor="end" font-size="11.5" class="muted">25 GiB → 1.06 GiB uploaded</text></g>
+  <g class="a6"><circle cx="374" cy="208" r="9" fill="#1d2536" stroke="#d9c6ff" stroke-width="2"/><text x="374" y="212" text-anchor="middle" font-size="11" font-weight="800" style="fill:#d9c6ff">✓</text><text x="392" y="212" font-size="13.5" font-weight="700">Build a seed ISO: cloud-init cidata</text><text x="912" y="212" text-anchor="end" font-size="11.5" class="muted">user, key or password, guest agent</text></g>
+  <g class="a7"><circle cx="374" cy="241" r="9" fill="#1d2536" stroke="#a8e4ff" stroke-width="2"/><text x="374" y="245" text-anchor="middle" font-size="11" font-weight="800" style="fill:#a8e4ff">✓</text><text x="392" y="245" font-size="13.5" font-weight="700">Create VM 120 and boot it</text><text x="912" y="245" text-anchor="end" font-size="11.5" class="muted">VirtIO disk and NIC, your bridge and VLAN</text></g>
+  <g class="a8"><circle cx="374" cy="274" r="9" fill="#1d2536" stroke="#9ff0c4" stroke-width="2"/><text x="374" y="278" text-anchor="middle" font-size="11" font-weight="800" style="fill:#9ff0c4">✓</text><text x="392" y="278" font-size="13.5" font-weight="700">Wait for the guest agent</text><text x="912" y="278" text-anchor="end" font-size="11.5" class="muted">reads the address: 10.0.0.77</text></g>
+  <g class="a9"><circle cx="374" cy="307" r="9" fill="#1d2536" stroke="#9ff0c4" stroke-width="2"/><text x="374" y="311" text-anchor="middle" font-size="11" font-weight="800" style="fill:#9ff0c4">✓</text><text x="392" y="311" font-size="13.5" font-weight="700">Delete the seed ISO</text><text x="912" y="311" text-anchor="end" font-size="11.5" class="muted">it held the credentials</text></g>
+  <rect x="30" y="364" width="900" height="150" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <text x="48" y="390" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">ONE TOOL PER OS · SAME RESULT</text>
+  <g class="a10"><text x="48" y="416" font-size="11.5" class="mono" style="fill:#ffc48a">deploy_ubuntu_vm</text><text x="246" y="416" font-size="12" class="muted">Ubuntu 24.04 LTS</text></g>
+  <rect x="470" y="405" width="230" height="12" rx="6" fill="#232c3f"/>
+  <rect class="a11" x="470" y="405" width="230" height="12" rx="6" fill="#ff8a1f"/>
+  <g class="a12"><text x="912" y="416" text-anchor="end" font-size="12" font-weight="700" style="fill:#ffc48a">ready · ssh ubuntu@10.0.0.71</text></g>
+  <g class="a13"><text x="48" y="441" font-size="11.5" class="mono" style="fill:#a8e4ff">deploy_kali_vm</text><text x="246" y="441" font-size="12" class="muted">Kali Linux 2026.3</text></g>
+  <rect x="470" y="430" width="230" height="12" rx="6" fill="#232c3f"/>
+  <rect class="a14" x="470" y="430" width="230" height="12" rx="6" fill="#3ec7ff"/>
+  <g class="a15"><text x="912" y="441" text-anchor="end" font-size="12" font-weight="700" style="fill:#a8e4ff">ready · ssh kali@10.0.0.77</text></g>
+  <g class="a16"><text x="48" y="466" font-size="11.5" class="mono" style="fill:#d9c6ff">deploy_windows11_vm</text><text x="246" y="466" font-size="12" class="muted">Windows 11 (TPM 2.0, Secure Boot)</text></g>
+  <rect x="470" y="455" width="230" height="12" rx="6" fill="#232c3f"/>
+  <rect class="a17" x="470" y="455" width="230" height="12" rx="6" fill="#b58cff"/>
+  <g class="a18"><text x="912" y="466" text-anchor="end" font-size="12" font-weight="700" style="fill:#d9c6ff">ready · RDP or console, admin</text></g>
+  <g class="a19"><text x="48" y="491" font-size="11.5" class="mono" style="fill:#9ff0c4">deploy_pdm_vm</text><text x="246" y="491" font-size="12" class="muted">Datacenter Manager on Debian 13</text></g>
+  <rect x="470" y="480" width="230" height="12" rx="6" fill="#232c3f"/>
+  <rect class="a20" x="470" y="480" width="230" height="12" rx="6" fill="#3ddc84"/>
+  <g class="a21"><text x="912" y="491" text-anchor="end" font-size="12" font-weight="700" style="fill:#9ff0c4">ready · https://10.0.0.80:8443</text></g>
+</svg>
