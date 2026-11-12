@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 444" width="960" height="444" role="img" aria-labelledby="t d">
   <title id="t">HTTP clients with their own tokens and roles</title>
-  <desc id="d">Four clients call proxmox-mcp-server-http. ops with the admin role sees 341 tools, ci with the operator role sees 268, grafana with the read role sees 150, and a client with no token gets 401 Unauthorized. The audit log records ci's clone_vm as ok and grafana's stop_vm as refused for its role.</desc>
+  <desc id="d">Four clients call proxmox-mcp-server-http. ops with the admin role sees 346 tools, ci with the operator role sees 273, grafana with the read role sees 151, and a client with no token gets 401 Unauthorized. The audit log records ci's clone_vm as ok and grafana's stop_vm as refused for its role.</desc>
   <style>
     text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
     .muted { fill: #8b96ad; }
@@ -39,7 +39,7 @@
   <circle class="a1" cx="296" cy="135" r="6" fill="#ff8a1f"/>
   <line x1="572" y1="135" x2="640" y2="135" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
   <circle class="a2" cx="574" cy="135" r="6" fill="#ff8a1f"/>
-  <g class="a3"><rect x="644" y="112" width="286" height="46" rx="10" fill="#161d2b" stroke="#ff8a1f"/><text x="662" y="141" font-size="18" font-weight="800" style="fill:#ffc48a">341 tools</text><text x="912" y="140" text-anchor="end" font-size="12" class="muted">everything</text></g>
+  <g class="a3"><rect x="644" y="112" width="286" height="46" rx="10" fill="#161d2b" stroke="#ff8a1f"/><text x="662" y="141" font-size="18" font-weight="800" style="fill:#ffc48a">346 tools</text><text x="912" y="140" text-anchor="end" font-size="12" class="muted">everything</text></g>
   <rect x="40" y="170" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
   <text x="56" y="190" font-size="14" font-weight="700">ci</text>
   <text x="56" y="207" font-size="11.5" class="muted">pipeline</text>
@@ -48,7 +48,7 @@
   <circle class="a4" cx="296" cy="193" r="6" fill="#ffb02e"/>
   <line x1="572" y1="193" x2="640" y2="193" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
   <circle class="a5" cx="574" cy="193" r="6" fill="#ffb02e"/>
-  <g class="a6"><rect x="644" y="170" width="286" height="46" rx="10" fill="#161d2b" stroke="#ffb02e"/><text x="662" y="199" font-size="18" font-weight="800" style="fill:#ffd48a">268 tools</text><text x="912" y="198" text-anchor="end" font-size="12" class="muted">no destructive tools</text></g>
+  <g class="a6"><rect x="644" y="170" width="286" height="46" rx="10" fill="#161d2b" stroke="#ffb02e"/><text x="662" y="199" font-size="18" font-weight="800" style="fill:#ffd48a">273 tools</text><text x="912" y="198" text-anchor="end" font-size="12" class="muted">no destructive tools</text></g>
   <rect x="40" y="228" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
   <text x="56" y="248" font-size="14" font-weight="700">grafana</text>
   <text x="56" y="265" font-size="11.5" class="muted">dashboard</text>
@@ -57,7 +57,7 @@
   <circle class="a7" cx="296" cy="251" r="6" fill="#3ec7ff"/>
   <line x1="572" y1="251" x2="640" y2="251" stroke="#2c3750" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
   <circle class="a8" cx="574" cy="251" r="6" fill="#3ec7ff"/>
-  <g class="a9"><rect x="644" y="228" width="286" height="46" rx="10" fill="#161d2b" stroke="#3ec7ff"/><text x="662" y="257" font-size="18" font-weight="800" style="fill:#a8e4ff">150 tools</text><text x="912" y="256" text-anchor="end" font-size="12" class="muted">reads only</text></g>
+  <g class="a9"><rect x="644" y="228" width="286" height="46" rx="10" fill="#161d2b" stroke="#3ec7ff"/><text x="662" y="257" font-size="18" font-weight="800" style="fill:#a8e4ff">151 tools</text><text x="912" y="256" text-anchor="end" font-size="12" class="muted">reads only</text></g>
   <rect x="40" y="286" width="250" height="46" rx="10" fill="#161d2b" stroke="#2c3750"/>
   <text x="56" y="306" font-size="14" font-weight="700">unknown</text>
   <text x="56" y="323" font-size="11.5" class="muted">no token</text>

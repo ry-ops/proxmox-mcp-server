@@ -5,13 +5,15 @@
 <p align="center">
   <a href="https://github.com/ry-ops/proxmox-mcp-server/releases"><img src="https://img.shields.io/github/v/release/ry-ops/proxmox-mcp-server?color=ff8a1f&label=release" alt="Release"></a>
   <img src="https://img.shields.io/badge/tools-346-ff8a1f" alt="346 tools">
+  <a href="#pdm"><img src="https://img.shields.io/badge/Datacenter_Manager-89_tools-3ddc84" alt="Proxmox Datacenter Manager: 89 tools"></a>
+  <a href="#deploy"><img src="https://img.shields.io/badge/deploy_by_asking-Ubuntu_%C2%B7_Kali_%C2%B7_Win11_%C2%B7_PDM-b58cff" alt="Deploy Ubuntu, Kali, Windows 11 and PDM by asking"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-3ec7ff" alt="Python 3.10+"></a>
   <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-2.x-b58cff" alt="MCP SDK 2.x"></a>
   <a href="https://github.com/ry-ops/proxmox-mcp-server/pkgs/container/proxmox-mcp-server"><img src="https://img.shields.io/badge/docker-ghcr.io-3ddc84" alt="Docker image on ghcr.io"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
 </p>
 
-<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 346 tools across VMs, containers, storage, clustering, Ceph, SDN and more.</p>
+<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 346 tools across VMs, containers, storage, clustering, Ceph, SDN and more. Add <b>Proxmox Datacenter Manager</b> for 89 more that reach every cluster and Backup Server it manages, and <b>ask for a machine by name</b>: Ubuntu, Kali, Windows 11 or a Datacenter Manager.</p>
 
 <p align="center">
   <a href="#talk">Talk to it</a> ·
@@ -20,6 +22,8 @@
   <a href="#prompts">Prompts</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#clusters">Clusters</a> ·
+  <a href="#deploy">Deploy by asking</a> ·
+  <a href="#pdm">Datacenter Manager</a> ·
   <a href="#toolsets">Toolsets</a> ·
   <a href="#http">HTTP</a> ·
   <a href="#read-only">Safety</a> ·
@@ -32,6 +36,8 @@
 
 ## ✨ Highlights
 
+- 🧑‍🚀 **Ask for a machine, get a running one.** "Spin up a Kali VM" runs `deploy_kali_vm`: official image, checksum checked, installed unattended, address reported. Ubuntu, Windows 11 (TPM, Secure Boot, VirtIO) and Datacenter Manager work the same way. [More](#deploy)
+- 🛰️ **Every cluster through one connection.** Point it at Proxmox Datacenter Manager and 89 tools reach every Proxmox VE cluster and Backup Server it manages, including cross-cluster migration. [More](#pdm)
 - 🧰 **The whole API, not a demo.** 346 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
 - 🧭 **Workflows built in.** Five MCP prompts, such as a cluster health check and a snapshot-change-verify routine, plus live cluster state as MCP resources.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
@@ -46,7 +52,7 @@
 - 📜 **Every change on the record.** `PROXMOX_AUDIT_LOG` writes one JSON line per write call: who, what, the outcome and the task, with secrets redacted.
 - 🐳 **Runs anywhere.** Use `uv` from a clone, or the multi-arch image on `ghcr.io`.
 - ♻️ **Long sessions just work.** Password logins renew their Proxmox ticket before it expires.
-- 🤝 **A2A-ready.** `agent-card.json` lists every tool in 14 skill categories, for agent-to-agent discovery.
+- 🤝 **A2A-ready.** `agent-card.json` lists every tool, Proxmox VE and Datacenter Manager, by skill category, for agent-to-agent discovery.
 - 🛡️ **Appliances.** `deploy_fortigate_vm` builds a FortiGate-VM from Fortinet's KVM image, with WAN/LAN NICs on the bridges and VLANs you choose. `deploy_cloud_vms` builds cluster-ready VMs from a cloud image, with your SSH key and a static IP each, ready for k3s-mcp-server's `create_cluster`.
 
 <a id="talk"></a>
@@ -318,6 +324,10 @@ Give each extra cluster only the toolsets it needs, because every server's tools
 
 ### 🧑‍🚀 Deploy an OS by asking
 
+<p align="center">
+  <img src="docs/deploy.svg" width="100%" alt="You ask for a Kali VM and the server runs deploy_kali_vm: it fetches Kali's official cloud image and checks its SHA-256, repacks the sparse 25 GiB disk as a 1.06 GiB qcow2, builds a cloud-init seed ISO, creates and boots VM 120, waits for the guest agent to report 10.0.0.77, and deletes the seed ISO. Below, Ubuntu, Kali, Windows 11 and Datacenter Manager build side by side, each finishing with how to reach the machine.">
+</p>
+
 Ask for a VM by name and the server does the rest: fetches the official image (checksum verified, cached on storage and reused), builds a small seed ISO with the first-boot settings, creates and starts the VM, waits until its guest agent answers, and reports how to reach it.
 
 | Tool | What you get |
@@ -333,6 +343,10 @@ Give an SSH public key, or the tool generates a password and returns it once (th
 <a id="pdm"></a>
 
 ### 🛰️ Proxmox Datacenter Manager
+
+<p align="center">
+  <img src="docs/pdm.svg" width="100%" alt="proxmox-mcp's pdm toolset connects to Proxmox Datacenter Manager with an API token. One pdm_list_resources call fans out to three remotes and returns their guests, nodes and datastores. pdm_pve_remote_migrate_guest moves web-01 from pve-lab to the pve-prod cluster. pdm_pve_stop_guest on the protected guest pve-lab:104 is refused, and pdm_collect_metrics, which PDM reserves for root@pam, explains the elevated permission it needs.">
+</p>
 
 If you run [Proxmox Datacenter Manager](https://pdm.proxmox.com/) (PDM), point the server at it and the `pdm` toolset loads: 89 tools that reach every Proxmox VE cluster and Proxmox Backup Server PDM manages, through one connection. It can run alongside a direct Proxmox VE connection, or on its own.
 
