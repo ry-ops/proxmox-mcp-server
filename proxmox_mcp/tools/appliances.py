@@ -1,4 +1,5 @@
-"""Appliance deployment: FortiGate-VM (KVM image) and cloud-image VMs ready for a cluster."""
+"""Appliance deployment: FortiGate-VM (KVM image), cloud-image VMs ready for a cluster, and
+Ubuntu, Kali, Windows 11 and Datacenter Manager VMs by name (os_deploy.py)."""
 
 from __future__ import annotations
 
@@ -10,6 +11,7 @@ from typing import Any
 from urllib.parse import quote, urlparse
 
 from ..client import ProxmoxClient
+from . import os_deploy
 
 NODE = {"type": "string", "description": "Node name (e.g. pve01)"}
 OPT_STR = lambda desc: {"type": "string", "description": desc}  # noqa: E731
@@ -104,6 +106,8 @@ TOOLS = [
     },
 ]
 
+TOOLS += os_deploy.TOOLS
+
 
 async def wait_task(client: ProxmoxClient, node: str, upid: str, timeout: float = 600, poll: float = 2) -> dict[str, Any]:
     """Poll a task until it stops; raise if it fails or times out."""
@@ -135,6 +139,8 @@ def _filename(url: str) -> str:
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
+    if name in os_deploy.NAMES:
+        return await os_deploy.handle(name, args, client)
     if name == "deploy_cloud_vms":
         return await deploy_cloud_vms(args, client)
     if name != "deploy_fortigate_vm":

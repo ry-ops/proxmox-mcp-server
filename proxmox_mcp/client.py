@@ -204,7 +204,10 @@ class ProxmoxClient:
         method: str,
         path: str,
         data: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
+        timeout: float | None = None,
     ) -> Any:
+        """files (multipart uploads) and timeout are for POSTs such as storage uploads."""
         if PROXMOX_READ_ONLY and method != "GET":
             raise PermissionError(
                 f"Read-only mode (PROXMOX_READ_ONLY): refusing {method} {path}"
@@ -220,24 +223,35 @@ class ProxmoxClient:
         if self.ticket and time.monotonic() - self.ticket_issued > TICKET_LIFETIME:
             await self._renew_ticket(self.ticket)
         ticket = self.ticket
-        response = await self._send(method, url, data)
+        response = await self._send(method, url, data, files, timeout)
         if response.status_code == 401 and ticket:
             # The ticket expired or was revoked early: log in once more and retry.
             await self._renew_ticket(ticket)
-            response = await self._send(method, url, data)
+            for spec in (files or {}).values():
+                if hasattr(spec[1], "seek"):
+                    spec[1].seek(0)  # send the upload again from the start
+            response = await self._send(method, url, data, files, timeout)
         if response.is_error:
             raise _api_error(response)
         return response.json()
 
     async def _send(
-        self, method: str, url: str, data: dict[str, Any] | None
+        self,
+        method: str,
+        url: str,
+        data: dict[str, Any] | None,
+        files: dict[str, Any] | None = None,
+        timeout: float | None = None,
     ) -> httpx.Response:
         headers = self._headers(method)
+        extra: dict[str, Any] = {}
+        if timeout is not None:
+            extra["timeout"] = timeout
         try:
             if method == "GET":
                 response = await self.client.get(url, headers=headers, params=data)
             elif method == "POST":
-                response = await self.client.post(url, headers=headers, data=data)
+                response = await self.client.post(url, headers=headers, data=data, files=files, **extra)
             elif method == "PUT":
                 response = await self.client.put(url, headers=headers, data=data)
             else:
@@ -248,6 +262,18 @@ class ProxmoxClient:
 
     async def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
         return await self.request("GET", path, params)
+
+    async def upload(
+        self, node: str, storage: str, content: str, filename: str, fileobj: Any, timeout: float = 3600
+    ) -> Any:
+        """Upload a file to a storage (content: iso, vztmpl or import). Returns the task."""
+        return await self.request(
+            "POST",
+            f"/nodes/{node}/storage/{storage}/upload",
+            {"content": content},
+            files={"filename": (filename, fileobj, "application/octet-stream")},
+            timeout=timeout,
+        )
 
     async def post(self, path: str, data: dict[str, Any] | None = None) -> Any:
         return await self.request("POST", path, data)

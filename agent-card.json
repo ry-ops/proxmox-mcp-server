@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 341 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 346 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.13.1",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -4037,7 +4037,7 @@
     },
     {
       "category": "appliances",
-      "description": "Deploy network appliances and cloud-image VMs as ready-to-boot VMs (FortiGate-VM, cluster nodes)",
+      "description": "Deploy network appliances and cloud-image VMs as ready-to-boot VMs (FortiGate-VM, cluster nodes); Ubuntu, Kali, Windows 11 and Datacenter Manager VMs by name",
       "capabilities": [
         {
           "name": "deploy_fortigate_vm",
@@ -4092,6 +4092,132 @@
             "description (optional)"
           ],
           "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "deploy_ubuntu_vm",
+          "description": "Create an Ubuntu 24.04 LTS VM just by asking: fetches the official cloud image (checksum verified, cached and reused), sets the user with your SSH key or a generated password (returned once), installs the guest agent, starts it, and reports its IP when it's ready.",
+          "inputs": [
+            "node",
+            "name (optional)",
+            "vmid (optional)",
+            "cores (optional)",
+            "memory (optional)",
+            "disk_gb (optional)",
+            "disk_storage (optional)",
+            "image_storage (optional)",
+            "bridge (optional)",
+            "vlan (optional)",
+            "ip (optional)",
+            "gateway (optional)",
+            "nameservers (optional)",
+            "username (optional)",
+            "ssh_public_keys (optional)",
+            "onboot (optional)",
+            "tags (optional)",
+            "description (optional)",
+            "wait_until_ready (optional)",
+            "ready_timeout (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "deploy_kali_vm",
+          "description": "Create a Kali Linux VM just by asking: downloads Kali's official cloud image (checksum verified), repacks its sparse 25 GiB disk as qcow2 so only the ~1 GiB of data is uploaded, sets the user with your SSH key or a generated password (returned once), installs the guest agent, starts it, and reports its IP when it's ready.",
+          "inputs": [
+            "node",
+            "name (optional)",
+            "vmid (optional)",
+            "cores (optional)",
+            "memory (optional)",
+            "disk_gb (optional)",
+            "disk_storage (optional)",
+            "image_storage (optional)",
+            "bridge (optional)",
+            "vlan (optional)",
+            "ip (optional)",
+            "gateway (optional)",
+            "nameservers (optional)",
+            "username (optional)",
+            "ssh_public_keys (optional)",
+            "onboot (optional)",
+            "tags (optional)",
+            "description (optional)",
+            "wait_until_ready (optional)",
+            "ready_timeout (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "deploy_pdm_vm",
+          "description": "Create a Proxmox Datacenter Manager just by asking: a Debian 13 VM (official cloud image) where cloud-init installs PDM from Proxmox's no-subscription repository. Sets the root password (generated and returned once) for the web UI, and when ready reports https://<ip>:8443 and the login.",
+          "inputs": [
+            "node",
+            "name (optional)",
+            "vmid (optional)",
+            "cores (optional)",
+            "memory (optional)",
+            "disk_gb (optional)",
+            "disk_storage (optional)",
+            "image_storage (optional)",
+            "bridge (optional)",
+            "vlan (optional)",
+            "ip (optional)",
+            "gateway (optional)",
+            "nameservers (optional)",
+            "username (optional)",
+            "ssh_public_keys (optional)",
+            "onboot (optional)",
+            "tags (optional)",
+            "description (optional)",
+            "wait_until_ready (optional)",
+            "ready_timeout (optional)",
+            "root_password (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "deploy_windows11_vm",
+          "description": "Create a Windows 11 VM just by asking: q35 with UEFI, Secure Boot keys, TPM 2.0 and VirtIO disk and network, installed unattended from a Windows 11 ISO already on storage (found automatically; Microsoft has no stable download link) with VirtIO drivers and guest tools. Creates a local administrator with a generated password (returned once). Installs Windows 11 Pro without activation by default. Setup takes 20 to 40 minutes.",
+          "inputs": [
+            "node",
+            "name (optional)",
+            "vmid (optional)",
+            "iso (optional)",
+            "virtio_iso (optional)",
+            "cores (optional)",
+            "memory (optional)",
+            "disk_gb (optional)",
+            "disk_storage (optional)",
+            "iso_storage (optional)",
+            "bridge (optional)",
+            "vlan (optional)",
+            "edition (optional)",
+            "computer_name (optional)",
+            "username (optional)",
+            "password (optional)",
+            "timezone (optional)",
+            "locale (optional)",
+            "onboot (optional)",
+            "tags (optional)",
+            "description (optional)",
+            "wait_until_ready (optional)",
+            "ready_timeout (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "list_os_images",
+          "description": "OS images the deploy tools use: which are cached on the node's storage, and with check_upstream, the latest official version of each.",
+          "inputs": [
+            "node",
+            "check_upstream (optional)"
+          ],
+          "read_only": true,
           "destructive": false
         }
       ]

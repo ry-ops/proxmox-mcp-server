@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- **Deploy an OS by asking:** `deploy_ubuntu_vm`, `deploy_kali_vm`, `deploy_pdm_vm` and
+  `deploy_windows11_vm`, plus `list_os_images`, in the `appliances` toolset. Each fetches the
+  official image (checksum verified, cached and reused), hands the guest its first-boot settings
+  on a seed ISO the server builds (cloud-init `cidata`, or Windows' `autounattend.xml`), creates
+  and starts the VM, waits for its guest agent and reports the address. Credentials are an SSH key
+  or a generated password returned once; the seed ISO is deleted once the guest is up.
+  - Kali's `.tar.xz` cloud image is repacked by the server as qcow2, so only its ≈1 GiB of data is
+    uploaded instead of a 25 GiB raw disk.
+  - Datacenter Manager is installed on Debian 13 from the no-subscription repository, with the
+    enterprise repository removed.
+  - Windows 11 gets UEFI, Secure Boot keys, TPM 2.0, VirtIO drivers during Setup and the VirtIO
+    guest tools at first logon; the server answers the "Press any key" boot prompt.
+- The client can upload files to storage (`ProxmoxClient.upload`), and the server builds ISO 9660
+  images with Joliet names (`seediso.py`) and qcow2 images (`qcow2.py`) with no new dependencies.
+
 ## [2.13.1] - 2026-11-10
 
 ### Changed

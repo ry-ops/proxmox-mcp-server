@@ -65,7 +65,12 @@ def test_schema_is_well_formed(tool):
     assert tool.description.strip()
 
 
-@pytest.mark.parametrize("tool", ALL, ids=lambda t: t.name)
+# The OS deploy tools fetch images from the internet and drive a whole install; they're covered
+# step by step in tests/test_os_deploy.py instead.
+OS_DEPLOY = {"deploy_ubuntu_vm", "deploy_kali_vm", "deploy_pdm_vm", "deploy_windows11_vm"}
+
+
+@pytest.mark.parametrize("tool", [t for t in ALL if t.name not in OS_DEPLOY], ids=lambda t: t.name)
 async def test_read_only_label_matches_http_methods(tool):
     """A tool labelled read-only must only GET; any other tool must send a write."""
     props = tool.input_schema.get("properties", {})
