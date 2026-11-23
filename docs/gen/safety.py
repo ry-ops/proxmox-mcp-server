@@ -33,7 +33,7 @@ b.append(
 modes = [
     ("default", "every tool", 346, ORANGE, ORANGE_T),
     ("PROXMOX_NO_DESTRUCTIVE=true", "no delete, stop, wipe, rollback", 273, AMBER, "#ffd48a"),
-    ("PROXMOX_READ_ONLY=true", "reads only", 151, BLUE, BLUE_T),
+    ("PROXMOX_READ_ONLY=true", "reads only", 152, BLUE, BLUE_T),
 ]
 for i, (env, what, n, col, tcol) in enumerate(modes):
     y = 146 + i * 54
@@ -137,7 +137,7 @@ for i, (t, line, col) in enumerate(lines):
 
 title = "Guardrails: modes, protected guests and the audit log"
 desc = (
-    "Three bars show how many tools the client sees: 346 by default, 273 with PROXMOX_NO_DESTRUCTIVE, 151 with "
+    "Three bars show how many tools the client sees: 346 by default, 273 with PROXMOX_NO_DESTRUCTIVE, 152 with "
     "PROXMOX_READ_ONLY. On a node, guests 100 and 101 are protected. stop_vm on 120 succeeds, delete_vm on 100 is "
     "refused, and node_stopall without a guest list is refused. Each call appears in the JSON-lines audit log."
 )

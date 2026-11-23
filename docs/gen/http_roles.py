@@ -28,7 +28,7 @@ b.append(
 rows = [
     ("ops", "Claude Code", "admin", ORANGE, ORANGE_T, "346 tools", "everything"),
     ("ci", "pipeline", "operator", AMBER, "#ffd48a", "273 tools", "no destructive tools"),
-    ("grafana", "dashboard", "read", BLUE, BLUE_T, "151 tools", "reads only"),
+    ("grafana", "dashboard", "read", BLUE, BLUE_T, "152 tools", "reads only"),
     ("unknown", "no token", "—", RED, RED_T, "401", "Unauthorized"),
 ]
 b.append(
@@ -100,7 +100,7 @@ for i, (t, line, col) in enumerate(
 title = "HTTP clients with their own tokens and roles"
 desc = (
     "Four clients call proxmox-mcp-server-http. ops with the admin role sees 346 tools, ci with the operator role sees "
-    "273, grafana with the read role sees 151, and a client with no token gets 401 Unauthorized. The audit log records "
+    "273, grafana with the read role sees 152, and a client with no token gets 401 Unauthorized. The audit log records "
     "ci's clone_vm as ok and grafana's stop_vm as refused for its role."
 )
 open(sys.argv[1], "w").write(svg(960, 444, title, desc, A.style(), "\n".join(b)))

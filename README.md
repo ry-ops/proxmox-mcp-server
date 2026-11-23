@@ -41,7 +41,7 @@
 - 🧰 **The whole API, not a demo.** 346 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
 - 🧭 **Workflows built in.** Five MCP prompts, such as a cluster health check and a snapshot-change-verify routine, plus live cluster state as MCP resources.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
-- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 151 read-only tools.
+- 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 152 read-only tools.
 - 🧯 **Safe writes, protected guests.** `PROXMOX_NO_DESTRUCTIVE=true` hides the 73 tools that delete, stop, wipe or roll back. `PROXMOX_PROTECTED_VMIDS` names guests no tool may change.
 - ⏳ **Waits for the slow stuff.** Clone, migrate, backup and restore take `wait: true`, and `wait_for_task` follows any task to the end, with the log when it fails.
 - 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 346 to 127, and the context it costs by more than half. Results come back as compact JSON.
@@ -432,7 +432,7 @@ PROXMOX_TOOLSETS=nodes,qemu,lxc,storage
 | `PROXMOX_NO_DESTRUCTIVE=true` | 273 | 35k |
 | `nodes,qemu,lxc,storage,cluster` | 164 | 23k |
 | `nodes,qemu,lxc,storage` | 127 | 19k |
-| `PROXMOX_READ_ONLY=true` | 151 | 13k |
+| `PROXMOX_READ_ONLY=true` | 152 | 13k |
 | `qemu` | 47 | 8k |
 
 Every count includes `wait_for_task`, which loads with any selection.
@@ -443,7 +443,7 @@ The names are `nodes`, `qemu`, `lxc`, `storage`, `cluster`, `access`, `firewall`
 
 Each tool tells the client what it does, through standard MCP annotations:
 
-- **`readOnlyHint: true`** on the 151 tools that only read.
+- **`readOnlyHint: true`** on the 152 tools that only read.
 - **`destructiveHint: true`** on the 73 that delete, stop, wipe, roll back, restore over, or run commands in a guest.
 - **`destructiveHint: false`** on the other writes, such as create, start or update.
 
@@ -527,7 +527,7 @@ Clone, migrate, backup, restore, disk moves, snapshots and power actions start a
   <img src="docs/safety.svg" width="100%" alt="Bars show 341 tools by default, 268 with PROXMOX_NO_DESTRUCTIVE and 150 with PROXMOX_READ_ONLY. Guests 100 and 101 are protected: stop_vm on 120 succeeds, delete_vm on 100 and node_stopall without a list are refused, and each call lands in the audit log.">
 </p>
 
-**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **The client sees only the 151 read-only tools**, so it never plans around a tool that would be refused. Three read-style tools send POST requests, so they're hidden too:
+**`PROXMOX_READ_ONLY=true`** makes the server look-but-don't-touch. Only GET requests are sent, and every create, update, delete or action tool is refused inside the server before it reaches the network. **The client sees only the 152 read-only tools**, so it never plans around a tool that would be refused. Three read-style tools send POST requests, so they're hidden too:
 - `vm_agent_ping`;
 - `get_vm_vnc_proxy` and `get_vm_spice_proxy`, which create console access tickets.
 

@@ -175,3 +175,29 @@ async def test_reads_ignore_protection(fake, monkeypatch):
 async def test_output_is_compact(fake):
     text = await call("list_pools", {})
     assert text == '{"data":[]}'
+
+
+# --- analyze_schedule ---
+
+
+async def test_analyze_schedule_is_a_read_only_get():
+    from proxmox_mcp import registry
+    from proxmox_mcp.tools import cluster
+
+    class Recorder:
+        def __init__(self):
+            self.calls = []
+
+        async def get(self, path, params=None):
+            self.calls.append(("GET", path, params))
+            return {"data": []}
+
+        async def post(self, path, data=None):
+            raise AssertionError("schedule-analyze only answers GET")
+
+    rec = Recorder()
+    await cluster.handle("analyze_schedule", {"schedule": "02:00", "iterations": 3}, rec)
+    assert rec.calls == [
+        ("GET", "/cluster/jobs/schedule-analyze", {"schedule": "02:00", "iterations": 3})
+    ]
+    assert registry.is_read_only("analyze_schedule")

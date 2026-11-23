@@ -605,7 +605,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get("/cluster/jobs/realm-sync")
 
     elif name == "analyze_schedule":
-        data = dict(args.items())
-        return await client.post("/cluster/jobs/schedule-analyze", data)
+        params = {k: args[k] for k in ("schedule", "iterations", "starttime") if k in args}
+        return await client.get("/cluster/jobs/schedule-analyze", params)
 
     raise ValueError(f"Unknown tool: {name}")

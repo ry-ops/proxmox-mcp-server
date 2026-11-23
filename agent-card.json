@@ -2059,7 +2059,7 @@
             "iterations (optional)",
             "starttime (optional)"
           ],
-          "read_only": false,
+          "read_only": true,
           "destructive": false
         },
         {

@@ -84,7 +84,7 @@ ALIASES = {"vms": "qemu", "vm": "qemu", "containers": "lxc", "ct": "lxc"}
 
 # Tools whose name does not say what they do to the cluster.
 # These only GET, though their names do not start with get_/list_:
-_READS = {"vm_agent_exec_status", "wait_for_task"}
+_READS = {"analyze_schedule", "vm_agent_exec_status", "wait_for_task"}
 # These POST (they open a console ticket), though their names start with get_:
 _WRITES = {"get_vm_vnc_proxy", "get_vm_spice_proxy"}
 
