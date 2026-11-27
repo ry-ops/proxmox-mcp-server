@@ -6,6 +6,28 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- **High availability for Proxmox VE 9**, which deprecates HA groups in favour of HA rules:
+  - `list_ha_rules`, `get_ha_rule`, `create_ha_rule`, `update_ha_rule` and `delete_ha_rule`.
+    Node-affinity rules keep resources on, or off, chosen nodes, with priorities and an optional
+    strict mode. Resource-affinity rules keep resources together or apart. The tools explain
+    mix-ups, such as `nodes` on a resource-affinity rule, before Proxmox does.
+  - `migrate_ha_resource` and `relocate_ha_resource` move HA-managed guests through the HA
+    manager, which overrides a plain migration. The result names the resources blocking the move and
+    any that move with it.
+  - `get_ha_manager_status`: CRM and LRM state, node modes, fencing and watchdogs.
+  - `set_node_maintenance`, `disarm_ha` (`freeze` or `ignore`) and `arm_ha`.
+  - `purge` on `delete_ha_resource`, and `auto-rebalance` on HA resources.
+- Relocating, maintenance mode, disarming HA and deleting a rule are destructive, so
+  `PROXMOX_NO_DESTRUCTIVE` hides them and the operator role can't call them. Rules that name a
+  protected guest are refused.
+
+### Fixed
+- HA resource and rule IDs are checked before they go into an API path, so an ID like
+  `200/../../access` is refused.
+- `agent-card.json` now has the descriptions and inputs of the tools changed in 2.15.0.
+- README: the appliances toolset has 7 tools, not 2.
+
 ## [2.15.0] - 2026-11-27
 
 ### Added

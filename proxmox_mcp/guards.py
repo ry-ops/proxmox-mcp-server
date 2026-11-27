@@ -79,6 +79,8 @@ def targets(name: str, args: dict[str, Any]) -> set[int]:
     found |= _ids(args.get("target-vmid"))
     found |= _ids(args.get("vms"))
     found |= _ids(args.get("sid"))
+    if name in ("create_ha_rule", "update_ha_rule"):
+        found |= _ids(args.get("resources"))  # a rule can move or stop the guests it names
     for m in _VOLUME_ID.finditer(str(args.get("volume", ""))):
         found.add(int(m[1] or m[2]))
     extra = args.get("extra_config")

@@ -112,6 +112,9 @@ _DESTRUCTIVE = {
     "vm_agent_exec",
     "vm_agent_set_user_password",
     "change_user_password",
+    "relocate_ha_resource",  # stops the guest, then starts it elsewhere
+    "set_node_maintenance",  # moves every HA guest off the node
+    "disarm_ha",  # no fencing until re-armed
 }
 
 

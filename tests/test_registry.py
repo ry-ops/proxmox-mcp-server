@@ -22,6 +22,11 @@ REAL_ARGS = {
     "vnet": "vnet1",
     "zone": "zone1",
     "name": "pve-manager",
+    # HA resource and rule IDs end up in API paths and are checked.
+    "sid": "vm:100",
+    "rule": "keep-apart",
+    "resources": "vm:100,vm:101",
+    "nodes": "pve01:2,pve02",
 }
 
 

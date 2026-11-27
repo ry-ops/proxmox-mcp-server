@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/ry-ops/proxmox-mcp-server/releases"><img src="https://img.shields.io/github/v/release/ry-ops/proxmox-mcp-server?color=ff8a1f&label=release" alt="Release"></a>
-  <img src="https://img.shields.io/badge/tools-346-ff8a1f" alt="346 tools">
+  <img src="https://img.shields.io/badge/tools-357-ff8a1f" alt="357 tools">
   <a href="#pdm"><img src="https://img.shields.io/badge/Datacenter_Manager-89_tools-3ddc84" alt="Proxmox Datacenter Manager: 89 tools"></a>
   <a href="#deploy"><img src="https://img.shields.io/badge/deploy_by_asking-Ubuntu_%C2%B7_Kali_%C2%B7_Win11_%C2%B7_PDM-b58cff" alt="Deploy Ubuntu, Kali, Windows 11 and PDM by asking"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-3ec7ff" alt="Python 3.10+"></a>
@@ -17,12 +17,12 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ffb02e" alt="MIT"></a>
 </p>
 
-<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 346 tools across VMs, containers, storage, clustering, Ceph, SDN and more. Add <b>Proxmox Datacenter Manager</b> for 89 more that reach every cluster and Backup Server it manages, and <b>ask for a machine by name</b>: Ubuntu, Kali, Windows 11 or a Datacenter Manager.</p>
+<p align="center"><b>Talk to your Proxmox cluster.</b> A Model Context Protocol server that gives Claude, or any MCP client, the <b>whole Proxmox VE API</b>: 357 tools across VMs, containers, storage, clustering, Ceph, SDN and more. Add <b>Proxmox Datacenter Manager</b> for 89 more that reach every cluster and Backup Server it manages, and <b>ask for a machine by name</b>: Ubuntu, Kali, Windows 11 or a Datacenter Manager.</p>
 
 <p align="center">
   <a href="#talk">Talk to it</a> ·
   <a href="#how">How it works</a> ·
-  <a href="#tools">346 tools</a> ·
+  <a href="#tools">357 tools</a> ·
   <a href="#prompts">Prompts</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#clusters">Clusters</a> ·
@@ -42,13 +42,13 @@
 
 - 🧑‍🚀 **Ask for a machine, get a running one.** "Spin up a Kali VM" runs `deploy_kali_vm`: official image, checksum checked, installed unattended, address reported. Ubuntu, Windows 11 (TPM, Secure Boot, VirtIO) and Datacenter Manager work the same way. [More](#deploy)
 - 🛰️ **Every cluster through one connection.** Point it at Proxmox Datacenter Manager and 89 tools reach every Proxmox VE cluster and Backup Server it manages, including cross-cluster migration. [More](#pdm)
-- 🧰 **The whole API, not a demo.** 346 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
+- 🧰 **The whole API, not a demo.** 357 tools across 14 areas: nodes, QEMU VMs, LXC containers, storage and backup, cluster and HA, access control, firewall, disks, Ceph, ACME, SDN, notifications, pools and appliances.
 - 🧭 **Workflows built in.** Five MCP prompts, such as a cluster health check and a snapshot-change-verify routine, plus live cluster state as MCP resources.
 - 🖥️ **Inside your guests too.** Run commands through the QEMU guest agent (`vm_agent_exec` → `vm_agent_exec_status`) and read back the exit code and output.
 - 🔒 **Look-but-don't-touch with one switch.** `PROXMOX_READ_ONLY=true` refuses every write inside the server, and the client sees only the 151 read-only tools.
 - 🧯 **Safe writes, protected guests.** `PROXMOX_NO_DESTRUCTIVE=true` hides the 73 tools that delete, stop, wipe or roll back. `PROXMOX_PROTECTED_VMIDS` names guests no tool may change.
 - ⏳ **Waits for the slow stuff.** Clone, migrate, backup and restore take `wait: true`, and `wait_for_task` follows any task to the end, with the log when it fails.
-- 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 346 to 127, and the context it costs by more than half. Results come back as compact JSON.
+- 🎯 **Load only what you use.** `PROXMOX_TOOLSETS=nodes,qemu,lxc,storage` cuts the tool list from 357 to 127, and the context it costs by more than half. Results come back as compact JSON.
 - 🚦 **Labelled for safe approval.** Every tool carries MCP `readOnlyHint` and `destructiveHint` annotations, so clients can auto-approve reads and ask before a delete, stop or rollback.
 - 🆕 **Current protocol, old clients welcome.** Built on MCP SDK 2: clients on the stateless 2026-07-28 protocol and on every handshake version back to 2024-11-05 connect. Failed calls are flagged as errors, so clients show them as failures.
 - 🔑 **API tokens or passwords.** Tokens are recommended; pair them with a `PVEAuditor` role for monitoring.
@@ -129,7 +129,7 @@ Each resource is a single read, so resources work in read-only mode and for ever
 
 <a id="tools"></a>
 
-## 🧰 346 tools, 14 areas
+## 🧰 357 tools, 14 areas
 
 <p align="center">
   <img src="docs/tools.svg" width="100%" alt="A tile map of the 341 tools by toolset: QEMU VMs 46, nodes 38, cluster and HA 37, access control 33, Ceph 33, firewall 31, LXC 28, notifications 23, disks 17, ACME 17, SDN 16, storage and backup 14, pools 5, appliances 2, plus wait_for_task, which every toolset loads. Then all but nodes, qemu, lxc and storage dim, and the count drops to 127.">
@@ -141,7 +141,7 @@ Each resource is a single read, so resources work in read-only mode and for ever
 | QEMU VMs | 46 | Lifecycle, create/clone/delete, config, snapshots, migration, disk resize/move, RRD metrics, guest agent (`vm_agent_exec`, `vm_agent_exec_status`), VNC proxy |
 | LXC containers | 28 | Lifecycle, create/clone/delete, config, snapshots, migration, resize |
 | Storage & backup | 14 | Storage definitions, content and volumes, URL downloads, `vzdump` backup and restore |
-| Cluster | 37 | Status, resources, options, log, tasks, HA resources/groups, replication, backup jobs |
+| Cluster | 48 | Status, resources, options, log, tasks, HA resources and rules, HA migrate and relocate, maintenance mode, arm/disarm, replication, backup jobs |
 | Access control | 33 | Users, API tokens, groups, roles, ACLs, realms |
 | Firewall | 31 | Cluster and node rules, security groups, aliases, IP sets, macros, logs (per-VM and per-container rules are in the guest modules) |
 | Disks | 17 | SMART, wipe, GPT init, LVM, LVM-thin, ZFS, directory storage |
@@ -150,7 +150,7 @@ Each resource is a single read, so resources work in read-only mode and for ever
 | SDN | 16 | Zones, VNets, subnets, apply |
 | Notifications | 23 | Gotify, sendmail, SMTP and webhook endpoints, matchers |
 | Pools | 5 | Resource pool CRUD |
-| Appliances | 2 | `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license. `deploy_cloud_vms`: VMs from a cloud image (e.g. Ubuntu's) with cloud-init user, SSH key and a static IP or DHCP each, disk grown and started |
+| Appliances | 7 | Deploy by asking: `deploy_ubuntu_vm`, `deploy_kali_vm`, `deploy_windows11_vm`, `deploy_pdm_vm` and `list_os_images` ([more](#deploy)). `deploy_fortigate_vm`: FortiGate-VM from Fortinet's KVM image, WAN/LAN NICs on chosen bridges and VLANs, sized for the free evaluation license. `deploy_cloud_vms`: VMs from a cloud image (e.g. Ubuntu's) with cloud-init user, SSH key and a static IP or DHCP each, disk grown and started |
 
 One more tool, `wait_for_task`, is loaded with every toolset. It waits for any Proxmox task to finish; see [Waiting for long tasks](#wait).
 
@@ -167,6 +167,7 @@ uv run python -c "from proxmox_mcp.server import ALL_TOOLS; print('\n'.join(sort
 | Inventory | `list_nodes`, `get_cluster_resources`, `list_vms`, `list_containers`, `list_storage` |
 | VM lifecycle | `start_vm`, `shutdown_vm`, `stop_vm`, `reboot_vm`, `create_vm`, `clone_vm`, `migrate_vm` |
 | Disk images | `download_url_to_storage` with `content=import`, then `create_vm` with `scsi0=local-lvm:0,import-from=local:import/<image>`, or `import_vm_disk` |
+| High availability | `list_ha_rules`, `create_ha_rule` (keep guests on chosen nodes, together or apart), `migrate_ha_resource`, `set_node_maintenance`, `get_ha_manager_status` |
 | Snapshots | `create_vm_snapshot`, `list_vm_snapshots`, `rollback_vm_snapshot`, `delete_vm_snapshot` |
 | Monitoring | `get_node_status`, `get_vm_status`, `get_vm_rrddata`, `get_node_storage_status` |
 | Tasks | `list_cluster_tasks`, `list_node_tasks`, `get_task_status`, `get_task_log` |
@@ -424,7 +425,7 @@ The tools are generated from PDM's published API schema; [ROADMAP.md](ROADMAP.md
 
 ### 🎯 Toolsets: load only what you use
 
-Every tool the server advertises sits in the client's context on every turn, and all 346 schemas come to roughly 44k tokens. Set `PROXMOX_TOOLSETS` to the areas you need:
+Every tool the server advertises sits in the client's context on every turn, and all 357 schemas come to roughly 46k tokens. Set `PROXMOX_TOOLSETS` to the areas you need:
 
 ```bash
 PROXMOX_TOOLSETS=nodes,qemu,lxc,storage
@@ -432,11 +433,11 @@ PROXMOX_TOOLSETS=nodes,qemu,lxc,storage
 
 | Setting | Tools | Approx. tokens |
 |---|--:|--:|
-| all (default) | 346 | 44k |
-| `PROXMOX_NO_DESTRUCTIVE=true` | 273 | 35k |
-| `nodes,qemu,lxc,storage,cluster` | 164 | 23k |
+| all (default) | 357 | 46k |
+| `PROXMOX_NO_DESTRUCTIVE=true` | 280 | 36k |
+| `nodes,qemu,lxc,storage,cluster` | 175 | 25k |
 | `nodes,qemu,lxc,storage` | 127 | 19k |
-| `PROXMOX_READ_ONLY=true` | 151 | 13k |
+| `PROXMOX_READ_ONLY=true` | 154 | 13k |
 | `qemu` | 47 | 8k |
 
 Every count includes `wait_for_task`, which loads with any selection.
@@ -537,7 +538,7 @@ Clone, migrate, backup, restore, disk moves, snapshots and power actions start a
 
 **`PROXMOX_NO_DESTRUCTIVE=true`** is the middle ground. It hides the 73 tools labelled destructive: deleting, stopping, wiping, rolling back, restoring over a guest, and running commands inside one. Safe writes such as start, create, clone, snapshot and config changes stay available, so 268 tools remain.
 
-**`PROXMOX_PROTECTED_VMIDS=100,101,9000-9010`** names guests no tool may change, such as your router, DNS or backup server. The server checks every write before sending it: power actions, config changes, snapshots, migration, disk moves, deletion, guest-agent commands, HA changes, and deleting the guest's volumes or backups. Reads always work. Cloning from a protected template, backing it up and opening its console stay allowed, because they leave it as it is. Node-wide and bulk start, stop and migrate actions need an explicit `vms` list while any guest is protected, since they would otherwise include it. Whole-node shutdown and reboot are not covered.
+**`PROXMOX_PROTECTED_VMIDS=100,101,9000-9010`** names guests no tool may change, such as your router, DNS or backup server. The server checks every write before sending it: power actions, config changes, snapshots, migration, disk moves, deletion, guest-agent commands, HA changes, and deleting the guest's volumes or backups. Reads always work. Cloning from a protected template, backing it up and opening its console stay allowed, because they leave it as it is. Node-wide and bulk start, stop and migrate actions need an explicit `vms` list while any guest is protected, since they would otherwise include it. HA rules that name a protected guest are refused too, since a rule can move or stop it. Whole-node shutdown and reboot, HA maintenance mode and disarming HA act on the whole node or cluster and are not covered.
 
 <a id="audit"></a>
 
@@ -562,7 +563,7 @@ The rest of the security picture:
 
 ## 🤝 Agent-to-agent (A2A)
 
-[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It lists **all 346 Proxmox VE tools in 14 skill categories, plus the 89 Datacenter Manager tools**, each with its name, description, inputs, and `read_only` and `destructive` flags. A test fails if it drifts from the tool registry. It also covers authentication requirements and MCP protocol details.
+[`agent-card.json`](agent-card.json) is this server's identity and capability manifest for other agents. It lists **all 357 Proxmox VE tools in 14 skill categories, plus the 89 Datacenter Manager tools**, each with its name, description, inputs, and `read_only` and `destructive` flags. A test fails if it drifts from the tool registry. It also covers authentication requirements and MCP protocol details.
 
 | Category | Tools | Category | Tools |
 |---|--:|---|--:|
