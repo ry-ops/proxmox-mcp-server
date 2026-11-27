@@ -37,7 +37,7 @@ That gives us:
 
 ### 1. Kernel and package versions on a node
 
-**Status:** built (unreleased): `get_node_kernel`, `get_node_apt_versions`, `get_node_apt_history` and `get_node_apt_repositories`, plus `refresh_node_apt_index` and repository changes. The limits below still hold.
+**Status:** shipped in v2.17.0: `get_node_kernel`, `get_node_apt_versions`, `get_node_apt_history` and `get_node_apt_repositories`, plus `refresh_node_apt_index` and repository changes. The limits below still hold.
 
 **Today:** `get_node_status` reports the running kernel. `get_node_apt_update` lists pending
 updates and `get_node_apt_changelog` reads a package changelog.

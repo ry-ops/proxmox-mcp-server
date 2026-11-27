@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.17.0] - 2026-11-27
+
 ### Added
 - **Node updates and kernels:**
   - `get_node_kernel` answers "is the opt-in 7.3 kernel installed, and is it the one running?" It
@@ -420,6 +422,7 @@ released on its own.
 
 Initial release.
 
+[2.17.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.16.0...v2.17.0
 [2.16.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.15.0...v2.16.0
 [2.15.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.13.1...v2.14.0
