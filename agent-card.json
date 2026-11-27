@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 346 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 357 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.15.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -421,10 +421,18 @@
         },
         {
           "name": "get_node_scan",
-          "description": "Scan for available storage, iSCSI targets, or other resources on a node.",
+          "description": "Find storage a node can use before adding it: NFS exports, SMB shares, Proxmox Backup Server datastores, iSCSI or NVMe-oF targets, or local LVM, LVM-thin and ZFS. Inputs by type: nfs needs server; cifs needs server (username, password, domain optional); pbs needs server, username and password (fingerprint, port optional); iscsi and nvmeof need portal; lvmthin needs vg.",
           "inputs": [
             "node",
-            "type"
+            "type",
+            "server (optional)",
+            "portal (optional)",
+            "username (optional)",
+            "password (optional)",
+            "domain (optional)",
+            "fingerprint (optional)",
+            "port (optional)",
+            "vg (optional)"
           ],
           "read_only": true,
           "destructive": false
@@ -520,7 +528,8 @@
             "node",
             "vmid",
             "skiplock (optional)",
-            "timeout (optional)"
+            "timeout (optional)",
+            "sync-time-on-resume (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -593,7 +602,8 @@
             "node",
             "vmid",
             "skiplock (optional)",
-            "nocheck (optional)"
+            "nocheck (optional)",
+            "sync-time-on-resume (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -717,7 +727,8 @@
             "node",
             "vmid",
             "snapname",
-            "start (optional)"
+            "start (optional)",
+            "sync-time-on-resume (optional)"
           ],
           "read_only": false,
           "destructive": true
@@ -747,7 +758,8 @@
             "bwlimit (optional)",
             "force (optional)",
             "migration_type (optional)",
-            "migration_network (optional)"
+            "migration_network (optional)",
+            "with-conntrack-state (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -1196,8 +1208,8 @@
           "description": "Create a new LXC container.",
           "inputs": [
             "node",
-            "vmid (optional)",
             "ostemplate",
+            "vmid (optional)",
             "hostname (optional)",
             "memory (optional)",
             "swap (optional)",
@@ -1213,7 +1225,9 @@
             "pool (optional)",
             "storage (optional)",
             "start (optional)",
-            "description (optional)"
+            "description (optional)",
+            "entrypoint (optional)",
+            "env (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -1601,7 +1615,9 @@
             "ionice (optional)",
             "pigz (optional)",
             "remove (optional)",
-            "all (optional)"
+            "all (optional)",
+            "fleecing (optional)",
+            "pbs-change-detection-mode (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -1620,14 +1636,15 @@
             "start (optional)",
             "bwlimit (optional)",
             "pool (optional)",
-            "live-restore (optional)"
+            "live-restore (optional)",
+            "allow-identity-mismatch (optional)"
           ],
           "read_only": false,
           "destructive": true
         },
         {
           "name": "restore_container_backup",
-          "description": "Restore an LXC container from a vzdump backup, with its configuration. Optional rootfs and mp0, mp1, ... resize or move the disks; with force, an existing container is replaced.",
+          "description": "Restore an LXC container from a vzdump backup, with the backup's own configuration (network, mount points, features). By default every disk is recreated at its backed-up size on `storage`. To resize or move disks (the only way to shrink one), pass rootfs and any mount points to keep as mp0, mp1, ...: Proxmox then creates only the disks you list. With force, an existing container with this ID is replaced, disks included; Proxmox refuses if it is running or has protection set.",
           "inputs": [
             "node",
             "vmid",
@@ -1640,8 +1657,12 @@
             "bwlimit (optional)",
             "pool (optional)",
             "unprivileged (optional)",
+            "allow-identity-mismatch (optional)",
             "rootfs (optional)",
-            "mp0 ... mp255 (optional, with rootfs)"
+            "mp0 (optional)",
+            "mp1 (optional)",
+            "mp2 (optional)",
+            "mp3 (optional)"
           ],
           "read_only": false,
           "destructive": true
@@ -1693,18 +1714,32 @@
         },
         {
           "name": "set_cluster_options",
-          "description": "Set cluster-wide configuration options.",
+          "description": "Set cluster-wide options (datacenter.cfg). Structured options take Proxmox's key=value,key=value form, e.g. migration: type=secure,network=10.10.0.0/24.",
           "inputs": [
-            "keyboard (optional)",
-            "language (optional)",
-            "email_from (optional)",
-            "max_workers (optional)",
-            "migration_cidr (optional)",
-            "migration_type (optional)",
+            "migration (optional)",
+            "replication (optional)",
+            "crs (optional)",
+            "ha (optional)",
+            "fencing (optional)",
             "next-id (optional)",
-            "notify (optional)",
+            "token-policy (optional)",
+            "user-tag-access (optional)",
             "registered-tags (optional)",
             "tag-style (optional)",
+            "notify (optional)",
+            "bwlimit (optional)",
+            "max_workers (optional)",
+            "email_from (optional)",
+            "keyboard (optional)",
+            "language (optional)",
+            "console (optional)",
+            "mac_prefix (optional)",
+            "http_proxy (optional)",
+            "consent-text (optional)",
+            "webauthn (optional)",
+            "u2f (optional)",
+            "description (optional)",
+            "location (optional)",
             "delete (optional)"
           ],
           "read_only": false,
@@ -1804,6 +1839,8 @@
             "group (optional)",
             "max_restart (optional)",
             "max_relocate (optional)",
+            "failback (optional)",
+            "auto-rebalance (optional)",
             "comment (optional)"
           ],
           "read_only": false,
@@ -1818,6 +1855,8 @@
             "group (optional)",
             "max_restart (optional)",
             "max_relocate (optional)",
+            "failback (optional)",
+            "auto-rebalance (optional)",
             "comment (optional)",
             "delete (optional)",
             "digest (optional)"
@@ -1829,7 +1868,8 @@
           "name": "delete_ha_resource",
           "description": "Remove a resource from HA management.",
           "inputs": [
-            "sid"
+            "sid",
+            "purge (optional)"
           ],
           "read_only": false,
           "destructive": true
@@ -1846,6 +1886,123 @@
           "description": "Get HA manager status.",
           "inputs": [],
           "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "get_ha_manager_status",
+          "description": "Get the full HA manager state: the CRM master, each node's LRM and its mode (active, maintenance), fencing and watchdog state, and every resource's state as the manager sees it.",
+          "inputs": [],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "list_ha_rules",
+          "description": "List HA rules. Proxmox VE 9 replaces HA groups with rules: node-affinity rules keep resources on (or off) chosen nodes, resource-affinity rules keep resources together or apart.",
+          "inputs": [
+            "type (optional)",
+            "resource (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "get_ha_rule",
+          "description": "Get one HA rule.",
+          "inputs": [
+            "rule"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "create_ha_rule",
+          "description": "Create an HA rule. node-affinity: resources and nodes (node[:priority],..., higher priority preferred); strict=true limits the resources to those nodes and stops them if none is up. resource-affinity: resources (two or more) and affinity; these rules are always strict.",
+          "inputs": [
+            "rule",
+            "type",
+            "resources",
+            "nodes (optional)",
+            "affinity (optional)",
+            "strict (optional)",
+            "comment (optional)",
+            "disable (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "update_ha_rule",
+          "description": "Update an HA rule. Give its type; only the fields you pass change.",
+          "inputs": [
+            "rule",
+            "type",
+            "resources (optional)",
+            "nodes (optional)",
+            "affinity (optional)",
+            "strict (optional)",
+            "comment (optional)",
+            "disable (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "delete_ha_rule",
+          "description": "Delete an HA rule. The resources stay HA-managed, without this constraint.",
+          "inputs": [
+            "rule"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "migrate_ha_resource",
+          "description": "Live-migrate an HA-managed guest through the HA manager, which a plain migrate_vm can't do for HA guests. Returns the resources blocking the move (and the rule causing it) and any that move with it because of a positive resource-affinity rule.",
+          "inputs": [
+            "sid",
+            "node",
+            "with-conntrack-state (optional)",
+            "skip-config-check (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "relocate_ha_resource",
+          "description": "Relocate an HA-managed guest: stop it on its node and start it on the target. Use when live migration isn't possible. The guest is down in between.",
+          "inputs": [
+            "sid",
+            "node"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "set_node_maintenance",
+          "description": "Put a node into HA maintenance mode, or take it out. Enabling moves the node's HA-managed guests to other nodes (respecting HA rules) and keeps new ones off until it's disabled.",
+          "inputs": [
+            "node",
+            "maintenance-mode"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "disarm_ha",
+          "description": "Disarm the HA stack cluster-wide, releasing every watchdog, for network or corosync work. Nodes are not fenced while disarmed. freeze: HA ignores new commands and state changes; ignore: resources are left to you, outside HA. Re-arm with arm_ha.",
+          "inputs": [
+            "resource-mode"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "arm_ha",
+          "description": "Re-arm the HA stack after disarm_ha.",
+          "inputs": [],
+          "read_only": false,
           "destructive": false
         },
         {
@@ -1943,7 +2100,9 @@
             "bwlimit (optional)",
             "protected (optional)",
             "pool (optional)",
-            "comment (optional)"
+            "comment (optional)",
+            "fleecing (optional)",
+            "pbs-change-detection-mode (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -1958,6 +2117,8 @@
             "vmid (optional)",
             "enabled (optional)",
             "prune-backups (optional)",
+            "fleecing (optional)",
+            "pbs-change-detection-mode (optional)",
             "delete (optional)",
             "digest (optional)"
           ],
@@ -2064,9 +2225,10 @@
         },
         {
           "name": "wait_for_task",
-          "description": "Wait for a Proxmox task (UPID) to finish and report its outcome; returns 'running' if the timeout ends first.",
+          "description": "Wait for a Proxmox task to finish, given the UPID that clone, migrate, backup, restore, disk-move or power actions return. Returns status, exitstatus and ok; a failed task includes the end of its log. If the task is still running when the timeout ends, it returns status 'running' so you can call this again.",
           "inputs": [
-            "upid"
+            "upid",
+            "timeout (optional)"
           ],
           "read_only": true,
           "destructive": false
@@ -2194,6 +2356,7 @@
             "comment (optional)",
             "expire (optional)",
             "privsep (optional)",
+            "regenerate (optional)",
             "delete (optional)"
           ],
           "read_only": false,
@@ -2758,6 +2921,8 @@
             "tcpflags (optional)",
             "nf_conntrack_max (optional)",
             "nf_conntrack_tcp_timeout_established (optional)",
+            "nftables (optional)",
+            "log_level_forward (optional)",
             "delete (optional)",
             "digest (optional)"
           ],
@@ -3219,10 +3384,11 @@
         },
         {
           "name": "get_ceph_pool",
-          "description": "Get details of a specific Ceph pool.",
+          "description": "Get a Ceph pool's settings and status: size, min_size, PG count and autoscale, CRUSH rule and usage.",
           "inputs": [
             "node",
-            "name"
+            "name",
+            "verbose (optional)"
           ],
           "read_only": true,
           "destructive": false
@@ -3239,7 +3405,11 @@
             "pg_autoscale_mode (optional)",
             "crush_rule (optional)",
             "application (optional)",
-            "add_storages (optional)"
+            "add_storages (optional)",
+            "erasure-coding (optional)",
+            "target_size (optional)",
+            "target_size_ratio (optional)",
+            "pg_num_min (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -3384,8 +3554,8 @@
           "name": "register_acme_account",
           "description": "Register a new ACME account (Let's Encrypt).",
           "inputs": [
-            "name (optional)",
             "contact",
+            "name (optional)",
             "directory (optional)",
             "tos_url (optional)"
           ],
@@ -3858,10 +4028,10 @@
           "inputs": [
             "name",
             "server",
+            "from-address",
             "port (optional)",
             "mailto (optional)",
             "mailto-user (optional)",
-            "from-address",
             "author (optional)",
             "mode (optional)",
             "username (optional)",
@@ -3941,7 +4111,8 @@
             "invert-match (optional)",
             "comment (optional)",
             "disable (optional)",
-            "mode (optional)"
+            "mode (optional)",
+            "expression (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -3954,6 +4125,7 @@
             "target (optional)",
             "match-field (optional)",
             "match-severity (optional)",
+            "expression (optional)",
             "disable (optional)",
             "delete (optional)",
             "digest (optional)"
@@ -4073,11 +4245,11 @@
             "node",
             "names",
             "image",
+            "ssh_public_keys",
             "ip_addresses (optional)",
             "gateway (optional)",
             "nameserver (optional)",
             "searchdomain (optional)",
-            "ssh_public_keys",
             "ciuser (optional)",
             "bridge (optional)",
             "vlan (optional)",

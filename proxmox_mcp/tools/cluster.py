@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..client import ProxmoxClient
@@ -204,6 +205,7 @@ TOOLS = [
                 "max_restart": OPT_INT("Max restart attempts"),
                 "max_relocate": OPT_INT("Max relocation attempts"),
                 "failback": OPT_BOOL("Move back to the highest-priority node in its node-affinity rule when that node returns"),
+                "auto-rebalance": OPT_BOOL("Allow the HA manager to move it during automatic rebalancing"),
                 "comment": OPT_STR("Comment"),
             },
             "required": ["sid"],
@@ -221,6 +223,7 @@ TOOLS = [
                 "max_restart": OPT_INT("Max restart attempts"),
                 "max_relocate": OPT_INT("Max relocation attempts"),
                 "failback": OPT_BOOL("Move back to the highest-priority node in its node-affinity rule when that node returns"),
+                "auto-rebalance": OPT_BOOL("Allow the HA manager to move it during automatic rebalancing"),
                 "comment": OPT_STR("Comment"),
                 "delete": OPT_STR("Keys to delete"),
                 "digest": OPT_STR("Config digest"),
@@ -235,6 +238,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "sid": OPT_STR("Resource SID"),
+                "purge": OPT_BOOL("Also remove it from HA rules, deleting rules left with no other resource"),
             },
             "required": ["sid"],
         },
@@ -247,6 +251,162 @@ TOOLS = [
     {
         "name": "get_ha_status",
         "description": "Get HA manager status.",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "get_ha_manager_status",
+        "description": (
+            "Get the full HA manager state: the CRM master, each node's LRM and its mode (active, "
+            "maintenance), fencing and watchdog state, and every resource's state as the manager sees it."
+        ),
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "list_ha_rules",
+        "description": (
+            "List HA rules. Proxmox VE 9 replaces HA groups with rules: node-affinity rules keep resources "
+            "on (or off) chosen nodes, resource-affinity rules keep resources together or apart."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "type": {"type": "string", "enum": ["node-affinity", "resource-affinity"], "description": "Only this rule type"},
+                "resource": OPT_STR("Only rules that affect this resource (e.g. vm:100)"),
+            },
+        },
+    },
+    {
+        "name": "get_ha_rule",
+        "description": "Get one HA rule.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"rule": OPT_STR("Rule ID")},
+            "required": ["rule"],
+        },
+    },
+    {
+        "name": "create_ha_rule",
+        "description": (
+            "Create an HA rule. node-affinity: resources and nodes (node[:priority],..., higher priority "
+            "preferred); strict=true limits the resources to those nodes and stops them if none is up. "
+            "resource-affinity: resources (two or more) and affinity; these rules are always strict."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "rule": OPT_STR("Rule ID (letters, digits, - and _; starts with a letter)"),
+                "type": {"type": "string", "enum": ["node-affinity", "resource-affinity"], "description": "Rule type"},
+                "resources": OPT_STR("HA resources, e.g. vm:100,ct:101"),
+                "nodes": OPT_STR("node-affinity only: nodes with optional priority, e.g. pve1:2,pve2:1,pve3"),
+                "affinity": {"type": "string", "enum": ["positive", "negative"], "description": (
+                        "node-affinity: positive (default) keeps the resources on the given nodes, negative keeps them off. "
+                        "resource-affinity (required): positive keeps the resources together on one node, negative on separate nodes"
+                    )},
+                "strict": OPT_BOOL("node-affinity only: restrict the resources to the nodes (default false)"),
+                "comment": OPT_STR("Description"),
+                "disable": OPT_BOOL("Create the rule disabled"),
+            },
+            "required": ["rule", "type", "resources"],
+        },
+    },
+    {
+        "name": "update_ha_rule",
+        "description": "Update an HA rule. Give its type; only the fields you pass change.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "rule": OPT_STR("Rule ID"),
+                "type": {"type": "string", "enum": ["node-affinity", "resource-affinity"], "description": "Rule type"},
+                "resources": OPT_STR("HA resources, e.g. vm:100,ct:101"),
+                "nodes": OPT_STR("node-affinity only: nodes with optional priority"),
+                "affinity": {"type": "string", "enum": ["positive", "negative"], "description": (
+                        "node-affinity: positive (default) keeps the resources on the given nodes, negative keeps them off. "
+                        "resource-affinity (required): positive keeps the resources together on one node, negative on separate nodes"
+                    )},
+                "strict": OPT_BOOL("node-affinity only: restrict the resources to the nodes"),
+                "comment": OPT_STR("Description"),
+                "disable": OPT_BOOL("Disable or enable the rule"),
+                "delete": OPT_STR("Settings to remove, comma-separated"),
+                "digest": OPT_STR("Config digest, to refuse the change if the rule changed meanwhile"),
+            },
+            "required": ["rule", "type"],
+        },
+    },
+    {
+        "name": "delete_ha_rule",
+        "description": "Delete an HA rule. The resources stay HA-managed, without this constraint.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"rule": OPT_STR("Rule ID")},
+            "required": ["rule"],
+        },
+    },
+    {
+        "name": "migrate_ha_resource",
+        "description": (
+            "Live-migrate an HA-managed guest through the HA manager, which a plain migrate_vm can't do "
+            "for HA guests. Returns the resources blocking the move (and the rule causing it) and any that "
+            "move with it because of a positive resource-affinity rule."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "sid": OPT_STR("HA resource, e.g. vm:100 or ct:101 (a bare ID means that guest)"),
+                "node": OPT_STR("Target node"),
+                "with-conntrack-state": OPT_BOOL("VMs: carry the firewall's connection-tracking entries over"),
+                "skip-config-check": OPT_BOOL("Skip checking that the target can parse the guest's config"),
+            },
+            "required": ["sid", "node"],
+        },
+    },
+    {
+        "name": "relocate_ha_resource",
+        "description": (
+            "Relocate an HA-managed guest: stop it on its node and start it on the target. Use when live "
+            "migration isn't possible. The guest is down in between."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "sid": OPT_STR("HA resource, e.g. vm:100 or ct:101"),
+                "node": OPT_STR("Target node"),
+            },
+            "required": ["sid", "node"],
+        },
+    },
+    {
+        "name": "set_node_maintenance",
+        "description": (
+            "Put a node into HA maintenance mode, or take it out. Enabling moves the node's HA-managed "
+            "guests to other nodes (respecting HA rules) and keeps new ones off until it's disabled."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": OPT_STR("Node name"),
+                "maintenance-mode": {"type": "string", "enum": ["enable", "disable"], "description": "enable or disable"},
+            },
+            "required": ["node", "maintenance-mode"],
+        },
+    },
+    {
+        "name": "disarm_ha",
+        "description": (
+            "Disarm the HA stack cluster-wide, releasing every watchdog, for network or corosync work. "
+            "Nodes are not fenced while disarmed. freeze: HA ignores new commands and state changes; "
+            "ignore: resources are left to you, outside HA. Re-arm with arm_ha."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "resource-mode": {"type": "string", "enum": ["freeze", "ignore"], "description": "How HA treats resources while disarmed"},
+            },
+            "required": ["resource-mode"],
+        },
+    },
+    {
+        "name": "arm_ha",
+        "description": "Re-arm the HA stack after disarm_ha.",
         "inputSchema": {"type": "object", "properties": {}},
     },
     # --- Replication ---
@@ -495,6 +655,38 @@ TOOLS = [
 ]
 
 
+_SID = re.compile(r"(?:(?:vm|ct):)?\d+")
+_CONFIG_ID = re.compile(r"[A-Za-z][A-Za-z0-9_-]*")
+
+
+def _sid(args: dict[str, Any]) -> str:
+    """The HA resource ID for a path: vm:100, ct:101 or a bare guest ID."""
+    sid = str(args["sid"]).strip()
+    if not _SID.fullmatch(sid):
+        raise ValueError(f"sid must look like vm:100, ct:101 or 100, got {sid!r}")
+    return sid
+
+
+def _rule(args: dict[str, Any]) -> str:
+    rule = str(args["rule"]).strip()
+    if not _CONFIG_ID.fullmatch(rule):
+        raise ValueError(f"rule must start with a letter and use only letters, digits, - and _, got {rule!r}")
+    return rule
+
+
+def _check_rule_fields(args: dict[str, Any], creating: bool) -> None:
+    """Catch the mix-ups Proxmox would reject, with a clearer message."""
+    _rule(args)
+    if args["type"] == "resource-affinity":
+        wrong = [k for k in ("nodes", "strict") if k in args]
+        if wrong:
+            raise ValueError(f"{', '.join(wrong)} only apply to node-affinity rules")
+        if creating and "affinity" not in args:
+            raise ValueError("A resource-affinity rule needs affinity: positive (together) or negative (apart)")
+    elif creating and "nodes" not in args:
+        raise ValueError("A node-affinity rule needs nodes, e.g. pve1:2,pve2:1")
+
+
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
     if name == "get_cluster_status":
         return await client.get("/cluster/status")
@@ -550,25 +742,61 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get("/cluster/ha/resources", params or None)
 
     elif name == "get_ha_resource":
-        return await client.get(f"/cluster/ha/resources/{args['sid']}")
+        return await client.get(f"/cluster/ha/resources/{_sid(args)}")
 
     elif name == "add_ha_resource":
         data = dict(args.items())
         return await client.post("/cluster/ha/resources", data)
 
     elif name == "update_ha_resource":
-        sid = args["sid"]
         data = {k: v for k, v in args.items() if k != "sid"}
-        return await client.put(f"/cluster/ha/resources/{sid}", data)
+        return await client.put(f"/cluster/ha/resources/{_sid(args)}", data)
 
     elif name == "delete_ha_resource":
-        return await client.delete(f"/cluster/ha/resources/{args['sid']}")
+        params = {"purge": args["purge"]} if "purge" in args else None
+        return await client.delete(f"/cluster/ha/resources/{_sid(args)}", params)
 
     elif name == "list_ha_groups":
         return await client.get("/cluster/ha/groups")
 
     elif name == "get_ha_status":
         return await client.get("/cluster/ha/status/current")
+
+    elif name == "get_ha_manager_status":
+        return await client.get("/cluster/ha/status/manager_status")
+
+    elif name == "list_ha_rules":
+        params = {k: args[k] for k in ("type", "resource") if k in args}
+        return await client.get("/cluster/ha/rules", params or None)
+
+    elif name == "get_ha_rule":
+        return await client.get(f"/cluster/ha/rules/{_rule(args)}")
+
+    elif name == "create_ha_rule":
+        _check_rule_fields(args, creating=True)
+        return await client.post("/cluster/ha/rules", dict(args.items()))
+
+    elif name == "update_ha_rule":
+        _check_rule_fields(args, creating=False)
+        data = {k: v for k, v in args.items() if k != "rule"}
+        return await client.put(f"/cluster/ha/rules/{_rule(args)}", data)
+
+    elif name == "delete_ha_rule":
+        return await client.delete(f"/cluster/ha/rules/{_rule(args)}")
+
+    elif name in ("migrate_ha_resource", "relocate_ha_resource"):
+        action = "migrate" if name == "migrate_ha_resource" else "relocate"
+        data = {k: v for k, v in args.items() if k != "sid"}
+        return await client.post(f"/cluster/ha/resources/{_sid(args)}/{action}", data)
+
+    elif name == "set_node_maintenance":
+        return await client.put(f"/nodes/{args['node']}/maintenance", {"maintenance-mode": args["maintenance-mode"]})
+
+    elif name == "disarm_ha":
+        return await client.post("/cluster/ha/status/disarm-ha", {"resource-mode": args["resource-mode"]})
+
+    elif name == "arm_ha":
+        return await client.post("/cluster/ha/status/arm-ha")
 
     elif name == "list_replication_jobs":
         params = {k: args[k] for k in ("guest",) if k in args}
