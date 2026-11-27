@@ -81,6 +81,8 @@ async def test_read_only_label_matches_http_methods(tool):
     if tool.name in ("pdm_task_status", "pdm_task_log", "pdm_stop_task"):
         # Datacenter Manager's own tasks use the Backup Server UPID format, with a task ID field.
         args["upid"] = "UPID:localhost:00001234:0000ABCD:00000001:6720F0A1:aptupdate::root@pam:"
+    if tool.name == "get_node_scan":
+        args["server"] = "nas.test"  # the first scan type, nfs, needs a server
     client = RecordingClient()
     try:
         await asyncio.wait_for(HANDLERS[tool.name].handle(tool.name, args, client), 2)

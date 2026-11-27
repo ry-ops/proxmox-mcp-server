@@ -183,6 +183,12 @@ TOOLS = [
                 "storage": OPT_STR("Default storage for rootfs"),
                 "start": OPT_BOOL("Start container after creation"),
                 "description": OPT_STR("Container description"),
+                "entrypoint": OPT_STR("Command to run as init, with arguments (application containers, e.g. from an OCI image)"),
+                "env": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Runtime environment as KEY=value strings (application containers)",
+                },
             },
             "required": ["node", "ostemplate"],
         },
@@ -342,7 +348,7 @@ TOOLS = [
             "properties": {
                 "node": NODE,
                 "vmid": VMID,
-                "type": OPT_STR("Rule type: in or out"),
+                "type": OPT_STR("Rule type: in, out or forward (forward needs the nftables firewall)"),
                 "action": OPT_STR("Action: ACCEPT, DROP, or REJECT"),
                 "proto": OPT_STR("Protocol: tcp, udp, icmp, etc."),
                 "dport": OPT_STR("Destination port or range"),
@@ -476,6 +482,8 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
 
     elif name == "create_container":
         data = {k: v for k, v in args.items() if k != "node"}
+        if isinstance(data.get("env"), list):
+            data["env"] = "\0".join(data["env"])  # Proxmox takes a NUL-separated list
         return await client.post(base, data)
 
     elif name == "clone_container":
