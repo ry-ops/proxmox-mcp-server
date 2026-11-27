@@ -13,7 +13,7 @@ Getting ready for Proxmox VE 9's opt-in Linux 7.3 kernel has its own roadmap:
 2026-11-25) against the endpoints this server calls. Every API path below exists in Proxmox's published
 API schema. Items are in suggested order; effort is S (a few tools), M (a toolset area) or L.
 
-#### Fixes found while checking (done, in the next release)
+#### Fixes found while checking (shipped in v2.15.0)
 
 - **`set_cluster_options` sends keys the API doesn't have.** It offers `migration_cidr` and
   `migration_type` and passes them to `PUT /cluster/options`, which takes one `migration` property
