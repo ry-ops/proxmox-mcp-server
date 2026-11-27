@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="ROADMAP-KERNEL.md"><img src="docs/kernel.svg" width="100%" alt="In development: getting ready for Linux 7.3 on Proxmox VE 9. A nested test node moves from kernel 7.0 to the opt-in 7.3; beside it, what's on the table, what could change and what stays the same. Links to ROADMAP-KERNEL.md."></a>
+  <a href="ROADMAP-KERNEL.md"><img src="docs/kernel.svg" width="100%" alt="In development: getting ready for Linux 7.3 on Proxmox VE 9. A Proxmox server whose Proxmox VE API plate stays put while roadmap parts snap into its sockets: a version screen, a 7.0 kernel cartridge swapped for 7.3, a wrench for deploy_pve_vm, a nested PVE sled and a power cable. A heads-up note lists what could change. Links to ROADMAP-KERNEL.md."></a>
 </p>
 
 <p align="center">
