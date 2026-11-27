@@ -60,6 +60,8 @@ Proxmox VE 9 deprecates HA groups in favour of HA rules, and this server only ha
 
 #### Node updates and host (S)
 
+**Status:** built (unreleased), in the `nodes` and `cluster` toolsets; not yet run against a live node.
+
 Shared with [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md), item 1.
 
 - `GET /nodes/{node}/apt/versions`, `GET /nodes/{node}/apt/history` ("what changed before it broke?"),

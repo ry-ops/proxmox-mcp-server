@@ -28,6 +28,7 @@ _lock = threading.Lock()
 # Fields whose names don't look secret but carry secrets for these tools.
 _TOOL_SECRETS: dict[str, frozenset[str]] = {
     "upload_node_custom_cert": frozenset({"key"}),  # TLS private key
+    "set_node_subscription_key": frozenset({"key"}),  # subscription key
     "create_acme_plugin": frozenset({"data"}),  # DNS API credentials
     "update_acme_plugin": frozenset({"data"}),
     "create_webhook_endpoint": frozenset({"header"}),  # may hold Authorization headers

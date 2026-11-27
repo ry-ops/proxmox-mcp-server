@@ -1,7 +1,9 @@
-"""Node-level tools: status, config, network, DNS, time, services, syslog, journal, hardware, RRD."""
+"""Node-level tools: status, config, packages and kernels, APT repositories, subscription, network,
+DNS, time, services, syslog, journal, hardware, RRD."""
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..client import ProxmoxClient
@@ -9,6 +11,7 @@ from ..client import ProxmoxClient
 NODE = {"type": "string", "description": "Node name (e.g. pve01)"}
 OPT_INT = lambda desc: {"type": "integer", "description": desc}  # noqa: E731
 OPT_STR = lambda desc: {"type": "string", "description": desc}  # noqa: E731
+OPT_BOOL = lambda desc: {"type": "boolean", "description": desc}  # noqa: E731
 
 
 TOOLS = [
@@ -28,10 +31,13 @@ TOOLS = [
     },
     {
         "name": "get_node_config",
-        "description": "Get node configuration (wake-on-LAN MAC, etc.).",
+        "description": "Get node configuration: notes, Wake-on-LAN, on-boot delay, ballooning target, location, ACME.",
         "inputSchema": {
             "type": "object",
-            "properties": {"node": NODE},
+            "properties": {
+                "node": NODE,
+                "property": OPT_STR("Only this setting, e.g. wakeonlan or acme"),
+            },
             "required": ["node"],
         },
     },
@@ -305,6 +311,138 @@ TOOLS = [
         },
     },
     {
+        "name": "get_node_apt_versions",
+        "description": (
+            "Installed versions of the main Proxmox packages on a node, kernels included (like pveversion -v). "
+            "The proxmox-ve entry carries RunningKernel."
+        ),
+        "inputSchema": {"type": "object", "properties": {"node": NODE}, "required": ["node"]},
+    },
+    {
+        "name": "get_node_kernel",
+        "description": (
+            "Which kernel a node is running and which kernels are installed, e.g. to check whether the opt-in "
+            "7.3 kernel is installed and in use. installed_series lists the kernel series whose meta package "
+            "(proxmox-kernel-7.3) is installed. Installing a kernel or pinning one is a root-shell step "
+            "(apt, proxmox-boot-tool), not an API call."
+        ),
+        "inputSchema": {"type": "object", "properties": {"node": NODE}, "required": ["node"]},
+    },
+    {
+        "name": "get_node_apt_history",
+        "description": "Past APT transactions on a node, newest first: what was installed, upgraded or removed, and when.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "limit": OPT_INT("At most this many transactions"),
+                "package": OPT_STR("Only transactions that changed this package"),
+                "since": OPT_INT("Only transactions started at or after this Unix time"),
+                "until": OPT_INT("Only transactions started at or before this Unix time"),
+            },
+            "required": ["node"],
+        },
+    },
+    {
+        "name": "get_node_apt_repositories",
+        "description": (
+            "A node's APT repositories: each file and repository with its index, warnings (such as a "
+            "missing or duplicate Proxmox repository), and the standard repositories with their handles."
+        ),
+        "inputSchema": {"type": "object", "properties": {"node": NODE}, "required": ["node"]},
+    },
+    {
+        "name": "refresh_node_apt_index",
+        "description": "Refresh a node's package index (apt update), so get_node_apt_update lists current updates. Returns a task.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "notify": OPT_BOOL("Send a notification about new packages"),
+                "quiet": OPT_BOOL("Log output without progress indicators"),
+            },
+            "required": ["node"],
+        },
+    },
+    {
+        "name": "set_node_apt_repository",
+        "description": "Enable or disable one APT repository, named by its file path and index from get_node_apt_repositories.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "path": OPT_STR("Repository file, e.g. /etc/apt/sources.list.d/pve-enterprise.sources"),
+                "index": OPT_INT("Index of the repository within the file, from 0"),
+                "enabled": OPT_BOOL("Enable (true) or disable (false)"),
+                "digest": OPT_STR("Digest from get_node_apt_repositories, to refuse if the files changed"),
+            },
+            "required": ["node", "path", "index", "enabled"],
+        },
+    },
+    {
+        "name": "add_node_apt_repository",
+        "description": (
+            "Add a standard Proxmox repository by its handle, as listed in get_node_apt_repositories "
+            "(e.g. no-subscription, test, enterprise)."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "handle": OPT_STR("Repository handle"),
+                "digest": OPT_STR("Digest from get_node_apt_repositories"),
+            },
+            "required": ["node", "handle"],
+        },
+    },
+    {
+        "name": "set_node_subscription_key",
+        "description": "Set a node's Proxmox VE subscription key.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"node": NODE, "key": OPT_STR("Subscription key")},
+            "required": ["node", "key"],
+        },
+    },
+    {
+        "name": "refresh_node_subscription",
+        "description": "Check a node's subscription with the Proxmox server and update its status.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"node": NODE, "force": OPT_BOOL("Check now even if the cached status is still valid")},
+            "required": ["node"],
+        },
+    },
+    {
+        "name": "delete_node_subscription",
+        "description": "Remove a node's subscription key.",
+        "inputSchema": {"type": "object", "properties": {"node": NODE}, "required": ["node"]},
+    },
+    {
+        "name": "set_node_config",
+        "description": (
+            "Set node options: notes, Wake-on-LAN (wakeonlan needs the MAC set here), the delay before "
+            "on-boot guests start, the ballooning target, location and ACME domains."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "description": OPT_STR("Node notes, shown in the web interface"),
+                "wakeonlan": OPT_STR("Wake-on-LAN: mac=<MAC>[,bind-interface=<iface>][,broadcast-address=<IPv4>]"),
+                "startall-onboot-delay": OPT_INT("Seconds to wait before starting on-boot guests"),
+                "ballooning-target": OPT_INT("RAM usage target for ballooning, percent of total memory"),
+                "location": OPT_STR("Node location: latitude=<n>,longitude=<n>[,name=<name>]"),
+                "acme": OPT_STR("ACME settings: account=<name>,domains=<domain;domain>"),
+                "acmedomain0": OPT_STR("ACME domain: domain=<name>[,plugin=<plugin>][,alias=<domain>]"),
+                "delete": OPT_STR("Settings to remove, comma-separated"),
+                "digest": OPT_STR("Config digest, to refuse if the config changed meanwhile"),
+            },
+            "patternProperties": {"^acmedomain[1-5]$": {"type": "string"}},
+            "required": ["node"],
+        },
+    },
+    {
         "name": "get_node_hardware",
         "description": "List PCI devices and hardware info for a node.",
         "inputSchema": {
@@ -394,6 +532,19 @@ TOOLS = [
         },
     },
     {
+        "name": "node_suspendall",
+        "description": "Suspend all VMs on a node (to RAM), e.g. before maintenance. Give vms to suspend only some.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": NODE,
+                "vms": OPT_STR("Comma-separated VMIDs (default: all VMs on the node)"),
+                "max-workers": OPT_INT("How many to suspend at once"),
+            },
+            "required": ["node"],
+        },
+    },
+    {
         "name": "get_node_aplinfo",
         "description": "Get available LXC appliance/template info for a node.",
         "inputSchema": {
@@ -452,6 +603,32 @@ TOOLS = [
 ]
 
 
+_KERNEL_PACKAGE = re.compile(r"(?:proxmox|pve)-kernel-\d")
+_KERNEL_SERIES = re.compile(r"proxmox-kernel-(\d+\.\d+)")
+
+
+def _kernel_summary(response: Any) -> dict[str, Any]:
+    """Running kernel, installed kernel packages and series, from /apt/versions."""
+    packages = (response or {}).get("data") or []
+    installed = [p for p in packages if p.get("CurrentState", "Installed") == "Installed"]
+    running = next((p.get("RunningKernel") for p in packages if p.get("Package") == "proxmox-ve"), None)
+    series = sorted(
+        {m[1] for p in installed if (m := _KERNEL_SERIES.fullmatch(p.get("Package", "")))},
+        key=lambda s: tuple(int(x) for x in s.split(".")),
+    )
+    running_series = re.match(r"\d+\.\d+", running or "")
+    return {
+        "running_kernel": running,
+        "running_series": running_series[0] if running_series else None,
+        "installed_series": series,
+        "kernel_packages": [
+            {"package": p["Package"], "version": p.get("OldVersion") or p.get("Version")}
+            for p in installed
+            if _KERNEL_PACKAGE.match(p.get("Package", ""))
+        ],
+    }
+
+
 # Inputs each /scan/{type} endpoint takes, and the ones it requires.
 _SCAN_INPUTS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "nfs": (("server",), ("server",)),
@@ -478,7 +655,51 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/nodes/{node}/status")
 
     elif name == "get_node_config":
-        return await client.get(f"/nodes/{node}/config")
+        params = {"property": args["property"]} if "property" in args else None
+        return await client.get(f"/nodes/{node}/config", params)
+
+    elif name == "get_node_apt_versions":
+        return await client.get(f"/nodes/{node}/apt/versions")
+
+    elif name == "get_node_kernel":
+        return _kernel_summary(await client.get(f"/nodes/{node}/apt/versions"))
+
+    elif name == "get_node_apt_history":
+        params = {k: args[k] for k in ("limit", "package", "since", "until") if k in args}
+        return await client.get(f"/nodes/{node}/apt/history", params or None)
+
+    elif name == "get_node_apt_repositories":
+        return await client.get(f"/nodes/{node}/apt/repositories")
+
+    elif name == "refresh_node_apt_index":
+        data = {k: args[k] for k in ("notify", "quiet") if k in args}
+        return await client.post(f"/nodes/{node}/apt/update", data or None)
+
+    elif name == "set_node_apt_repository":
+        data = {k: args[k] for k in ("path", "index", "enabled", "digest") if k in args}
+        return await client.post(f"/nodes/{node}/apt/repositories", data)
+
+    elif name == "add_node_apt_repository":
+        data = {k: args[k] for k in ("handle", "digest") if k in args}
+        return await client.put(f"/nodes/{node}/apt/repositories", data)
+
+    elif name == "set_node_subscription_key":
+        return await client.put(f"/nodes/{node}/subscription", {"key": args["key"]})
+
+    elif name == "refresh_node_subscription":
+        data = {"force": args["force"]} if "force" in args else None
+        return await client.post(f"/nodes/{node}/subscription", data)
+
+    elif name == "delete_node_subscription":
+        return await client.delete(f"/nodes/{node}/subscription")
+
+    elif name == "set_node_config":
+        data = {k: v for k, v in args.items() if k != "node"}
+        return await client.put(f"/nodes/{node}/config", data)
+
+    elif name == "node_suspendall":
+        data = {k: args[k] for k in ("vms", "max-workers") if k in args}
+        return await client.post(f"/nodes/{node}/suspendall", data or None)
 
     elif name == "get_node_version":
         return await client.get(f"/nodes/{node}/version")

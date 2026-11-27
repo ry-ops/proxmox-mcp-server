@@ -6,6 +6,23 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- **Node updates and kernels:**
+  - `get_node_kernel` answers "is the opt-in 7.3 kernel installed, and is it the one running?" It
+    reports the running kernel and its series, the installed kernel series and the kernel packages.
+  - `get_node_apt_versions` lists the main Proxmox packages, like `pveversion -v`.
+  - `get_node_apt_history` lists past APT transactions, filtered by package and time.
+  - `get_node_apt_repositories` shows the repositories, their warnings and the standard repositories.
+  - `refresh_node_apt_index` refreshes the package index (apt update) and can wait.
+  - `set_node_apt_repository` enables or disables a repository, and `add_node_apt_repository`
+    adds a standard one.
+  - `set_node_subscription_key`, `refresh_node_subscription` and `delete_node_subscription`.
+    The audit log redacts the key.
+  - `set_node_config` sets notes, Wake-on-LAN (which `wakeonlan` needs), the on-boot delay,
+    the ballooning target, location and ACME domains. `get_node_config` takes `property`.
+  - `node_suspendall` and `bulk_suspend_guests`, which can hibernate to disk. Like the other
+    node-wide and bulk actions, they need an explicit `vms` list while any guest is protected.
+
 ## [2.16.0] - 2026-11-27
 
 ### Added
