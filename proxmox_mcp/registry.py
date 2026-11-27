@@ -73,6 +73,7 @@ WAITABLE = {
     "create_container_snapshot", "rollback_container_snapshot", "delete_container_snapshot",
     "backup_vm", "restore_vm_backup", "restore_container_backup",
     "download_url_to_storage",
+    "refresh_node_apt_index", "bulk_suspend_guests",
 } | pdm.WAITABLE
 WAIT_PROPERTY = {
     "type": "boolean",

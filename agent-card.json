@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 357 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 370 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.16.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -74,9 +74,10 @@
         },
         {
           "name": "get_node_config",
-          "description": "Get node configuration (wake-on-LAN MAC, etc.).",
+          "description": "Get node configuration: notes, Wake-on-LAN, on-boot delay, ballooning target, location, ACME.",
           "inputs": [
-            "node"
+            "node",
+            "property (optional)"
           ],
           "read_only": true,
           "destructive": false
@@ -325,6 +326,128 @@
           "destructive": false
         },
         {
+          "name": "get_node_apt_versions",
+          "description": "Installed versions of the main Proxmox packages on a node, kernels included (like pveversion -v). The proxmox-ve entry carries RunningKernel.",
+          "inputs": [
+            "node"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "get_node_kernel",
+          "description": "Which kernel a node is running and which kernels are installed, e.g. to check whether the opt-in 7.3 kernel is installed and in use. installed_series lists the kernel series whose meta package (proxmox-kernel-7.3) is installed. Installing a kernel or pinning one is a root-shell step (apt, proxmox-boot-tool), not an API call.",
+          "inputs": [
+            "node"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "get_node_apt_history",
+          "description": "Past APT transactions on a node, newest first: what was installed, upgraded or removed, and when.",
+          "inputs": [
+            "node",
+            "limit (optional)",
+            "package (optional)",
+            "since (optional)",
+            "until (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "get_node_apt_repositories",
+          "description": "A node's APT repositories: each file and repository with its index, warnings (such as a missing or duplicate Proxmox repository), and the standard repositories with their handles.",
+          "inputs": [
+            "node"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "refresh_node_apt_index",
+          "description": "Refresh a node's package index (apt update), so get_node_apt_update lists current updates. Returns a task.",
+          "inputs": [
+            "node",
+            "notify (optional)",
+            "quiet (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "set_node_apt_repository",
+          "description": "Enable or disable one APT repository, named by its file path and index from get_node_apt_repositories.",
+          "inputs": [
+            "node",
+            "path",
+            "index",
+            "enabled",
+            "digest (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "add_node_apt_repository",
+          "description": "Add a standard Proxmox repository by its handle, as listed in get_node_apt_repositories (e.g. no-subscription, test, enterprise).",
+          "inputs": [
+            "node",
+            "handle",
+            "digest (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "set_node_subscription_key",
+          "description": "Set a node's Proxmox VE subscription key.",
+          "inputs": [
+            "node",
+            "key"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "refresh_node_subscription",
+          "description": "Check a node's subscription with the Proxmox server and update its status.",
+          "inputs": [
+            "node",
+            "force (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "delete_node_subscription",
+          "description": "Remove a node's subscription key.",
+          "inputs": [
+            "node"
+          ],
+          "read_only": false,
+          "destructive": true
+        },
+        {
+          "name": "set_node_config",
+          "description": "Set node options: notes, Wake-on-LAN (wakeonlan needs the MAC set here), the delay before on-boot guests start, the ballooning target, location and ACME domains.",
+          "inputs": [
+            "node",
+            "description (optional)",
+            "wakeonlan (optional)",
+            "startall-onboot-delay (optional)",
+            "ballooning-target (optional)",
+            "location (optional)",
+            "acme (optional)",
+            "acmedomain0 (optional)",
+            "delete (optional)",
+            "digest (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
           "name": "get_node_hardware",
           "description": "List PCI devices and hardware info for a node.",
           "inputs": [
@@ -397,6 +520,17 @@
             "maxworkers (optional)",
             "vms (optional)",
             "with_local_disks (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
+        },
+        {
+          "name": "node_suspendall",
+          "description": "Suspend all VMs on a node (to RAM), e.g. before maintenance. Give vms to suspend only some.",
+          "inputs": [
+            "node",
+            "vms (optional)",
+            "max-workers (optional)"
           ],
           "read_only": false,
           "destructive": false
@@ -2153,6 +2287,18 @@
           ],
           "read_only": false,
           "destructive": true
+        },
+        {
+          "name": "bulk_suspend_guests",
+          "description": "Suspend many VMs across the cluster at once, to RAM or (to_disk) hibernated to disk. Returns a task.",
+          "inputs": [
+            "vms (optional)",
+            "to-disk (optional)",
+            "statestorage (optional)",
+            "max-workers (optional)"
+          ],
+          "read_only": false,
+          "destructive": false
         },
         {
           "name": "bulk_migrate_guests",

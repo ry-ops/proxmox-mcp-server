@@ -578,6 +578,19 @@ TOOLS = [
         },
     },
     {
+        "name": "bulk_suspend_guests",
+        "description": "Suspend many VMs across the cluster at once, to RAM or (to_disk) hibernated to disk. Returns a task.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "vms": OPT_STR("Comma-separated VMIDs (default: every guest)"),
+                "to-disk": OPT_BOOL("Hibernate to disk; the VM resumes on its next start"),
+                "statestorage": OPT_STR("Storage for the saved RAM state (with to-disk)"),
+                "max-workers": OPT_INT("How many to suspend at once"),
+            },
+        },
+    },
+    {
         "name": "bulk_migrate_guests",
         "description": "Migrate multiple VMs/containers to a target node.",
         "inputSchema": {
@@ -839,6 +852,10 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
     elif name == "bulk_start_guests":
         data = dict(args.items())
         return await client.post("/cluster/bulk-action/guest/start", data or None)
+
+    elif name == "bulk_suspend_guests":
+        data = {k: args[k] for k in ("vms", "to-disk", "statestorage", "max-workers") if k in args}
+        return await client.post("/cluster/bulk-action/guest/suspend", data or None)
 
     elif name == "bulk_shutdown_guests":
         data = {}

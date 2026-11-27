@@ -29,6 +29,8 @@ _ALL_GUESTS_BY_DEFAULT = {
     "bulk_start_guests",
     "bulk_shutdown_guests",
     "bulk_migrate_guests",
+    "node_suspendall",
+    "bulk_suspend_guests",
 }
 # Guest IDs inside volume names: vm-100-disk-0, base-9000-disk-0, subvol-101-disk-0,
 # and backups such as vzdump-qemu-100-2026_10_30-01_00_00.vma.zst.
