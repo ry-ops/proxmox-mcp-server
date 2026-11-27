@@ -7,6 +7,140 @@ Getting ready for Proxmox VE 9's opt-in Linux 7.3 kernel has its own roadmap:
 
 ## Planned
 
+### Proxmox VE 9 admin guide review
+
+**Status:** planned. From a read of the Proxmox VE Administration Guide (PVE 9.x, built
+2026-11-25) against the endpoints this server calls. Every API path below exists in Proxmox's published
+API schema. Items are in suggested order; effort is S (a few tools), M (a toolset area) or L.
+
+#### Fixes found while checking (do first)
+
+- **`set_cluster_options` sends keys the API doesn't have.** It offers `migration_cidr` and
+  `migration_type` and passes them to `PUT /cluster/options`, which takes one `migration` property
+  (`type=secure,network=<CIDR>`). Its schema also leaves out `replication`, `crs`, `ha`, `fencing`,
+  `token-policy`, `user-tag-access`, `consent-text`, `webauthn`, `u2f`, `bwlimit`, `mac_prefix`,
+  `http_proxy`, `console` and `location`, so an assistant never sets them.
+- **`get_ceph_pool` returns an index.** `GET /nodes/{node}/ceph/pool/{name}` is a directory index;
+  the pool's settings and usage are at `.../pool/{name}/status`.
+- **`get_node_scan` can't scan network storage.** It sends no `server`, `portal`, `username`,
+  `password` or `fingerprint`, so NFS, CIFS, PBS and iSCSI scans fail. Its type list names
+  `glusterfs` and `dir`, which aren't scan types, and leaves out `nvmeof`.
+- **`sdn.py` says it covers fabrics, controllers and IPAM.** It has no tools for any of them (see SDN
+  below).
+- **Options that pass through but aren't in the schemas.** Assistants fill in only what a schema lists,
+  so these go unused: `with-conntrack-state` on VM migrate, `sync-time-on-resume` on resume, start
+  and rollback, `entrypoint` and `env` on container create, `expression` on notification matchers,
+  `fleecing` and `pbs-change-detection-mode` on backup jobs, `regenerate` on token update,
+  `nftables` and the `forward` rule direction in the firewall, `failback` on HA resources,
+  `erasure-coding` on Ceph pools, and `allow-identity-mismatch` and `allow-new-uid` on restores.
+
+#### High availability (M)
+
+Proxmox VE 9 deprecates HA groups in favour of HA rules, and this server only has `list_ha_groups`.
+
+- HA rules, node affinity and resource affinity: `/cluster/ha/rules`, `/cluster/ha/rules/{rule}`.
+- Move an HA-managed guest the HA way: `POST /cluster/ha/resources/{sid}/migrate` and `/relocate`.
+  A plain `migrate_vm` on an HA guest is overridden by the HA manager.
+- Manager state (fencing, watchdog, CRM and LRM): `GET /cluster/ha/status/manager_status`.
+- Maintenance: `PUT /nodes/{node}/maintenance`, and `POST /cluster/ha/status/arm-ha` /
+  `disarm-ha` to pause HA during network or corosync work. Destructive class.
+
+#### Backups and restores (S to M)
+
+- Retention with a dry run: `GET` (preview) and `DELETE` `/nodes/{node}/storage/{storage}/prunebackups`.
+- Coverage audit: `GET /cluster/backup-info/not-backed-up` and `/cluster/backup/{id}/included_volumes`.
+- Look inside a backup before restoring: `GET /nodes/{node}/vzdump/extractconfig`.
+- Single-file restore from Proxmox Backup Server: `.../storage/{storage}/file-restore/list` and
+  `/download`. "Get me last night's /etc/nginx/nginx.conf."
+- Protect a backup or add notes: `PUT .../storage/{storage}/content/{volume}` (`protected`, `notes`).
+- Check alerts arrive: `POST /cluster/notifications/targets/{name}/test`; read and update single SMTP
+  and webhook endpoints.
+
+#### Node updates and host (S)
+
+Shared with [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md), item 1.
+
+- `GET /nodes/{node}/apt/versions`, `GET /nodes/{node}/apt/history` ("what changed before it broke?"),
+  `GET/POST/PUT /nodes/{node}/apt/repositories`, and `POST /nodes/{node}/apt/update` to refresh the index.
+- Subscription key set, refresh and remove: `PUT/POST/DELETE /nodes/{node}/subscription`.
+- Write node settings (Wake-on-LAN MAC, boot delay, ballooning target, ACME domains, notes):
+  `PUT /nodes/{node}/config`. `wakeonlan` can't work until the MAC is set.
+- Bulk suspend: `POST /nodes/{node}/suspendall` and `/cluster/bulk-action/guest/suspend`.
+
+#### Replication and cluster membership (S, reads first)
+
+- Replication run state: `GET /nodes/{node}/replication/{id}/status` and `/log`, and
+  `POST .../schedule_now` to sync before a migration. Today only the job definitions are covered.
+- Cluster membership: `GET /cluster/config/nodes`, `/cluster/config/totem`, `/cluster/config/qdevice`
+  (is the third vote alive on a two-node cluster?) and `GET /cluster/config/join`. Creating, joining
+  and removing nodes (`POST /cluster/config`, `POST /cluster/config/join`,
+  `DELETE /cluster/config/nodes/{node}`) come later, as destructive tools.
+
+#### Passthrough and CPU models (S to M)
+
+- Devices: `GET /nodes/{node}/hardware/pci`, `.../pci/{id}/mdev`, `/hardware/usb`.
+  `get_node_hardware` only reads the index today.
+- Cluster resource mappings for PCI, USB and directories (virtiofs): `/cluster/mapping/{pci,usb,dir}`.
+- Custom CPU models for mixed clusters: `/cluster/qemu/custom-cpu-models`.
+- QEMU capabilities: `GET /nodes/{node}/capabilities/qemu/cpu`, `/cpu-flags` and `/machines`, to
+  find guests pinned to machine versions that QEMU is retiring.
+
+#### Storage: SAN, NVMe over Fabrics, OCI and imports (M)
+
+- SAN and multipath health: `GET /cluster/san/status`, `/nodes/{node}/san`, and multipath entries
+  at `/cluster/multipath/wwid`.
+- NVMe over Fabrics: storage type `nvmeof`, `GET /nodes/{node}/scan/nvmeof`,
+  `/nodes/{node}/san/nvmeof` and its controllers.
+- OCI images as containers: `POST /nodes/{node}/storage/{storage}/oci-registry-pull` and
+  `GET /nodes/{node}/query-oci-repo-tags` ("run nginx as a container").
+- Import from VMware ESXi or OVA: `GET .../storage/{storage}/import-metadata`, then create the VM
+  from it. `import_vm_disk` handles single disks only.
+
+#### Ceph (S)
+
+- Safety before stopping or destroying an OSD: `GET /nodes/{node}/ceph/cmd-safety` (`ok-to-stop`).
+- OSD detail and scrub: `.../ceph/osd/{osdid}/metadata`, `/lv-info`, `POST .../scrub`.
+- CRUSH rules `GET .../ceph/rules`, first-time setup `POST .../ceph/init`, CephFS destroy, and
+  erasure-coded pools.
+
+#### SDN (M to L)
+
+The server covers zones, VNets, subnets and apply.
+
+- Controllers (EVPN, BGP, ISIS): `/cluster/sdn/controllers`. EVPN zones need one.
+- IPAM and IP mappings: `/cluster/sdn/ipams`, `.../ipams/{ipam}/status`,
+  `/cluster/sdn/vnets/{vnet}/ips` ("what address did CT 105 get?").
+- DNS plugins `/cluster/sdn/dns`; subnet update; a safe change window with `/cluster/sdn/lock`
+  and `POST /cluster/sdn/rollback`.
+- VNet firewall: `/cluster/sdn/vnets/{vnet}/firewall/rules` and `/options`.
+- Later (L): fabrics (OpenFabric, OSPF, WireGuard) under `/cluster/sdn/fabrics` with per-node
+  status, and BGP prefix lists and route maps.
+
+#### Access and firewall (S)
+
+- "Why does this token get a 403?": `GET /access/permissions?userid=&path=`.
+- Unlock a user locked out of two-factor: `PUT /access/users/{userid}/unlock-tfa`; edit a TFA entry.
+- Update rules in place at node, guest and security-group level (today only cluster rules; elsewhere
+  it's delete and re-add, which shifts positions). Edit IP set entries. Guest IP sets and aliases.
+- Realm sync job create, update and delete (`/cluster/jobs/realm-sync/{id}`).
+
+#### Guests (S)
+
+- More guest agent calls: `fstrim`, `fsfreeze-*`, `file-read`, `file-write`, `get-users`, `info`.
+- Container addresses without an agent: `GET /nodes/{node}/lxc/{vmid}/interfaces`.
+- Cross-cluster migration straight to Proxmox VE: `POST .../{qemu,lxc}/{vmid}/remote_migrate` (today
+  only through the `pdm` toolset).
+- A guarded "clear stale lock" tool (`PUT .../config` with `delete=lock`), which checks for running
+  tasks first.
+- Metrics: get and update a metric server, the `opentelemetry` type, and `GET /cluster/metrics/export`.
+
+#### Not reachable through the API
+
+These stay as documentation, not tools: `proxmox-boot-tool` (kernel pin, ESP), `apt full-upgrade`,
+corosync.conf edits and `pvecm qdevice setup`, ZFS pool and dataset administration, `pveceph install`
+and Ceph key rotation, `pve-firewall simulate`, `pct enter/exec/push/pull`, and interactive
+consoles (`termproxy`, `vncshell`), which aren't usable over MCP.
+
 ### Deploy an OS by asking: Ubuntu, Kali, Windows 11 and PDM
 
 **Status:** shipped in v2.14.0: the five tools are in the `appliances` toolset, covered by unit
