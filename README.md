@@ -1,4 +1,8 @@
 <p align="center">
+  <a href="ROADMAP-KERNEL.md"><img src="docs/kernel.svg" width="100%" alt="In development: getting ready for Linux 7.3 on Proxmox VE 9. A nested test node moves from kernel 7.0 to the opt-in 7.3; beside it, what's on the table, what could change and what stays the same. Links to ROADMAP-KERNEL.md."></a>
+</p>
+
+<p align="center">
   <img src="docs/hero.svg" width="100%" alt="You ask your assistant to clone VM 9000 to web-02 and start it; clone_vm and start_vm flow over MCP, by stdio or HTTP, through proxmox-mcp-server to the Proxmox cluster, and the new VM lights up on pve2.">
 </p>
 

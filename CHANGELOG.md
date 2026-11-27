@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `ROADMAP-KERNEL.md`: a separate roadmap for Proxmox VE 9's opt-in Linux 7.3 kernel (kernel and
+  package version reads, a nested Proxmox VE node built by `deploy_pve_vm`, and testing on 7.0 and
+  7.3), with an animated in-development banner (`docs/kernel.svg`) above the README hero.
+
 ## [2.14.0] - 2026-11-12
 
 ### Added

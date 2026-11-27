@@ -2,6 +2,9 @@
 
 Work we plan to do in an upcoming release. Items here are not scheduled yet.
 
+Getting ready for Proxmox VE 9's opt-in Linux 7.3 kernel has its own roadmap:
+[ROADMAP-KERNEL.md](ROADMAP-KERNEL.md).
+
 ## Planned
 
 ### Deploy an OS by asking: Ubuntu, Kali, Windows 11 and PDM

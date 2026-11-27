@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 370" width="960" height="370" role="img" aria-labelledby="t d">
+  <title id="t">In development: getting ready for Linux 7.3 on Proxmox VE 9</title>
+  <desc id="d">An in-development banner. A nested test node shows its running kernel as 7.0.14-pve, the default. apt install proxmox-kernel-7.3 runs, the node reboots, and get_node_status reports kernel 7.3.5-1-pve, opt-in. Beside it, three columns fill in. On the table: a kernel and package versions tool, deploy_pve_vm for a nested node, a live run of the deploy tools, and a second cluster for Datacenter Manager. Could change: ZFS disk utilization readings, a build based on kernel.org instead of Ubuntu, missing NIC firmware, and new boot-log messages. Stays the same: the Proxmox VE API, every existing tool, 7.0 as the default, and nothing on production.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e6ebf5; }
+    .muted { fill: #8b96ad; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes a1 { 0%,1.43% { opacity: 0; transform: translateY(6px); } 3.93%,40.00% { opacity: 1; transform: translateY(0); } 42.50%,100% { opacity: 0; transform: translateY(0); } } .a1 { animation: a1 14s infinite; }
+    @keyframes a2 { 0%,45.71% { opacity: 0; transform: translateY(6px); } 48.21%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a2 { animation: a2 14s infinite; }
+    @keyframes a3 { 0%,7.14% { opacity: 0; transform: translateY(6px); } 9.64%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a3 { animation: a3 14s infinite; }
+    @keyframes a4 { 0%,10.00% { width: 0; } 31.43%,95.71% { width: 264px; } 98.21%,100% { width: 0; } } .a4 { animation: a4 14s infinite; }
+    @keyframes a5 { 0%,34.29% { opacity: 0; transform: translateY(6px); } 36.79%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a5 { animation: a5 14s infinite; }
+    @keyframes a6 { 0%,48.57% { opacity: 0; transform: translateY(6px); } 51.07%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a6 { animation: a6 14s infinite; }
+    @keyframes a7 { 0%,5.71% { opacity: 0; transform: translateY(6px); } 8.21%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a7 { animation: a7 14s infinite; }
+    @keyframes a8 { 0%,8.57% { opacity: 0; transform: translateY(6px); } 11.07%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a8 { animation: a8 14s infinite; }
+    @keyframes a9 { 0%,13.57% { opacity: 0; transform: translateY(6px); } 16.07%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a9 { animation: a9 14s infinite; }
+    @keyframes a10 { 0%,18.57% { opacity: 0; transform: translateY(6px); } 21.07%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a10 { animation: a10 14s infinite; }
+    @keyframes a11 { 0%,23.57% { opacity: 0; transform: translateY(6px); } 26.07%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a11 { animation: a11 14s infinite; }
+    @keyframes a12 { 0%,37.14% { opacity: 0; transform: translateY(6px); } 39.64%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a12 { animation: a12 14s infinite; }
+    @keyframes a13 { 0%,40.00% { opacity: 0; transform: translateY(6px); } 42.50%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a13 { animation: a13 14s infinite; }
+    @keyframes a14 { 0%,45.00% { opacity: 0; transform: translateY(6px); } 47.50%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a14 { animation: a14 14s infinite; }
+    @keyframes a15 { 0%,50.00% { opacity: 0; transform: translateY(6px); } 52.50%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a15 { animation: a15 14s infinite; }
+    @keyframes a16 { 0%,55.00% { opacity: 0; transform: translateY(6px); } 57.50%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a16 { animation: a16 14s infinite; }
+    @keyframes a17 { 0%,64.29% { opacity: 0; transform: translateY(6px); } 66.79%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a17 { animation: a17 14s infinite; }
+    @keyframes a18 { 0%,67.14% { opacity: 0; transform: translateY(6px); } 69.64%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a18 { animation: a18 14s infinite; }
+    @keyframes a19 { 0%,72.14% { opacity: 0; transform: translateY(6px); } 74.64%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a19 { animation: a19 14s infinite; }
+    @keyframes a20 { 0%,77.14% { opacity: 0; transform: translateY(6px); } 79.64%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a20 { animation: a20 14s infinite; }
+    @keyframes a21 { 0%,82.14% { opacity: 0; transform: translateY(6px); } 84.64%,95.71% { opacity: 1; transform: translateY(0); } 98.21%,100% { opacity: 0; transform: translateY(0); } } .a21 { animation: a21 14s infinite; }
+    .hum { animation: hum 2.4s ease-in-out infinite; } @keyframes hum { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="960" height="370" rx="20" fill="#0f1420"/>
+  <rect x="40" y="26" width="168" height="26" rx="13" fill="#2d2410" stroke="#ffb02e"/><circle class="hum" cx="58" cy="39" r="5" fill="#ffb02e"/><text x="70" y="44" font-size="12" font-weight="800" letter-spacing=".08em" style="fill:#ffd88a">IN DEVELOPMENT</text>
+  <text x="40" y="88" font-size="28" font-weight="800">Getting ready for Linux 7.3 on Proxmox VE 9</text>
+  <text x="40" y="114" font-size="15" class="muted">Proxmox has an opt-in 7.3 kernel. Here is what we're building, testing and watching. Plans may change.</text>
+  <rect x="30" y="134" width="300" height="214" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <text x="48" y="160" font-size="11" font-weight="700" class="muted" letter-spacing=".1em">NESTED TEST NODE</text>
+  <rect x="48" y="172" width="264" height="44" rx="10" fill="#1d2536" stroke="#2c3750"/><text x="62" y="191" font-size="12" class="muted">running kernel</text>
+  <g class="a1"><text x="62" y="208" font-size="13" class="mono" style="fill:#a8e4ff">7.0.14-pve</text><text x="298" y="208" text-anchor="end" font-size="11" class="muted">default</text></g>
+  <g class="a2"><text x="62" y="208" font-size="13" class="mono" style="fill:#9ff0c4">7.3.5-1-pve</text><text x="298" y="208" text-anchor="end" font-size="11" style="fill:#9ff0c4">opt-in</text></g>
+  <g class="a3"><text x="48" y="240" font-size="11.5" class="mono" style="fill:#ffc48a">apt install proxmox-kernel-7.3</text></g>
+  <rect x="48" y="250" width="264" height="10" rx="5" fill="#232c3f"/>
+  <rect class="a4" x="48" y="250" width="264" height="10" rx="5" fill="#ff8a1f"/>
+  <g class="a5"><text x="48" y="282" font-size="11.5" class="mono" style="fill:#d9c6ff">reboot</text><text x="312" y="282" text-anchor="end" font-size="11" class="muted">into the new kernel</text></g>
+  <g class="a6"><rect x="48" y="296" width="264" height="36" rx="10" fill="#0b0f18" stroke="#3ddc84"/><text x="62" y="319" font-size="12" class="mono"><tspan style="fill:#9ff0c4">get_node_status</tspan><tspan class="muted"> kernel 7.3 ✓</tspan></text></g>
+  <rect x="346" y="134" width="584" height="214" rx="14" fill="#161d2b" stroke="#2c3750"/>
+  <g class="a7"><text x="362" y="160" font-size="11" font-weight="700" letter-spacing=".1em" style="fill:#ffc48a">ON THE TABLE</text></g>
+  <g class="a8"><rect x="362" y="174" width="176" height="32" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="374" y="194" font-size="11.5">kernel + package versions</text></g>
+  <g class="a9"><rect x="362" y="216" width="176" height="32" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="374" y="236" font-size="11.5">deploy_pve_vm (nested)</text></g>
+  <g class="a10"><rect x="362" y="258" width="176" height="32" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="374" y="278" font-size="11.5">live-run the deploy tools</text></g>
+  <g class="a11"><rect x="362" y="300" width="176" height="32" rx="8" fill="#1d2536" stroke="#ff8a1f"/><text x="374" y="320" font-size="11.5">a 2nd cluster for PDM</text></g>
+  <g class="a12"><text x="550" y="160" font-size="11" font-weight="700" letter-spacing=".1em" style="fill:#ffd88a">COULD CHANGE</text></g>
+  <g class="a13"><rect x="550" y="174" width="176" height="32" rx="8" fill="#1d2536" stroke="#ffb02e"/><text x="562" y="194" font-size="11.5">ZFS disk %util readings</text></g>
+  <g class="a14"><rect x="550" y="216" width="176" height="32" rx="8" fill="#1d2536" stroke="#ffb02e"/><text x="562" y="236" font-size="11.5">kernel.org-based build</text></g>
+  <g class="a15"><rect x="550" y="258" width="176" height="32" rx="8" fill="#1d2536" stroke="#ffb02e"/><text x="562" y="278" font-size="11.5">missing NIC firmware</text></g>
+  <g class="a16"><rect x="550" y="300" width="176" height="32" rx="8" fill="#1d2536" stroke="#ffb02e"/><text x="562" y="320" font-size="11.5">new boot-log messages</text></g>
+  <g class="a17"><text x="738" y="160" font-size="11" font-weight="700" letter-spacing=".1em" style="fill:#a8e4ff">STAYS THE SAME</text></g>
+  <g class="a18"><rect x="738" y="174" width="176" height="32" rx="8" fill="#1d2536" stroke="#3ec7ff"/><text x="750" y="194" font-size="11.5">the Proxmox VE API</text></g>
+  <g class="a19"><rect x="738" y="216" width="176" height="32" rx="8" fill="#1d2536" stroke="#3ec7ff"/><text x="750" y="236" font-size="11.5">every existing tool</text></g>
+  <g class="a20"><rect x="738" y="258" width="176" height="32" rx="8" fill="#1d2536" stroke="#3ec7ff"/><text x="750" y="278" font-size="11.5">7.0 stays the default</text></g>
+  <g class="a21"><rect x="738" y="300" width="176" height="32" rx="8" fill="#1d2536" stroke="#3ec7ff"/><text x="750" y="320" font-size="11.5">nothing on production</text></g>
+</svg>
