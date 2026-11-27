@@ -36,7 +36,7 @@ API schema. Items are in suggested order; effort is S (a few tools), M (a toolse
 
 #### High availability (M)
 
-**Status:** built (unreleased): eleven tools in the `cluster` toolset, covered by unit tests; not yet run against a live cluster.
+**Status:** shipped in v2.16.0: eleven tools in the `cluster` toolset, covered by unit tests; not yet run against a live cluster.
 
 Proxmox VE 9 deprecates HA groups in favour of HA rules, and this server only had `list_ha_groups`.
 

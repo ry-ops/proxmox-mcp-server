@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.16.0] - 2026-11-27
+
 ### Added
 - **High availability for Proxmox VE 9**, which deprecates HA groups in favour of HA rules:
   - `list_ha_rules`, `get_ha_rule`, `create_ha_rule`, `update_ha_rule` and `delete_ha_rule`.
@@ -401,6 +403,7 @@ released on its own.
 
 Initial release.
 
+[2.16.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.15.0...v2.16.0
 [2.15.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.13.1...v2.14.0
 [2.13.1]: https://github.com/ry-ops/proxmox-mcp-server/compare/v2.13.0...v2.13.1
