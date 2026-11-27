@@ -99,6 +99,9 @@ TOOLS = [
                 "vmid": VMID,
                 "skiplock": OPT_BOOL("Skip lock check"),
                 "timeout": OPT_INT("Timeout in seconds"),
+                "sync-time-on-resume": OPT_BOOL(
+                    "Override the guest agent's sync-time-on-resume setting: sync the guest clock when starting a hibernated VM"
+                ),
             },
             "required": ["node", "vmid"],
         },
@@ -184,6 +187,7 @@ TOOLS = [
                 "vmid": VMID,
                 "skiplock": OPT_BOOL("Skip lock check"),
                 "nocheck": OPT_BOOL("Skip check for lock"),
+                "sync-time-on-resume": OPT_BOOL("Override the guest agent's sync-time-on-resume setting for this call: sync the guest clock after the RAM state is restored"),
             },
             "required": ["node", "vmid"],
         },
@@ -333,6 +337,7 @@ TOOLS = [
                 "vmid": VMID,
                 "snapname": OPT_STR("Snapshot name to roll back to"),
                 "start": OPT_BOOL("Start VM after rollback"),
+                "sync-time-on-resume": OPT_BOOL("Override the guest agent's sync-time-on-resume setting for this call: sync the guest clock after the RAM state is restored"),
             },
             "required": ["node", "vmid", "snapname"],
         },
@@ -368,6 +373,9 @@ TOOLS = [
                 "force": OPT_BOOL("Allow migration even with local resources"),
                 "migration_type": OPT_STR("Migration type: secure, insecure, websocket"),
                 "migration_network": OPT_STR("CIDR of migration network"),
+                "with-conntrack-state": OPT_BOOL(
+                    "Live migration: carry the firewall's connection-tracking entries over, so established connections survive"
+                ),
             },
             "required": ["node", "vmid", "target"],
         },
@@ -475,7 +483,7 @@ TOOLS = [
             "properties": {
                 "node": NODE,
                 "vmid": VMID,
-                "type": OPT_STR("Rule type: in or out"),
+                "type": OPT_STR("Rule type: in, out or forward (forward needs the nftables firewall)"),
                 "action": OPT_STR("Action: ACCEPT, DROP, or REJECT"),
                 "proto": OPT_STR("Protocol: tcp, udp, icmp, etc."),
                 "dport": OPT_STR("Destination port or port range (e.g. 22 or 80:443)"),
@@ -757,7 +765,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{vm}/pending")
 
     elif name == "start_vm":
-        data = {k: args[k] for k in ("skiplock", "timeout") if k in args}
+        data = {k: args[k] for k in ("skiplock", "timeout", "sync-time-on-resume") if k in args}
         return await client.post(f"{vm}/status/start", data or None)
 
     elif name == "stop_vm":
@@ -781,7 +789,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.post(f"{vm}/status/suspend", data or None)
 
     elif name == "resume_vm":
-        data = {k: args[k] for k in ("skiplock", "nocheck") if k in args}
+        data = {k: args[k] for k in ("skiplock", "nocheck", "sync-time-on-resume") if k in args}
         return await client.post(f"{vm}/status/resume", data or None)
 
     elif name == "create_vm":
@@ -817,9 +825,7 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"{vm}/snapshot/{args['snapname']}/config")
 
     elif name == "rollback_vm_snapshot":
-        data = {}
-        if "start" in args:
-            data["start"] = args["start"]
+        data = {k: args[k] for k in ("start", "sync-time-on-resume") if k in args}
         return await client.post(f"{vm}/snapshot/{args['snapname']}/rollback", data or None)
 
     elif name == "delete_vm_snapshot":

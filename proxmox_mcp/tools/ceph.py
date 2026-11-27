@@ -248,12 +248,13 @@ TOOLS = [
     },
     {
         "name": "get_ceph_pool",
-        "description": "Get details of a specific Ceph pool.",
+        "description": "Get a Ceph pool's settings and status: size, min_size, PG count and autoscale, CRUSH rule and usage.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "node": NODE,
                 "name": OPT_STR("Pool name"),
+                "verbose": OPT_BOOL("Include extra detail"),
             },
             "required": ["node", "name"],
         },
@@ -273,6 +274,13 @@ TOOLS = [
                 "crush_rule": OPT_STR("CRUSH rule name"),
                 "application": OPT_STR("Pool application: rbd, cephfs, or rgw"),
                 "add_storages": OPT_BOOL("Add as Proxmox storage"),
+                "erasure-coding": OPT_STR(
+                    "Erasure-coded RBD pool, e.g. k=2,m=1 (optional failure-domain, device-class, profile). "
+                    "A replicated metadata pool is created with it; size, min_size and crush_rule apply to that one"
+                ),
+                "target_size": OPT_STR("Expected pool size for the PG autoscaler (e.g. 500G)"),
+                "target_size_ratio": {"type": "number", "description": "Expected share of the cluster's capacity for the PG autoscaler"},
+                "pg_num_min": OPT_INT("Minimum number of placement groups"),
             },
             "required": ["node", "name"],
         },
@@ -481,7 +489,9 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/nodes/{node}/ceph/pool")
 
     elif name == "get_ceph_pool":
-        return await client.get(f"/nodes/{node}/ceph/pool/{args['name']}")
+        # /pool/{name} is only a directory index; the settings and usage are under /status.
+        params = {"verbose": args["verbose"]} if "verbose" in args else None
+        return await client.get(f"/nodes/{node}/ceph/pool/{args['name']}/status", params)
 
     elif name == "create_ceph_pool":
         data = {k: v for k, v in args.items() if k != "node"}

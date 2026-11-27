@@ -413,12 +413,29 @@ TOOLS = [
     },
     {
         "name": "get_node_scan",
-        "description": "Scan for available storage, iSCSI targets, or other resources on a node.",
+        "description": (
+            "Find storage a node can use before adding it: NFS exports, SMB shares, Proxmox Backup Server "
+            "datastores, iSCSI or NVMe-oF targets, or local LVM, LVM-thin and ZFS. Inputs by type: nfs needs server; "
+            "cifs needs server (username, password, domain optional); pbs needs server, username and password "
+            "(fingerprint, port optional); iscsi and nvmeof need portal; lvmthin needs vg."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "node": NODE,
-                "type": OPT_STR("Scan type: zfs, lvm, lvmthin, iscsi, nfs, cifs, glusterfs, pbs, dir"),
+                "type": {
+                    "type": "string",
+                    "enum": ["nfs", "cifs", "pbs", "iscsi", "nvmeof", "lvm", "lvmthin", "zfs"],
+                    "description": "What to scan for",
+                },
+                "server": OPT_STR("Server name or address (nfs, cifs, pbs)"),
+                "portal": OPT_STR("Portal or discovery address, optional port (iscsi, nvmeof)"),
+                "username": OPT_STR("User name, or API token ID for pbs (cifs, pbs)"),
+                "password": OPT_STR("Password, or API token secret for pbs (cifs, pbs)"),
+                "domain": OPT_STR("SMB domain or workgroup (cifs)"),
+                "fingerprint": OPT_STR("Server certificate SHA-256 fingerprint (pbs)"),
+                "port": OPT_INT("Port (pbs)"),
+                "vg": OPT_STR("Volume group (lvmthin)"),
             },
             "required": ["node", "type"],
         },
@@ -433,6 +450,19 @@ TOOLS = [
         },
     },
 ]
+
+
+# Inputs each /scan/{type} endpoint takes, and the ones it requires.
+_SCAN_INPUTS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "nfs": (("server",), ("server",)),
+    "cifs": (("server", "username", "password", "domain"), ("server",)),
+    "pbs": (("server", "username", "password", "fingerprint", "port"), ("server", "username", "password")),
+    "iscsi": (("portal",), ("portal",)),
+    "nvmeof": (("portal",), ("portal",)),
+    "lvm": ((), ()),
+    "lvmthin": (("vg",), ("vg",)),
+    "zfs": ((), ()),
+}
 
 
 async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
@@ -582,7 +612,15 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
         return await client.get(f"/nodes/{node}/capabilities/qemu")
 
     elif name == "get_node_scan":
-        return await client.get(f"/nodes/{node}/scan/{args['type']}")
+        scan = args["type"]
+        if scan not in _SCAN_INPUTS:
+            raise ValueError(f"Unknown scan type {scan!r}: use one of {', '.join(_SCAN_INPUTS)}")
+        allowed, needed = _SCAN_INPUTS[scan]
+        missing = [k for k in needed if k not in args]
+        if missing:
+            raise ValueError(f"A {scan} scan needs {', '.join(missing)}")
+        params = {k: args[k] for k in allowed if k in args}
+        return await client.get(f"/nodes/{node}/scan/{scan}", params or None)
 
     elif name == "wakeonlan":
         return await client.post(f"/nodes/{node}/wakeonlan")

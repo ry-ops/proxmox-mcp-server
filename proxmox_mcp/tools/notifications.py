@@ -234,6 +234,10 @@ TOOLS = [
                 "comment": OPT_STR("Comment"),
                 "disable": OPT_BOOL("Disable matcher"),
                 "mode": OPT_STR("Match mode: all or any"),
+                "expression": OPT_STR(
+                    "Match expression as inline JSON. Replaces match-field, match-calendar, match-severity, "
+                    "invert-match and mode, which can all be written as sub-expressions"
+                ),
             },
             "required": ["name"],
         },
@@ -248,6 +252,10 @@ TOOLS = [
                 "target": OPT_STR("Notification targets"),
                 "match-field": OPT_STR("Field match rules"),
                 "match-severity": OPT_STR("Severity match"),
+                "expression": OPT_STR(
+                    "Match expression as inline JSON. Replaces match-field, match-calendar, match-severity, "
+                    "invert-match and mode, which can all be written as sub-expressions"
+                ),
                 "disable": OPT_BOOL("Disable"),
                 "delete": OPT_STR("Keys to delete"),
                 "digest": OPT_STR("Config digest"),

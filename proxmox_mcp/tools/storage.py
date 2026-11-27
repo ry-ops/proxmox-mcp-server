@@ -211,6 +211,8 @@ TOOLS = [
                 "pigz": OPT_INT("Use pigz for gzip compression with N cores"),
                 "remove": OPT_BOOL("Remove old backups according to prune policy"),
                 "all": OPT_BOOL("Backup all guests"),
+                "fleecing": OPT_STR("VMs only: fleecing, e.g. enabled=1,storage=local-lvm, so a slow backup target doesn't stall the guest"),
+                "pbs-change-detection-mode": OPT_STR("Containers to Proxmox Backup Server: legacy, data or metadata"),
             },
             "required": ["node"],
         },
@@ -232,6 +234,7 @@ TOOLS = [
                 "bwlimit": OPT_INT("Bandwidth limit in KB/s"),
                 "pool": OPT_STR("Resource pool"),
                 "live-restore": OPT_BOOL("Start VM immediately and restore in background"),
+                "allow-identity-mismatch": OPT_BOOL("Allow overwriting a guest with a backup of a different guest (its identity 'uid' differs); the guest keeps its own uid"),
             },
             "required": ["node", "vmid", "archive"],
         },
@@ -260,6 +263,7 @@ TOOLS = [
                 "bwlimit": OPT_INT("Bandwidth limit in KB/s"),
                 "pool": OPT_STR("Resource pool"),
                 "unprivileged": OPT_BOOL("Override the backup's unprivileged setting"),
+                "allow-identity-mismatch": OPT_BOOL("Allow overwriting a guest with a backup of a different guest (its identity 'uid' differs); the guest keeps its own uid"),
                 "rootfs": OPT_STR(
                     "Root disk instead of the backed-up one: STORAGE:SIZE_GIB[,options] "
                     "(e.g. local-lvm:16), or just a size in GiB on `storage`. Required with any mpN"

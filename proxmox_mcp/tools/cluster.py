@@ -49,20 +49,48 @@ TOOLS = [
     },
     {
         "name": "set_cluster_options",
-        "description": "Set cluster-wide configuration options.",
+        "description": (
+            "Set cluster-wide options (datacenter.cfg). Structured options take Proxmox's key=value,key=value form, "
+            "e.g. migration: type=secure,network=10.10.0.0/24."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
-                "keyboard": OPT_STR("Default keyboard layout (e.g. en-us)"),
-                "language": OPT_STR("Default language"),
+                "migration": OPT_STR("Migration settings: type=secure|insecure[,network=<CIDR>]"),
+                "replication": OPT_STR("Storage replication settings: type=secure|insecure[,network=<CIDR>]"),
+                "crs": OPT_STR(
+                    "Cluster resource scheduling: ha=basic|static|dynamic[,ha-rebalance-on-start=1]"
+                    "[,ha-auto-rebalance=1,ha-auto-rebalance-threshold=<n>,ha-auto-rebalance-margin=<n>,"
+                    "ha-auto-rebalance-method=bruteforce|topsis,ha-auto-rebalance-hold-duration=<n>]"
+                ),
+                "ha": OPT_STR("HA settings: shutdown_policy=freeze|failover|conditional|migrate"),
+                "fencing": OPT_STR("HA fencing mode: watchdog (default), hardware or both"),
+                "next-id": OPT_STR("Free-VMID range for auto-selection: lower=<n>,upper=<n>[,unique=1][,enforce=1]"),
+                "token-policy": OPT_STR(
+                    "API token policy, e.g. max-lifetime=<seconds>,require-expiry=1,require-privilege-separation=1"
+                    "[,disallow-expiry-extension=1][,default-to-max-lifetime=1][,allow-extension-on-regenerate=1]"
+                ),
+                "user-tag-access": OPT_STR("Which tags users may set: user-allow=none|list|existing|free[,user-allow-list=<a;b>]"),
+                "registered-tags": OPT_STR("Tags only Sys.Modify on / may set or delete (semicolon-separated)"),
+                "tag-style": OPT_STR(
+                    "Tag display: shape=full|circle|dense|none[,ordering=config|alphabetical][,case-sensitive=1][,color-map=<tag:hex;...>]"
+                ),
+                "notify": OPT_STR(
+                    "Notification policy: fencing=always|never, package-updates=auto|always|never, replication=always|never"
+                ),
+                "bwlimit": OPT_STR("I/O bandwidth limits in KiB/s: default=<n>,clone=<n>,migration=<n>,move=<n>,restore=<n>"),
+                "max_workers": OPT_INT("Workers per node for bulk actions and HA tasks"),
                 "email_from": OPT_STR("From address for cluster emails"),
-                "max_workers": OPT_INT("Max migration workers"),
-                "migration_cidr": OPT_STR("CIDR for migration network"),
-                "migration_type": OPT_STR("Migration type: secure or insecure"),
-                "next-id": OPT_STR("Next VM ID config (lower, upper)"),
-                "notify": OPT_STR("Notification policy"),
-                "registered-tags": OPT_STR("Allowed tags"),
-                "tag-style": OPT_STR("Tag display style"),
+                "keyboard": OPT_STR("Default keyboard layout for VNC (e.g. en-us)"),
+                "language": OPT_STR("Default web interface language"),
+                "console": OPT_STR("Default console viewer: html5, xtermjs, vv or applet"),
+                "mac_prefix": OPT_STR("Prefix for generated guest MAC addresses (default BC:24:11)"),
+                "http_proxy": OPT_STR("HTTP proxy for downloads, e.g. http://host:port/"),
+                "consent-text": OPT_STR("Text shown before login, base64-encoded"),
+                "webauthn": OPT_STR("WebAuthn settings: rp=<name>,origin=<https://host:8006>,id=<host>[,allow-subdomains=1]"),
+                "u2f": OPT_STR("U2F settings: appid=<url>,origin=<url>"),
+                "description": OPT_STR("Datacenter notes, shown in the web interface"),
+                "location": OPT_STR("Cluster location: latitude=<n>,longitude=<n>[,name=<name>]"),
                 "delete": OPT_STR("Comma-separated keys to delete"),
             },
         },
@@ -172,9 +200,10 @@ TOOLS = [
             "properties": {
                 "sid": OPT_STR("Resource SID (e.g. vm:100)"),
                 "state": OPT_STR("Desired HA state: started, stopped, enabled, disabled, ignored"),
-                "group": OPT_STR("HA group"),
+                "group": OPT_STR("HA group (deprecated in Proxmox VE 9 in favour of HA rules)"),
                 "max_restart": OPT_INT("Max restart attempts"),
                 "max_relocate": OPT_INT("Max relocation attempts"),
+                "failback": OPT_BOOL("Move back to the highest-priority node in its node-affinity rule when that node returns"),
                 "comment": OPT_STR("Comment"),
             },
             "required": ["sid"],
@@ -188,9 +217,10 @@ TOOLS = [
             "properties": {
                 "sid": OPT_STR("Resource SID"),
                 "state": OPT_STR("Desired state: started, stopped, enabled, disabled, ignored"),
-                "group": OPT_STR("HA group"),
+                "group": OPT_STR("HA group (deprecated in Proxmox VE 9 in favour of HA rules)"),
                 "max_restart": OPT_INT("Max restart attempts"),
                 "max_relocate": OPT_INT("Max relocation attempts"),
+                "failback": OPT_BOOL("Move back to the highest-priority node in its node-affinity rule when that node returns"),
                 "comment": OPT_STR("Comment"),
                 "delete": OPT_STR("Keys to delete"),
                 "digest": OPT_STR("Config digest"),
@@ -328,6 +358,8 @@ TOOLS = [
                 "protected": OPT_BOOL("Mark backups as protected"),
                 "pool": OPT_STR("Backup VMs in this pool"),
                 "comment": OPT_STR("Job comment"),
+                "fleecing": OPT_STR("VMs only: fleecing, e.g. enabled=1,storage=local-lvm, so a slow backup target doesn't stall the guest"),
+                "pbs-change-detection-mode": OPT_STR("Containers to Proxmox Backup Server: legacy, data or metadata"),
             },
         },
     },
@@ -343,6 +375,8 @@ TOOLS = [
                 "vmid": OPT_STR("VMIDs to backup"),
                 "enabled": OPT_BOOL("Enable/disable job"),
                 "prune-backups": OPT_STR("Prune policy"),
+                "fleecing": OPT_STR("VMs only: fleecing, e.g. enabled=1,storage=local-lvm"),
+                "pbs-change-detection-mode": OPT_STR("Containers to Proxmox Backup Server: legacy, data or metadata"),
                 "delete": OPT_STR("Keys to delete"),
                 "digest": OPT_STR("Config digest"),
             },
@@ -481,6 +515,12 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
 
     elif name == "set_cluster_options":
         data = dict(args.items())
+        # Earlier versions offered migration_type and migration_cidr, which aren't API options:
+        # Proxmox takes one `migration` property. Translate them for older callers.
+        legacy_type, legacy_net = data.pop("migration_type", None), data.pop("migration_cidr", None)
+        if (legacy_type or legacy_net) and "migration" not in data:
+            parts = [f"type={legacy_type or 'secure'}"] + ([f"network={legacy_net}"] if legacy_net else [])
+            data["migration"] = ",".join(parts)
         return await client.put("/cluster/options", data)
 
     elif name == "get_cluster_log":

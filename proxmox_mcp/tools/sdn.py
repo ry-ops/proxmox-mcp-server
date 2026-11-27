@@ -1,4 +1,4 @@
-"""SDN tools: zones, vnets, subnets, fabrics, controllers, IPAM."""
+"""SDN tools: zones, VNets, subnets, per-node SDN status, and applying pending changes."""
 
 from __future__ import annotations
 

@@ -25,7 +25,7 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "type": OPT_STR("in or out"),
+                "type": OPT_STR("in, out or forward (forward needs the nftables firewall)"),
                 "action": OPT_STR("ACCEPT, DROP, or REJECT"),
                 "proto": OPT_STR("Protocol: tcp, udp, icmp, etc."),
                 "dport": OPT_STR("Destination port or range"),
@@ -47,7 +47,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "pos": OPT_INT("Rule position"),
-                "type": OPT_STR("in or out"),
+                "type": OPT_STR("in, out or forward (forward needs the nftables firewall)"),
                 "action": OPT_STR("ACCEPT, DROP, or REJECT"),
                 "proto": OPT_STR("Protocol"),
                 "dport": OPT_STR("Destination port"),
@@ -144,7 +144,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "group": OPT_STR("Security group name"),
-                "type": OPT_STR("in or out"),
+                "type": OPT_STR("in, out or forward (forward needs the nftables firewall)"),
                 "action": OPT_STR("ACCEPT, DROP, or REJECT"),
                 "proto": OPT_STR("Protocol"),
                 "dport": OPT_STR("Destination port"),
@@ -303,7 +303,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "node": NODE,
-                "type": OPT_STR("in or out"),
+                "type": OPT_STR("in, out or forward (forward needs the nftables firewall)"),
                 "action": OPT_STR("ACCEPT, DROP, or REJECT"),
                 "proto": OPT_STR("Protocol"),
                 "dport": OPT_STR("Destination port"),
@@ -354,6 +354,10 @@ TOOLS = [
                 "tcpflags": OPT_BOOL("Filter illegal TCP flags"),
                 "nf_conntrack_max": OPT_INT("Max connection tracking entries"),
                 "nf_conntrack_tcp_timeout_established": OPT_INT("TCP connection tracking timeout"),
+                "nftables": OPT_BOOL(
+                    "Use the nftables-based firewall (proxmox-firewall). Restart running guests after switching"
+                ),
+                "log_level_forward": OPT_STR("Log level for forwarded traffic (emerg to debug, or nolog)"),
                 "delete": OPT_STR("Keys to delete"),
                 "digest": OPT_STR("Config digest"),
             },

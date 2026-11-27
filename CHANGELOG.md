@@ -10,6 +10,32 @@ All notable changes to this project are documented here. The format is based on
 - `ROADMAP-KERNEL.md`: a separate roadmap for Proxmox VE 9's opt-in Linux 7.3 kernel (kernel and
   package version reads, a nested Proxmox VE node built by `deploy_pve_vm`, and testing on 7.0 and
   7.3), with an animated in-development banner (`docs/kernel.svg`) above the README hero.
+- A "Proxmox VE 9 admin guide review" section in `ROADMAP.md`.
+- Options Proxmox VE 9 takes that the tool schemas didn't list. They're now listed, and the
+  handlers that picked out their own arguments pass them on:
+  - `with-conntrack-state` on `migrate_vm`;
+  - `sync-time-on-resume` on `start_vm`, `resume_vm` and `rollback_vm_snapshot`;
+  - `entrypoint` and `env` on `create_container` (`env` as a list of `KEY=value`);
+  - `expression` on notification matchers;
+  - `fleecing` and `pbs-change-detection-mode` on `backup_vm` and backup jobs;
+  - `regenerate` on `update_user_token`;
+  - `nftables` and `log_level_forward` on `set_node_firewall_options`, and the `forward` rule
+    direction;
+  - `failback` on HA resources;
+  - `erasure-coding`, `target_size`, `target_size_ratio` and `pg_num_min` on `create_ceph_pool`;
+  - `allow-identity-mismatch` on both restore tools.
+
+### Fixed
+- `set_cluster_options` offered `migration_type` and `migration_cidr`, which aren't API options.
+  It now takes `migration` (`type=secure,network=<CIDR>`) and still translates the old inputs. Its
+  schema adds the options it was missing, among them `replication`, `crs`, `ha`, `fencing`,
+  `token-policy`, `user-tag-access`, `webauthn`, `bwlimit` and `location`.
+- `get_ceph_pool` read `/ceph/pool/{name}`, which is only a directory index. It now reads the pool's
+  `/status`.
+- `get_node_scan` sent no inputs, so NFS, SMB, Backup Server and iSCSI scans couldn't work. It now
+  takes `server`, `portal`, `username`, `password`, `domain`, `fingerprint`, `port` and `vg`, adds
+  `nvmeof`, says which inputs are missing, and refuses scan types Proxmox doesn't have.
+- The `sdn` module described fabrics, controllers and IPAM, which it doesn't have.
 
 ## [2.14.0] - 2026-11-12
 

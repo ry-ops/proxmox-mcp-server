@@ -13,7 +13,7 @@ Getting ready for Proxmox VE 9's opt-in Linux 7.3 kernel has its own roadmap:
 2026-11-25) against the endpoints this server calls. Every API path below exists in Proxmox's published
 API schema. Items are in suggested order; effort is S (a few tools), M (a toolset area) or L.
 
-#### Fixes found while checking (do first)
+#### Fixes found while checking (done, in the next release)
 
 - **`set_cluster_options` sends keys the API doesn't have.** It offers `migration_cidr` and
   `migration_type` and passes them to `PUT /cluster/options`, which takes one `migration` property
@@ -32,7 +32,7 @@ API schema. Items are in suggested order; effort is S (a few tools), M (a toolse
   and rollback, `entrypoint` and `env` on container create, `expression` on notification matchers,
   `fleecing` and `pbs-change-detection-mode` on backup jobs, `regenerate` on token update,
   `nftables` and the `forward` rule direction in the firewall, `failback` on HA resources,
-  `erasure-coding` on Ceph pools, and `allow-identity-mismatch` and `allow-new-uid` on restores.
+  `erasure-coding` on Ceph pools, and `allow-identity-mismatch` on restores.
 
 #### High availability (M)
 

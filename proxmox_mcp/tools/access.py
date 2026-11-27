@@ -150,6 +150,9 @@ TOOLS = [
                 "comment": OPT_STR("Token comment"),
                 "expire": OPT_INT("Expiry as Unix timestamp"),
                 "privsep": OPT_BOOL("Token privilege separation"),
+                "regenerate": OPT_BOOL(
+                    "Replace the token's secret. The new secret is returned once; anything using the old one loses access"
+                ),
                 "delete": OPT_STR("Keys to delete"),
             },
             "required": ["userid", "tokenid"],
