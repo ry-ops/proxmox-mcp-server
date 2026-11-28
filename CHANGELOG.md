@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `get_cluster_topology` returns the cluster as one graph: hosts, physical interfaces and bonds,
+  bridges and VLAN interfaces, SDN VNets, guests with their NICs (bridge, VLAN tag, MAC, firewall,
+  link state) and disks, and storage, joined by typed edges (`member`, `port`, `bond_member`,
+  `vlan`, `nic`, `disk`, `storage`, `runs_on`). It replaces one network call per node and one
+  config call per guest, so a client can draw the lab, feed a mapping tool such as Homelable, or
+  check wiring for drift. `format: mermaid` returns a flowchart. Filters: `node`,
+  `include_stopped`, `include_storage`. Clusters without SDN or HA work too.
+
 ### Removed
 - The in-development kernel banner (`docs/kernel.svg` and its generator) above the README hero.
   [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md) stays, linked from [ROADMAP.md](ROADMAP.md).

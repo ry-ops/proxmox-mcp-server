@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp-server",
-  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 370 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
+  "description": "AI agent for managing Proxmox Virtual Environment infrastructure. Provides 371 tools covering nearly the full Proxmox VE API, plus 89 Proxmox Datacenter Manager tools for many clusters and Backup Servers through one PDM: VMs, containers, storage and backup, clustering and HA, access control, firewall, disks, Ceph, ACME certificates, SDN, notifications, resource pools and appliance deployment.",
   "version": "2.17.0",
   "url": "https://github.com/ry-ops/proxmox-mcp-server",
   "protocol": {
@@ -1819,6 +1819,18 @@
           "description": "Get all cluster resources (nodes, VMs, containers, storage, pools) with usage stats.",
           "inputs": [
             "type (optional)"
+          ],
+          "read_only": true,
+          "destructive": false
+        },
+        {
+          "name": "get_cluster_topology",
+          "description": "Get the whole cluster as one graph: hosts, interfaces, bridges and VLANs, SDN VNets, guests with NICs and disks, and storage, with typed edges; or as a Mermaid flowchart.",
+          "inputs": [
+            "node (optional)",
+            "include_stopped (optional)",
+            "include_storage (optional)",
+            "format (optional)"
           ],
           "read_only": true,
           "destructive": false
