@@ -7,6 +7,65 @@ Getting ready for Proxmox VE 9's opt-in Linux 7.3 kernel has its own roadmap:
 
 ## Planned
 
+### Live testing
+
+**Status:** planned. Four releases have shipped with unit tests only: the tests mock the Proxmox API,
+so they check what each tool sends but not what a real node does with it. This section lists what
+still needs a live run, in order. When an area passes, its status line elsewhere in this file says
+"verified live on Proxmox VE <version>", and what the run turns up ships as a patch release.
+
+**How we run it**
+
+- Reads first, then writes. Writes only touch throwaway guests, or the nested node from
+  [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md) once it exists, never a production guest or node.
+- `PROXMOX_PROTECTED_VMIDS` covers every guest that isn't a test guest, and `PROXMOX_AUDIT_LOG`
+  is on, so each run leaves a record of what it called.
+- Every change gets undone in the same run: repositories, node settings and HA rules go back to
+  how they were, and test guests are deleted.
+- Each run notes the Proxmox VE version and kernel it ran on.
+
+**1. Reads from v2.15.0 to v2.17.0 (any node)**
+
+`get_node_kernel`, `get_node_apt_versions`, `get_node_apt_history`, `get_node_apt_repositories`,
+`get_node_config` with `property`, `get_ha_manager_status`, `list_ha_rules`, `get_ha_rule`, and
+`get_node_scan` for each storage type the lab has (NFS, CIFS, PBS, iSCSI, LVM, ZFS). Check that the
+outputs match what the web UI shows, and that `get_node_kernel` reports the running kernel correctly.
+
+**2. Deploy tools from v2.14.0 (one node, throwaway guests)**
+
+`list_os_images`, then `deploy_pdm_vm` (item 2 in [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md)), then
+`deploy_ubuntu_vm`, `deploy_kali_vm` and `deploy_windows11_vm` (needs a Windows 11 ISO on
+storage). Each must end reachable, as the deploy section below defines it, and its seed ISO must be
+gone afterwards.
+
+**3. Writes from v2.15.0 and v2.17.0 (one node)**
+
+- `set_cluster_options` with `migration` (the old `migration_type` and `migration_cidr` inputs too),
+  then restore the original value.
+- `refresh_node_apt_index` with `wait`; `add_node_apt_repository` and `set_node_apt_repository`
+  (enable, then disable again); `set_node_config` (notes, Wake-on-LAN MAC), then restore.
+- Options added in v2.15.0, each on a test guest: `sync-time-on-resume`, `with-conntrack-state`,
+  container `entrypoint` and `env`, backup `fleecing` and `pbs-change-detection-mode`,
+  `allow-identity-mismatch` on restore, firewall `nftables` and `forward` rules, notification
+  matcher `expression`, and token `regenerate` on a test token.
+- `node_suspendall` and `bulk_suspend_guests` with an explicit `vms` list of test guests.
+- Subscription key set, refresh and delete only on the nested node, never on a node with a real
+  subscription.
+
+**4. HA from v2.16.0 (needs a cluster of two or more nodes)**
+
+HA rules (create, update, delete), `migrate_ha_resource` and `relocate_ha_resource` on test guests.
+`set_node_maintenance`, `disarm_ha` and `arm_ha` change how the whole cluster behaves, so they run
+only on a throwaway cluster, for example two nested nodes, not on the production cluster.
+
+**5. Needs hardware or a second cluster**
+
+- `get_ceph_pool` (now reads `.../pool/{name}/status`) and the new Ceph pool options: needs a Ceph
+  cluster. A small one on nested nodes would do.
+- PDM cross-cluster migration (`pdm_pve_remote_migrate_guest`): needs the nested node added as a
+  second remote (item 4 in [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md)).
+- The Proxmox VE 7.0 and 7.3 kernel comparison: item 4 in [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md).
+
 ### Proxmox VE 9 admin guide review
 
 **Status:** planned. From a read of the Proxmox VE Administration Guide (PVE 9.x, built
