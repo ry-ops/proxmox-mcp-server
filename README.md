@@ -1,8 +1,4 @@
 <p align="center">
-  <a href="ROADMAP-KERNEL.md"><img src="docs/kernel.svg" width="100%" alt="In development: getting ready for Linux 7.3 on Proxmox VE 9. A Proxmox server whose Proxmox VE API plate stays put while roadmap parts snap into its sockets: a version screen, a 7.0 kernel cartridge swapped for 7.3, a wrench for deploy_pve_vm, a nested PVE sled and a power cable. A heads-up note lists what could change. Links to ROADMAP-KERNEL.md."></a>
-</p>
-
-<p align="center">
   <img src="docs/hero.svg" width="100%" alt="You ask your assistant to clone VM 9000 to web-02 and start it; clone_vm and start_vm flow over MCP, by stdio or HTTP, through proxmox-mcp-server to the Proxmox cluster, and the new VM lights up on pve2.">
 </p>
 

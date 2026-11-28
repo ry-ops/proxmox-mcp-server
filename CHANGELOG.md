@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Removed
+- The in-development kernel banner (`docs/kernel.svg` and its generator) above the README hero.
+  [ROADMAP-KERNEL.md](ROADMAP-KERNEL.md) stays, linked from [ROADMAP.md](ROADMAP.md).
+
 ## [2.17.0] - 2026-11-27
 
 ### Added
