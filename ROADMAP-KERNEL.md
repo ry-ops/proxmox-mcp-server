@@ -1,9 +1,5 @@
 # Roadmap: Linux 7.3 on Proxmox VE 9
 
-<p align="center">
-  <img src="docs/kernel.svg" width="100%" alt="In development: getting ready for Linux 7.3 on Proxmox VE 9. A Proxmox server whose Proxmox VE API plate stays put while roadmap parts snap into its sockets: a version screen, a 7.0 kernel cartridge swapped for 7.3, a wrench for deploy_pve_vm, a nested PVE sled and a power cable. A heads-up note lists what could change.">
-</p>
-
 **Status: in development.** Nothing here has shipped. This is a separate direction from
 [ROADMAP.md](ROADMAP.md) and may change as we test.
 
