@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .. import topology
 from ..client import ProxmoxClient
 
 OPT_INT = lambda desc: {"type": "integer", "description": desc}  # noqa: E731
@@ -25,6 +26,30 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "type": OPT_STR("Filter by type: vm, storage, node, sdn"),
+            },
+        },
+    },
+    {
+        "name": "get_cluster_topology",
+        "description": (
+            "Get the whole cluster as one graph: hosts, physical interfaces and bonds, bridges and VLAN "
+            "interfaces, SDN VNets, guests with their NICs (bridge, VLAN tag, MAC, firewall) and disks, "
+            "and storage. Edges say how they connect (runs_on, port, vlan, nic, disk, storage). "
+            "Use it to draw the lab, feed a documentation or mapping tool, or check wiring for drift, "
+            "instead of reading each node's network and every guest's config one by one. "
+            "format=mermaid returns a Mermaid flowchart instead of JSON."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "node": OPT_STR("Only this node and its guests (default: every node)"),
+                "include_stopped": OPT_BOOL("Include stopped guests and templates (default true)"),
+                "include_storage": OPT_BOOL("Include storage and guest disks (default true)"),
+                "format": {
+                    "type": "string",
+                    "enum": ["graph", "mermaid"],
+                    "description": "graph (JSON nodes and edges, default) or mermaid",
+                },
             },
         },
     },
@@ -707,6 +732,17 @@ async def handle(name: str, args: dict[str, Any], client: ProxmoxClient) -> Any:
     elif name == "get_cluster_resources":
         params = {k: args[k] for k in ("type",) if k in args}
         return await client.get("/cluster/resources", params or None)
+
+    elif name == "get_cluster_topology":
+        graph = await topology.build_topology(
+            client,
+            node_filter=args.get("node"),
+            include_stopped=args.get("include_stopped", True),
+            include_storage=args.get("include_storage", True),
+        )
+        if args.get("format") == "mermaid":
+            return {"summary": graph["summary"], "mermaid": topology.to_mermaid(graph)}
+        return graph
 
     elif name == "get_cluster_version":
         return await client.get("/version")
