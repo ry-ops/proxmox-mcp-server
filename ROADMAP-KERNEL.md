@@ -33,6 +33,8 @@ That gives us:
 - a second Proxmox VE cluster for Datacenter Manager, which [ROADMAP.md](ROADMAP.md) needs to
   test cross-cluster migration live.
 
+The full list of what still needs a live run is in [ROADMAP.md](ROADMAP.md#live-testing).
+
 ## Planned
 
 ### 1. Kernel and package versions on a node
